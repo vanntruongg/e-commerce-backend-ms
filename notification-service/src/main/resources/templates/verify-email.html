@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Verify Email</title>
+    <style>
+        .container {
+            width: 33.3333%;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 1.25rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .heading {
+            font-size: 1.5rem;
+        }
+
+        .paragraph {
+            margin-top: 1rem;
+            margin-bottom: 0;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #6b46c1;
+            color: #fff;
+            border: 1px solid #ccc;
+            text-decoration: none;
+            padding: 8px 16px;
+        }
+
+        .button:hover {
+            background-color: #805ad5;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .footer {
+            margin-top: 1rem;
+        }
+
+        .footer p {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer p.text-sm {
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="heading">NEST Store</h2>
+
+    <div class="paragraph">
+        <p>Chào <span th:text="${name}"></span>,</p>
+        <p>Cảm ơn bạn đã đăng ký tài khoản với chúng tôi. Để hoàn tất việc đăng ký và kích hoạt tài khoản của bạn,
+            vui lòng xác nhận địa chỉ email.</p>
+    </div>
+
+        <button class="button">
+            <a th:href="${url}">Xác minh ngay</a>
+        </button>
+
+    <div class="footer">
+        <p>Chào mừng đến với NEST!</p>
+        <p class="text-sm">Nếu bạn không bắt đầu đăng ký này, vui lòng bỏ qua email này. Liên kết xác minh này sẽ hết hạn sau 24 giờ.</p>
+    </div>
+</div>
+</body>
+</html>

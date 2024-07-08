@@ -1,0 +1,24 @@
+server:
+  port: 9003
+  servlet:
+    context-path: /notification
+spring:
+  application:
+    name: notification-service
+  data:
+    mongodb:
+      uri: mongodb://root:root@localhost:27017/notification-service?authSource=admin
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    username: vantruong.ct263ctu@gmail.com
+    # https://myaccount.google.com/u/1/apppasswords
+    password: ymwuovhcpviucpjn
+    port: 587
+    protocol: smtp
+    test-connection: false
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true

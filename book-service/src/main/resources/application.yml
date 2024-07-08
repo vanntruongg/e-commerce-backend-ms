@@ -1,0 +1,10 @@
+server:
+  port: 9002
+spring:
+  application:
+    name: book-service
+  data:
+    mongodb:
+      database: book-service
+      host: localhost
+      port: 27017
