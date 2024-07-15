@@ -1,27 +1,28 @@
 package identityservice.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-@EnableWebSecurity
+import javax.crypto.spec.SecretKeySpec;
+
 @Configuration
-@EnableWebMvc
+@EnableWebSecurity
 public class SecurityConfig {
-  private final AuthEntryPointJwt authEntryPointJwt;
-  private final JwtService jwtService;
-  private final UserDetailsServiceImpl userDetailsService;
+
+  @Value("${jwt.secret}")
+  private String secret;
 
   private static final String[] PUBLIC_API_ENDPOINT = {
           "/identity/users/register",
@@ -35,34 +36,29 @@ public class SecurityConfig {
           "/internal/**"
   };
 
-  public SecurityConfig(
-          AuthEntryPointJwt authEntryPointJwt, JwtService jwtService, UserDetailsServiceImpl userDetailsService) {
-    this.authEntryPointJwt = authEntryPointJwt;
-    this.jwtService = jwtService;
-    this.userDetailsService = userDetailsService;
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+    httpSecurity.csrf(AbstractHttpConfigurer::disable);
+
+    httpSecurity.authorizeHttpRequests(request -> request
+            .requestMatchers(PUBLIC_API_ENDPOINT).permitAll()
+            .anyRequest().authenticated()
+    );
+
+    httpSecurity.oauth2ResourceServer(oauth2 ->
+            oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
+    );
+
+    return httpSecurity.build();
   }
 
   @Bean
-  public AuthFilterService authFilterService() {
-    return new AuthFilterService(jwtService, userDetailsService);
-  }
-
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.cors(Customizer.withDefaults())
-            .csrf(AbstractHttpConfigurer::disable)
-            .exceptionHandling(exception -> exception
-                    .authenticationEntryPoint(authEntryPointJwt))
-            .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(PUBLIC_API_ENDPOINT).permitAll()
-                    .anyRequest().authenticated()
-            )
-            .sessionManagement(session ->
-                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-    http.addFilterBefore(authFilterService(), UsernamePasswordAuthenticationFilter.class);
-
-    return http.build();
+  public JwtDecoder jwtDecoder() {
+    SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(), "HS512");
+    return NimbusJwtDecoder
+            .withSecretKey(secretKeySpec)
+            .macAlgorithm(MacAlgorithm.HS512)
+            .build();
   }
 
   @Bean

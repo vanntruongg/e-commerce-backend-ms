@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface UserAddressRepository extends JpaRepository<UserAddress, Integer> {
 
+  List<UserAddress> findAllByUserEmailOrderByIsDefaultDesc(String email);
   List<UserAddress> findAllByUserEmail(String email);
   Optional<UserAddress> findByUserEmailAndIsDefault(String email, boolean isDefault);
 }

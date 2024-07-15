@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +27,7 @@ public class UserAddressServiceImpl implements UserAddressService {
 
   @Override
   public List<AddressResponse> getAllAddressByUserId(String email) {
-    List<UserAddress> userAddresses = userAddressRepository.findAllByUserEmail(email);
+    List<UserAddress> userAddresses = userAddressRepository.findAllByUserEmailOrderByIsDefaultDesc(email);
     return userAddresses.stream().map(address -> modelMapper.map(address, AddressResponse.class)).collect(Collectors.toList());
   }
 
@@ -59,8 +58,8 @@ public class UserAddressServiceImpl implements UserAddressService {
     }
 
     AddressData ward = addressService.findAddressById(request.getWardId());
-    AddressData district = addressService.findAddressById(request.getWardId());
-    AddressData province = addressService.findAddressById(request.getWardId());
+    AddressData district = addressService.findAddressById(request.getDistrictId());
+    AddressData province = addressService.findAddressById(request.getProvinceId());
     UserAddress userAddress = UserAddress.builder()
             .name(request.getName())
             .phone(request.getPhone())

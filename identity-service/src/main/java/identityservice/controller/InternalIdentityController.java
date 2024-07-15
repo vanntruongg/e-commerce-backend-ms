@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static identityservice.constant.AuthApiEndpoint.AUTH;
 import static identityservice.constant.AuthApiEndpoint.IDENTITY;
 import static identityservice.constant.InternalApiEndpoint.*;
 
@@ -24,6 +23,7 @@ public class InternalIdentityController {
   @PostMapping(INTROSPECT)
   public ResponseEntity<CommonResponse<Object>> authenticate(@RequestBody IntrospectRequest request) {
     return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(identityService.introspect(request).isValid())
             .data(identityService.introspect(request))
             .build());
   }

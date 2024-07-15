@@ -22,7 +22,7 @@ public class AddressServiceImpl implements AddressService {
   private final AddressRepository addressDataRepository;
 
   public List<AddressData> getAddressDataByParentCode(String parentCode) {
-    return addressDataRepository.findAllByParentCode("null".equals(parentCode) ? null : parentCode);
+    return addressDataRepository.findAllByParentCodeOrderByName("null".equals(parentCode) ? null : parentCode);
   }
 
   @Override

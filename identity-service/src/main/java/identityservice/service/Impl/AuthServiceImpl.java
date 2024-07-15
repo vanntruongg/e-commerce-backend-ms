@@ -7,7 +7,7 @@ import identityservice.dto.request.LoginRequest;
 import identityservice.dto.request.RefreshTokenRequest;
 import identityservice.dto.request.SendMailVerifyUserRequest;
 import identityservice.dto.response.IntrospectResponse;
-import identityservice.dto.response.LoginResponse;
+import identityservice.dto.response.AuthenticationResponse;
 import identityservice.entity.Token;
 import identityservice.entity.User;
 import identityservice.enums.AccountStatus;
@@ -51,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
   MailClient mailClient;
 
   @Override
-  public LoginResponse login(LoginRequest request) {
+  public AuthenticationResponse login(LoginRequest request) {
     var authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
     );
@@ -67,9 +67,9 @@ public class AuthServiceImpl implements AuthService {
       throw new AccountUnAvailableException(ErrorCode.DENIED, MessageConstant.ACCOUNT_UNAVAILABLE, new Throwable("unAvailable"));
     }
 
-    String accessToken = jwtService.generateAccessToken(userPrincipal);
-    String refreshToken = jwtService.generateRefreshToken(userPrincipal);
-    return LoginResponse.builder()
+    String accessToken = jwtService.generateToken(userPrincipal, true);
+    String refreshToken = jwtService.generateToken(userPrincipal, false);
+    return AuthenticationResponse.builder()
             .accessToken(accessToken)
             .refreshToken(refreshToken)
             .build();
@@ -79,26 +79,27 @@ public class AuthServiceImpl implements AuthService {
   public IntrospectResponse introspect(IntrospectRequest request) {
     var token = request.getToken();
     return IntrospectResponse.builder()
-            .valid(jwtService.validateToken(token))
+            .valid(jwtService.introspect(token))
             .build();
   }
 
   @Override
-  public LoginResponse refreshToken(RefreshTokenRequest request) {
+  public AuthenticationResponse refreshToken(RefreshTokenRequest request) {
     String token = request.getRefreshToken();
 
-    if (!jwtService.validateToken(token)) {
+    if (!jwtService.introspect(token)) {
       throw new BadCredentialsException("Invalid refresh token!");
     }
     String email = jwtService.getEmailFromToken(token);
     UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(email);
 
-    String accessToken = jwtService.generateAccessToken(userDetails);
+    String accessToken = jwtService.generateToken(userDetails, true);
 
-    return LoginResponse.builder()
+    return AuthenticationResponse.builder()
             .accessToken(accessToken)
             .build();
   }
+
   @Override
   public Boolean processVerifyEmail(String tokenValue) {
     Token token = tokenService.findByTokenValue(tokenValue);
@@ -116,6 +117,7 @@ public class AuthServiceImpl implements AuthService {
     userRepository.save(user);
     return true;
   }
+
   @Override
   public Boolean requestVerifyAccount(String email) {
     Token token = Utils.generateToken(TokenType.VERIFICATION);

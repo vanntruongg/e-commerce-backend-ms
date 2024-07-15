@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface AddressRepository extends JpaRepository<AddressData, Integer> {
 
-  List<AddressData> findAllByParentCode(String parentCode);
+  List<AddressData> findAllByParentCodeOrderByName(String parentCode);
 }

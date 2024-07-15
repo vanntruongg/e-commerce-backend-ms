@@ -69,7 +69,7 @@ public class UserAddressController {
             .build());
   }
 
-  @DeleteMapping( DELETE + ID_PARAM)
+  @DeleteMapping( DELETE)
   public ResponseEntity<CommonResponse<Object>> deleteAddress(
           @RequestParam("email") String email,
           @RequestParam("addressId") Integer addressId

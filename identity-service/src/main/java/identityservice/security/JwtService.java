@@ -1,18 +1,18 @@
 package identityservice.security;
 
-import identityservice.entity.Role;
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import identityservice.entity.User;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.security.Key;
+import java.text.ParseException;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 import java.util.StringJoiner;
 
 @Service
@@ -26,13 +26,9 @@ public class JwtService {
   @Value("${jwt.expire-time-refresh-token}")
   private long expireTimeRefreshToken;
 
-  private Key getSignKey() {
-    return Keys.hmacShaKeyFor(secret.getBytes());
-  }
-
   private String buildRole(User user) {
     StringJoiner stringJoiner = new StringJoiner(" ");
-    if(!CollectionUtils.isEmpty(user.getRoles()))
+    if (!CollectionUtils.isEmpty(user.getRoles()))
       user.getRoles().forEach(role -> {
         stringJoiner.add(role.getName());
         if (!CollectionUtils.isEmpty(role.getPermissions()))
@@ -41,48 +37,58 @@ public class JwtService {
     return stringJoiner.toString();
   }
 
-  public String generateAccessToken(UserDetailsImpl userDetails) {
-    return Jwts.builder()
-            .setSubject(userDetails.getUsername())
-            .claim("email", userDetails.getUsername())
-            .claim("roles", buildRole(userDetails.getUser()))
-            .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + expireTimeAccessToken))
-            .signWith(getSignKey(), SignatureAlgorithm.HS512)
-            .compact();
-  }
+  public String generateToken(UserDetailsImpl userDetails, boolean isAccessToken) {
+    JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
-  public String generateRefreshToken(UserDetailsImpl userDetails) {
-    return Jwts.builder()
-            .setSubject(userDetails.getUsername())
-            .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + expireTimeRefreshToken))
-            .signWith(getSignKey(), SignatureAlgorithm.HS512)
-            .compact();
+    JWTClaimsSet.Builder claimsSet = new JWTClaimsSet.Builder()
+            .subject(userDetails.getUsername())
+            .issuer("vantruong.com")
+            .issueTime(new Date())
+            .expirationTime(new Date(System.currentTimeMillis() + (isAccessToken ? expireTimeAccessToken : expireTimeRefreshToken)));
+
+    if (isAccessToken) {
+      claimsSet
+              .claim("email", userDetails.getUsername())
+              .claim("roles", buildRole(userDetails.getUser()));
+    }
+
+    Payload payload = new Payload(claimsSet.build().toJSONObject());
+
+    JWSObject jwsObject = new JWSObject(header, payload);
+
+    try {
+      jwsObject.sign(new MACSigner(secret.getBytes()));
+      return jwsObject.serialize();
+    } catch (JOSEException e) {
+      log.error("Can't create token: {}", e.getMessage());
+      throw new RuntimeException(e);
+    }
   }
 
   public String getEmailFromToken(String token) {
-    return Jwts.parserBuilder()
-            .setSigningKey(getSignKey())
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .getSubject();
+    try {
+      SignedJWT signedJWT = SignedJWT.parse(token);
+      return signedJWT.getJWTClaimsSet().getSubject();
+    } catch (ParseException e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  public boolean validateToken(String token) {
+  public boolean introspect(String token) {
     try {
-      Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
-      return true;
-    } catch (MalformedJwtException ex) {
-      log.error("Invalid JWT token: {}", ex.getMessage());
-    } catch (ExpiredJwtException ex) {
-      log.error("JWT is expired: {}", ex.getMessage());
-    } catch (UnsupportedJwtException ex) {
-      log.error("JWT is unsupported: {}", ex.getMessage());
-    } catch (IllegalThreadStateException ex) {
-      log.error("JWT claims string is empty: {}", ex.getMessage());
+      JWSVerifier verifier = new MACVerifier(secret.getBytes());
+
+      SignedJWT signedJWT = SignedJWT.parse(token);
+
+      Date expireTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+      return signedJWT.verify(verifier) && expireTime.after(new Date());
+    } catch (JOSEException e) {
+      log.error("JOSEException occurred: {}", e.getMessage());
+      throw new RuntimeException("JOSEException occurred", e);
+    } catch (ParseException e) {
+      log.error("ParseException occurred: {}", e.getMessage());
+      throw new RuntimeException("ParseException occurred", e);
     }
-    return false;
   }
 }
