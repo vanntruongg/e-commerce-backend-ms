@@ -57,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
             new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
     );
     SecurityContextHolder.getContext().setAuthentication(authentication);
-    var userDetails = userDetailsService.loadUserByUsername(request.getEmail());
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
     // check if user has verified the account
     if (!userDetails.isEnabled()) {
       throw new UnVerifiedAccountException(ErrorCode.DENIED, MessageConstant.UNVERIFIED_ACCOUNT, new Throwable("unVerify"));

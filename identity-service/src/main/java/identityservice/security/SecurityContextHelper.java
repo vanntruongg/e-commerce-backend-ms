@@ -38,7 +38,7 @@ public class SecurityContextHelper {
   public Set<Role> getRoles() {
     UserDetailsImpl userDetails = getUserDetails();
     if (userDetails != null) {
-      return userDetails.getRoles();
+      return userDetails.getRole();
     }
     throw new AuthenticationException();
   }

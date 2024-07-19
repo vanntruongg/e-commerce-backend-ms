@@ -1,4 +1,4 @@
-package orderservice.entity.dto;
+package orderservice.dto;
 
 import lombok.Getter;
 

@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import orderservice.entity.Order;
 import orderservice.entity.OrderDetail;
-import orderservice.entity.dto.OrderDetailDto;
-import orderservice.entity.dto.internal.RemoveItemsCartRequest;
+import orderservice.dto.OrderDetailDto;
+import orderservice.dto.internal.RemoveItemsCartRequest;
 import orderservice.repository.OrderDetailRepository;
 import orderservice.repository.client.CartClient;
 import orderservice.repository.client.ProductClient;
@@ -32,6 +32,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
   public List<OrderDetail> createOrderDetails(Order order, List<OrderDetailDto> orderDetailDTOs) {
     List<OrderDetail> orderDetails = new ArrayList<>();
     Map<Integer, Integer> stockUpdate = new HashMap<>();
+
     orderDetailDTOs.forEach(orderDetailDto -> {
       OrderDetail orderDetail = mapOrderDetailDTOToOrderDetail(orderDetailDto);
       orderDetail.setOrder(order);
@@ -39,6 +40,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
       stockUpdate.put(orderDetailDto.getProductId(), orderDetailDto.getQuantity());
 //    call the product service to update product quantity
     });
+
     orderDetailRepository.saveAll(orderDetails);
 
     productClient.updateProductQuantity(stockUpdate);

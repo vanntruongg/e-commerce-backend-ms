@@ -8,7 +8,9 @@ import identityservice.dto.request.RegisterRequest;
 import identityservice.dto.request.ResetPasswordRequest;
 import identityservice.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import static identityservice.constant.AuthApiEndpoint.REGISTER;
@@ -19,6 +21,7 @@ import static identityservice.constant.UserApiEndpoint.*;
 @RestController
 @RequestMapping(IDENTITY + USERS)
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
   private final UserService userService;

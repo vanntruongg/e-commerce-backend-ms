@@ -2,7 +2,7 @@ package orderservice.service;
 
 import orderservice.entity.Order;
 import orderservice.entity.OrderDetail;
-import orderservice.entity.dto.OrderDetailDto;
+import orderservice.dto.OrderDetailDto;
 
 import java.util.List;
 

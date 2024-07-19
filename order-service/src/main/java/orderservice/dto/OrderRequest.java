@@ -1,6 +1,5 @@
-package orderservice.entity.dto;
+package orderservice.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +10,6 @@ import java.util.List;
 public class OrderRequest {
   private int orderId;
   private String email;
-  private String name;
-  private String phone;
   private Integer addressId;
   private float totalPrice;
   private String notes;

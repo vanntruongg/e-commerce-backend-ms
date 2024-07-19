@@ -32,7 +32,7 @@ public class InternalIdentityController {
   }
 
   @GetMapping(USER_EXISTED_BY_EMAIL)
-  public ResponseEntity<CommonResponse<Object>> existedByEmail(@RequestParam("user") String email) {
+  public ResponseEntity<CommonResponse<Object>> existedByEmail(@RequestParam("email") String email) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .data(userService.existedByEmail(email))
             .build());

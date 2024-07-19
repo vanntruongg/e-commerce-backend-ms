@@ -4,19 +4,22 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import orderservice.constant.MessageConstant;
+import orderservice.dto.UserAddress;
 import orderservice.entity.Order;
 import orderservice.entity.OrderDetail;
 import orderservice.entity.PaymentMethod;
-import orderservice.entity.dto.OrderDto;
-import orderservice.entity.dto.OrderRequest;
+import orderservice.dto.OrderDto;
+import orderservice.dto.OrderRequest;
 import orderservice.enums.OrderStatus;
 import orderservice.exception.ErrorCode;
 import orderservice.exception.NotFoundException;
 import orderservice.repository.OrderRepository;
 import orderservice.repository.client.MailClient;
+import orderservice.repository.client.UserAddressClient;
 import orderservice.service.OrderDetailService;
 import orderservice.service.OrderService;
 import orderservice.service.PaymentMethodService;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
   OrderDetailService orderDetailService;
   PaymentMethodService paymentMethodService;
   MailClient mailClient;
+  UserAddressClient userAddressClient;
   static int MONTH_IN_YEAR = 12;
 
 
@@ -51,8 +55,6 @@ public class OrderServiceImpl implements OrderService {
 
     Order newOrder = Order.builder()
             .email(orderRequest.getEmail())
-            .name(orderRequest.getName())
-            .phone(orderRequest.getPhone())
             .totalPrice(orderRequest.getTotalPrice())
             .notes(orderRequest.getNotes())
             .addressId(orderRequest.getAddressId())
@@ -61,7 +63,8 @@ public class OrderServiceImpl implements OrderService {
             .build();
     Order savedOrder = orderRepository.save(newOrder);
     List<OrderDetail> orderDetails = orderDetailService.createOrderDetails(newOrder, orderRequest.getListProduct());
-    mailClient.sendMailConfirmOrder(convertToOrderDto(savedOrder, orderDetails));
+    UserAddress userAddress = userAddressClient.getUserAddressById(savedOrder.getAddressId()).getData();
+    mailClient.sendMailConfirmOrder(convertToOrderDto(savedOrder, orderDetails, userAddress));
     return orderRequest;
   }
 
@@ -97,7 +100,8 @@ public class OrderServiceImpl implements OrderService {
   public OrderDto getOrderById(int id) {
     Order order = orderRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, "Không tìm thấy đơn hàng có mã: " + id));
     List<OrderDetail> orderDetails = orderDetailService.getAllOrderDetailByOrder(order);
-    return convertToOrderDto(order, orderDetails);
+    UserAddress userAddress = userAddressClient.getUserAddressById(order.getAddressId()).getData();
+    return convertToOrderDto(order, orderDetails, userAddress);
   }
 
   @Override
@@ -190,17 +194,16 @@ public class OrderServiceImpl implements OrderService {
   }
 
 
-  private OrderDto convertToOrderDto(Order order, List<OrderDetail> orderDetail) {
+  private OrderDto convertToOrderDto(Order order, List<OrderDetail> orderDetail, UserAddress userAddress) {
     return OrderDto.builder()
             .orderId(order.getOrderId())
             .email(order.getEmail())
-            .name(order.getName())
-            .phone(order.getPhone())
             .notes(order.getNotes())
-            .addressId(order.getAddressId())
+            .address(userAddress)
             .totalPrice(order.getTotalPrice())
             .orderStatus(order.getOrderStatus().getName())
             .paymentMethod(order.getPaymentMethod().getMethod())
+            .createdDate(order.getCreatedDate())
             .orderDetail(orderDetail)
             .build();
   }
@@ -208,7 +211,8 @@ public class OrderServiceImpl implements OrderService {
   private List<OrderDto> convertToListOrderDto(List<Order> orders) {
     return orders.stream().map(order -> {
       List<OrderDetail> orderDetail = orderDetailService.getAllOrderDetailByOrder(order);
-      return convertToOrderDto(order, orderDetail);
+      UserAddress userAddress = userAddressClient.getUserAddressById(order.getAddressId()).getData();
+      return convertToOrderDto(order, orderDetail, userAddress);
     }).toList();
   }
 }

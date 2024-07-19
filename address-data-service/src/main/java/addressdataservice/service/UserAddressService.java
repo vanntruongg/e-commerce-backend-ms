@@ -1,6 +1,7 @@
 package addressdataservice.service;
 
 import addressdataservice.dto.AddressResponse;
+import addressdataservice.dto.InternalUserAddressResponse;
 import addressdataservice.dto.UserAddressRequest;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface UserAddressService {
   Boolean setDefaultAddress(String email, Integer id);
 
   Boolean deleteAddress(String email, Integer addressId);
+
+  InternalUserAddressResponse getUserAddressById(Integer addressId);
 }

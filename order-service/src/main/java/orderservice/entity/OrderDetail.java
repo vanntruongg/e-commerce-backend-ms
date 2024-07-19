@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -36,4 +38,10 @@ public class OrderDetail extends BaseEntity {
   @JoinColumn(name = "o_id", referencedColumnName = "o_id")
   @JsonIgnore
   private Order order;
+
+  @Override
+  @JsonIgnore
+  public LocalDateTime getCreatedDate() {
+    return null;
+  }
 }

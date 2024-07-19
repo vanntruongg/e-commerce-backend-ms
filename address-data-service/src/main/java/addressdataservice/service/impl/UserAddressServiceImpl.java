@@ -2,6 +2,7 @@ package addressdataservice.service.impl;
 
 import addressdataservice.constant.MessageConstant;
 import addressdataservice.dto.AddressResponse;
+import addressdataservice.dto.InternalUserAddressResponse;
 import addressdataservice.dto.UserAddressRequest;
 import addressdataservice.entity.AddressData;
 import addressdataservice.entity.UserAddress;
@@ -131,6 +132,20 @@ public class UserAddressServiceImpl implements UserAddressService {
 
     userAddressRepository.delete(userAddress);
     return true;
+  }
+
+  @Override
+  public InternalUserAddressResponse getUserAddressById(Integer addressId) {
+    UserAddress userAddress = findById(addressId);
+    return InternalUserAddressResponse.builder()
+            .id(userAddress.getId())
+            .name(userAddress.getName())
+            .phone(userAddress.getPhone())
+            .street(userAddress.getStreet())
+            .ward(userAddress.getWard().getName())
+            .district(userAddress.getDistrict().getName())
+            .province(userAddress.getProvince().getName())
+            .build();
   }
 
 }
