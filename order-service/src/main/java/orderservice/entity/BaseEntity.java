@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity implements Serializable {
 
   @CreatedDate
-  @JsonIgnore
   @Column(name = "created_date", nullable = false, updatable = false)
   private LocalDateTime createdDate = LocalDateTime.now();
 

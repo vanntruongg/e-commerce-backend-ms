@@ -20,12 +20,6 @@ public class Order extends BaseEntity {
   @Column(name = "email")
   private String email;
 
-  @Column(name = "o_name")
-  private String name;
-
-  @Column(name = "o_phone")
-  private String phone;
-
   @Column(name = "o_notes")
   private String notes;
 

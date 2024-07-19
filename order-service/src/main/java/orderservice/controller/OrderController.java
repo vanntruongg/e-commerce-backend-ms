@@ -3,7 +3,7 @@ package orderservice.controller;
 import lombok.RequiredArgsConstructor;
 import orderservice.common.CommonResponse;
 import orderservice.constant.MessageConstant;
-import orderservice.entity.dto.OrderRequest;
+import orderservice.dto.OrderRequest;
 import orderservice.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

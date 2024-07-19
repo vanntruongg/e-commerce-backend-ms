@@ -1,7 +1,7 @@
 package orderservice.service;
 
-import orderservice.entity.dto.OrderDto;
-import orderservice.entity.dto.OrderRequest;
+import orderservice.dto.OrderDto;
+import orderservice.dto.OrderRequest;
 
 import java.util.List;
 import java.util.Map;

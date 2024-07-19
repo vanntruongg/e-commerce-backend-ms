@@ -1,4 +1,4 @@
-package orderservice.entity.dto.internal;
+package orderservice.dto.internal;
 
 import lombok.Builder;
 import lombok.Getter;
