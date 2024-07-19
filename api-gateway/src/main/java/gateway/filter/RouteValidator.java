@@ -13,6 +13,7 @@ public class RouteValidator {
 //          Identity endpoints
           "/api/v1/identity/users/register",
           "/api/v1/identity/auth/login",
+          "/api/v1/identity/auth/logout",
           "/api/v1/identity/auth/refresh-token",
           "/api/v1/identity/auth/verify-email",
           "/api/v1/identity/auth/request/verify",

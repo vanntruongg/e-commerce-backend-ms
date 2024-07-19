@@ -1,5 +1,6 @@
 package identityservice.controller;
 
+import com.nimbusds.jose.JOSEException;
 import identityservice.common.CommonResponse;
 import identityservice.dto.request.IntrospectRequest;
 import identityservice.service.AuthService;
@@ -7,6 +8,8 @@ import identityservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 
 import static identityservice.constant.AuthApiEndpoint.IDENTITY;
 import static identityservice.constant.InternalApiEndpoint.*;
@@ -21,7 +24,7 @@ public class InternalIdentityController {
   private final UserService userService;
 
   @PostMapping(INTROSPECT)
-  public ResponseEntity<CommonResponse<Object>> authenticate(@RequestBody IntrospectRequest request) {
+  public ResponseEntity<CommonResponse<Object>> authenticate(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(identityService.introspect(request).isValid())
             .data(identityService.introspect(request))

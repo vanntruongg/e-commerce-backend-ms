@@ -3,6 +3,7 @@ package identityservice.service;
 import com.nimbusds.jose.JOSEException;
 import identityservice.dto.request.IntrospectRequest;
 import identityservice.dto.request.LoginRequest;
+import identityservice.dto.request.LogoutRequest;
 import identityservice.dto.request.RefreshTokenRequest;
 import identityservice.dto.response.IntrospectResponse;
 import identityservice.dto.response.AuthenticationResponse;
@@ -19,9 +20,10 @@ public interface AuthService {
   AuthenticationResponse refreshToken(RefreshTokenRequest request);
 
 
-  Boolean logout(HttpServletRequest request, HttpServletResponse response);
 
   Boolean processVerifyEmail(String token);
   Boolean requestVerifyAccount(String email);
-  IntrospectResponse introspect(IntrospectRequest request);
+  IntrospectResponse introspect(IntrospectRequest request) throws ParseException, JOSEException;
+
+  Boolean logout(LogoutRequest request) throws ParseException, JOSEException;
 }

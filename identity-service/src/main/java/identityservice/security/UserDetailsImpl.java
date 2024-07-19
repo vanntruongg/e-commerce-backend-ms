@@ -18,7 +18,7 @@ import java.util.Set;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserDetailsImpl implements UserDetails {
+public class UserDetailsImpl extends User implements UserDetails {
   private transient User user;
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {

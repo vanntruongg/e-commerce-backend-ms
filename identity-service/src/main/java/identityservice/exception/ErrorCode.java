@@ -7,4 +7,5 @@ public class ErrorCode {
   public static final Integer DENIED = 403;
   public static final Integer EXPIRED = 101;
   public static final Integer FORM_ERROR = 420;
+  public static final Integer UNAUTHENTICATED = 401;
 }

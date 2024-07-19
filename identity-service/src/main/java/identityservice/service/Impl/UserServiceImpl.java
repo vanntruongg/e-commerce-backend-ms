@@ -23,6 +23,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,7 +117,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   public List<User> getAllUser() {
     return userRepository.findAll();
   }
@@ -124,6 +125,8 @@ public class UserServiceImpl implements UserService {
   @Override
   @PostAuthorize("returnObject.email == authentication.name")
   public User getUserByEmail(String email) {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    authentication.getAuthorities().forEach(authority -> log.info(authority.getAuthority()));
     return userRepository.findById(email).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.USER_NOT_FOUND));
   }
 
