@@ -1,28 +1,27 @@
 package identityservice.service.Impl;
 
+import com.nimbusds.jose.JOSEException;
 import identityservice.common.Utils;
 import identityservice.constant.MessageConstant;
-import identityservice.dto.request.IntrospectRequest;
-import identityservice.dto.request.LoginRequest;
-import identityservice.dto.request.RefreshTokenRequest;
-import identityservice.dto.request.SendMailVerifyUserRequest;
-import identityservice.dto.response.IntrospectResponse;
+import identityservice.dto.request.*;
 import identityservice.dto.response.AuthenticationResponse;
+import identityservice.dto.response.IntrospectResponse;
+import identityservice.entity.InvalidatedToken;
 import identityservice.entity.Token;
 import identityservice.entity.User;
 import identityservice.enums.AccountStatus;
 import identityservice.enums.TokenType;
 import identityservice.exception.*;
+import identityservice.repository.InvalidatedTokenRepository;
 import identityservice.repository.UserRepository;
 import identityservice.repository.client.MailClient;
 import identityservice.security.JwtService;
+import identityservice.security.SecurityContextHelper;
 import identityservice.security.UserDetailsImpl;
 import identityservice.security.UserDetailsServiceImpl;
 import identityservice.service.AuthService;
 import identityservice.service.TokenService;
 import identityservice.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,10 +30,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 
 @Service
@@ -44,11 +44,12 @@ import java.time.LocalDateTime;
 public class AuthServiceImpl implements AuthService {
   JwtService jwtService;
   AuthenticationManager authenticationManager;
-  UserDetailsServiceImpl userDetailsService;
   UserService userService;
+  UserDetailsServiceImpl userDetailsService;
   TokenService tokenService;
   UserRepository userRepository;
   MailClient mailClient;
+  InvalidatedTokenRepository invalidatedTokenRepository;
 
   @Override
   public AuthenticationResponse login(LoginRequest request) {
@@ -56,19 +57,18 @@ public class AuthServiceImpl implements AuthService {
             new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
     );
     SecurityContextHolder.getContext().setAuthentication(authentication);
-    UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-
+    var userDetails = userDetailsService.loadUserByUsername(request.getEmail());
     // check if user has verified the account
-    if (!userPrincipal.isEnabled()) {
+    if (!userDetails.isEnabled()) {
       throw new UnVerifiedAccountException(ErrorCode.DENIED, MessageConstant.UNVERIFIED_ACCOUNT, new Throwable("unVerify"));
     }
 
-    if (!userPrincipal.isActive()) {
+    if (!userDetails.isActive()) {
       throw new AccountUnAvailableException(ErrorCode.DENIED, MessageConstant.ACCOUNT_UNAVAILABLE, new Throwable("unAvailable"));
     }
 
-    String accessToken = jwtService.generateToken(userPrincipal, true);
-    String refreshToken = jwtService.generateToken(userPrincipal, false);
+    String accessToken = jwtService.generateToken(userDetails, true);
+    String refreshToken = jwtService.generateToken(userDetails, false);
     return AuthenticationResponse.builder()
             .accessToken(accessToken)
             .refreshToken(refreshToken)
@@ -76,10 +76,16 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public IntrospectResponse introspect(IntrospectRequest request) {
+  public IntrospectResponse introspect(IntrospectRequest request) throws ParseException, JOSEException {
     var token = request.getToken();
+    boolean isValid = true;
+    try {
+      jwtService.verifyToken(token);
+    } catch (AuthenticationException e) {
+      isValid = false;
+    }
     return IntrospectResponse.builder()
-            .valid(jwtService.introspect(token))
+            .valid(isValid)
             .build();
   }
 
@@ -87,12 +93,11 @@ public class AuthServiceImpl implements AuthService {
   public AuthenticationResponse refreshToken(RefreshTokenRequest request) {
     String token = request.getRefreshToken();
 
-    if (!jwtService.introspect(token)) {
+    if (!jwtService.validateToken(token)) {
       throw new BadCredentialsException("Invalid refresh token!");
     }
     String email = jwtService.getEmailFromToken(token);
-    UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(email);
-
+    UserDetailsImpl userDetails = userDetailsService.loadUserByUsername(email);
     String accessToken = jwtService.generateToken(userDetails, true);
 
     return AuthenticationResponse.builder()
@@ -135,24 +140,44 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public Boolean logout(HttpServletRequest request, HttpServletResponse response) {
-    var auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth == null) {
-      return false;
-    }
+  public Boolean logout(LogoutRequest request) throws ParseException, JOSEException {
+    var signToken = jwtService.verifyToken(request.getToken());
 
-    UserDetailsImpl userDetails = null;
-    if (auth instanceof UsernamePasswordAuthenticationToken) {
-      userDetails = (UserDetailsImpl) auth.getPrincipal();
-    }
+    String jwt = signToken.getJWTClaimsSet().getJWTID();
+    Date expiredTime = signToken.getJWTClaimsSet().getExpirationTime();
 
-    if (userDetails != null) {
-      new SecurityContextLogoutHandler().logout(request, response, auth);
-      SecurityContextHolder.getContext().setAuthentication(null);
-      auth.setAuthenticated(false);
-      return true;
-    }
-    return false;
+    InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+            .id(jwt)
+            .expiredTime(expiredTime)
+            .build();
+    invalidatedTokenRepository.save(invalidatedToken);
+
+    SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
+    SecurityContextHolder.getContext().setAuthentication(null);
+
+    return true;
+
+
+
   }
-
+//  @Override
+//  public Boolean logout(LogoutRequest request) {
+//    var auth = SecurityContextHolder.getContext().getAuthentication();
+//    if (auth == null) {
+//      return false;
+//    }
+//
+//    User user = null;
+//    if (auth instanceof UsernamePasswordAuthenticationToken) {
+//      user = (User) auth.getPrincipal();
+//    }
+//
+//    if (user != null) {
+//      new SecurityContextLogoutHandler().logout(request, response, auth);
+//      SecurityContextHolder.getContext().setAuthentication(null);
+//      auth.setAuthenticated(false);
+//      return true;
+//    }
+//    return false;
+//  }
 }

@@ -5,6 +5,7 @@ import identityservice.common.CommonResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -24,7 +25,16 @@ public class RestResponseEntityExceptionHandler {
             .build());
   }
 
-  @ExceptionHandler(value = {DuplicationException.class})
+  @ExceptionHandler(value = AccessDeniedException.class)
+  public ResponseEntity<CommonResponse<Object>> handleAccessDeniedException(Exception exception, WebRequest request) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(CommonResponse.builder()
+            .isSuccess(false)
+            .message("You don't have permission")
+            .errorDetails(exception.getCause() != null ? exception.getCause().getMessage() : StringUtils.EMPTY)
+            .build());
+  }
+
+  @ExceptionHandler(value = DuplicationException.class)
   public ResponseEntity<CommonResponse<Object>> duplicateException(Exception ex, WebRequest request) {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(CommonResponse.builder()
             .isSuccess(false)
@@ -33,7 +43,7 @@ public class RestResponseEntityExceptionHandler {
             .build());
   }
 
-  @ExceptionHandler(value = {UnVerifiedAccountException.class})
+  @ExceptionHandler(value = UnVerifiedAccountException.class)
   public ResponseEntity<CommonResponse<Object>> handleUnverifiedAccount(Exception ex, WebRequest request) {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(CommonResponse.builder()
             .isSuccess(false)
@@ -42,7 +52,7 @@ public class RestResponseEntityExceptionHandler {
             .build());
   }
 
-  @ExceptionHandler(value = {AccountUnAvailableException.class})
+  @ExceptionHandler(value = AccountUnAvailableException.class)
   public ResponseEntity<CommonResponse<Object>> handleAccountUnAvailable(Exception ex, WebRequest request) {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(CommonResponse.builder()
             .isSuccess(false)
@@ -52,7 +62,7 @@ public class RestResponseEntityExceptionHandler {
   }
 
 
-  @ExceptionHandler(value = {OldPasswordNotMatches.class})
+  @ExceptionHandler(value = OldPasswordNotMatches.class)
   public ResponseEntity<CommonResponse<Object>> handleOldPasswordNotMatches(Exception ex, WebRequest request) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.builder()
             .isSuccess(false)
@@ -61,7 +71,7 @@ public class RestResponseEntityExceptionHandler {
             .build());
   }
 
-  @ExceptionHandler(value = {FormException.class})
+  @ExceptionHandler(value = FormException.class)
   public ResponseEntity<CommonResponse<Object>> handleFormException(Exception ex, WebRequest request) {
     return ResponseEntity.status(ErrorCode.FORM_ERROR).body(CommonResponse.builder()
             .isSuccess(false)

@@ -1,8 +1,10 @@
 package identityservice.controller;
 
+import com.nimbusds.jose.JOSEException;
 import identityservice.common.CommonResponse;
 import identityservice.constant.MessageConstant;
 import identityservice.dto.request.LoginRequest;
+import identityservice.dto.request.LogoutRequest;
 import identityservice.dto.request.RefreshTokenRequest;
 import identityservice.dto.request.RegisterRequest;
 import identityservice.service.AuthService;
@@ -14,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 
 import static identityservice.constant.AuthApiEndpoint.*;
 import static identityservice.constant.UserApiEndpoint.REQUEST_VERIFY;
@@ -66,11 +70,13 @@ public class AuthController {
   }
 
   @PostMapping(LOGOUT)
-  public ResponseEntity<CommonResponse<Object>> logout(HttpServletRequest request, HttpServletResponse response) {
-    if (authService.logout(request, response)) {
-      return ResponseEntity.ok().body(CommonResponse.builder().isSuccess(true).message(MessageConstant.LOGOUT_SUCCESS).build());
-    } else {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(CommonResponse.builder().isSuccess(false).build());
-    }
+  public ResponseEntity<CommonResponse<Object>> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .data(authService.logout(request))
+            .message(MessageConstant.LOGOUT_SUCCESS)
+            .build());
+
   }
 }

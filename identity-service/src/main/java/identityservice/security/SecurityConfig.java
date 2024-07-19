@@ -1,5 +1,6 @@
 package identityservice.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,13 +14,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+  private final UserDetailsServiceImpl userDetailsService;
 
   @Value("${jwt.secret}")
   private String secret;
@@ -27,6 +33,7 @@ public class SecurityConfig {
   private static final String[] PUBLIC_API_ENDPOINT = {
           "/identity/users/register",
           "/identity/auth/login",
+          "/identity/auth/logout",
           "/identity/auth/verify-email",
           "/identity/auth/refresh-token",
           "/identity/auth/request/verify",
@@ -37,7 +44,7 @@ public class SecurityConfig {
   };
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+  SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
     httpSecurity.authorizeHttpRequests(request -> request
@@ -46,14 +53,28 @@ public class SecurityConfig {
     );
 
     httpSecurity.oauth2ResourceServer(oauth2 ->
-            oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
-    );
+            oauth2.jwt(jwtConfigurer ->
+                    jwtConfigurer.decoder(jwtDecoder())
+                            .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+    ).userDetailsService(userDetailsService);
 
     return httpSecurity.build();
   }
 
   @Bean
-  public JwtDecoder jwtDecoder() {
+  JwtAuthenticationConverter jwtAuthenticationConverter() {
+    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+    jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
+    JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+    jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+
+    return jwtAuthenticationConverter;
+  }
+
+
+  @Bean
+  JwtDecoder jwtDecoder() {
     SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(), "HS512");
     return NimbusJwtDecoder
             .withSecretKey(secretKeySpec)
@@ -62,12 +83,12 @@ public class SecurityConfig {
   }
 
   @Bean
-  public PasswordEncoder passwordEncoder() {
+  PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+  AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
     return configuration.getAuthenticationManager();
   }
 }
