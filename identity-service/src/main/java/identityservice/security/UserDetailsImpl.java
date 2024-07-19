@@ -9,23 +9,24 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserDetailsImpl extends User implements UserDetails {
+public class UserDetailsImpl implements UserDetails {
   private transient User user;
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     List<SimpleGrantedAuthority> simpleGrantedAuthorityList = new ArrayList<>();
-    for (Role role : user.getRoles()) {
+    if (!CollectionUtils.isEmpty(user.getRoles()))
+      user.getRoles().forEach(role -> {
       simpleGrantedAuthorityList.add(new SimpleGrantedAuthority(role.getName()));
-    }
+        if (!CollectionUtils.isEmpty(role.getPermissions()))
+          role.getPermissions().forEach(permission -> simpleGrantedAuthorityList.add(new SimpleGrantedAuthority(permission.getName())));
+    });
     return simpleGrantedAuthorityList;
   }
 

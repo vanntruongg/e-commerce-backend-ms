@@ -56,7 +56,7 @@ public class SecurityConfig {
             oauth2.jwt(jwtConfigurer ->
                     jwtConfigurer.decoder(jwtDecoder())
                             .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-    ).userDetailsService(userDetailsService);
+    );
 
     return httpSecurity.build();
   }
@@ -65,6 +65,7 @@ public class SecurityConfig {
   JwtAuthenticationConverter jwtAuthenticationConverter() {
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
     jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+    jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
 
     JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
     jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);

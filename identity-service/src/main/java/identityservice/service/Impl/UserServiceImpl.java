@@ -201,15 +201,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Boolean addAddress(String address) {
-//    String email = securityContextHelper.getUserId();
-//    User user = getUserByEmail(email);
-//    userRepository.save(user);
-    return true;
-  }
-
-  @Override
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   public Long getUserCount() {
     return userRepository.count();
   }

@@ -25,8 +25,6 @@ public interface UserService {
 
   Boolean addPhoneNumber(String phone);
 
-  Boolean addAddress(String address);
-
   Long getUserCount();
 
 

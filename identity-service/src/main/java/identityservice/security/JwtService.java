@@ -5,10 +5,8 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import identityservice.constant.MessageConstant;
 import identityservice.entity.User;
 import identityservice.exception.AuthenticationException;
-import identityservice.exception.ErrorCode;
 import identityservice.repository.InvalidatedTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -30,10 +30,6 @@ public class JwtService {
 
   @Value("${jwt.secret}")
   private String secret;
-  @Value("${jwt.expire-time-access-token}")
-  private long expireTimeAccessToken;
-  @Value("${jwt.expire-time-refresh-token}")
-  private long expireTimeRefreshToken;
 
   private String buildRole(User user) {
     StringJoiner stringJoiner = new StringJoiner(" ");
@@ -47,6 +43,9 @@ public class JwtService {
   }
 
   public String generateToken(UserDetailsImpl userDetails, boolean isAccessToken) {
+    long expireTimeAccessToken = Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli();
+    long expireTimeRefreshToken = Instant.now().plus(24, ChronoUnit.HOURS).toEpochMilli();
+
     JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
     JWTClaimsSet.Builder claimsSet = new JWTClaimsSet.Builder()
@@ -54,7 +53,7 @@ public class JwtService {
             .issuer("vantruong.com")
             .issueTime(new Date())
             .jwtID(UUID.randomUUID().toString())
-            .expirationTime(new Date(System.currentTimeMillis() + (isAccessToken ? expireTimeAccessToken : expireTimeRefreshToken)));
+            .expirationTime(new Date(isAccessToken ? expireTimeAccessToken : expireTimeRefreshToken));
 
     if (isAccessToken) {
       claimsSet
@@ -101,19 +100,19 @@ public class JwtService {
   }
 
   public SignedJWT verifyToken(String token) throws JOSEException, ParseException {
-      JWSVerifier verifier = new MACVerifier(secret.getBytes());
-      SignedJWT signedJWT = SignedJWT.parse(token);
-      Date expireTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+    JWSVerifier verifier = new MACVerifier(secret.getBytes());
+    SignedJWT signedJWT = SignedJWT.parse(token);
+    Date expireTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
-      var verified = signedJWT.verify(verifier);
+    var verified = signedJWT.verify(verifier);
 
-      if (!(verified && expireTime.after(new Date()))) {
-        throw new AuthenticationException();
-      }
+    if (!(verified && expireTime.after(new Date()))) {
+      throw new AuthenticationException();
+    }
 
-      if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
-        throw new AuthenticationException();
-      }
-      return signedJWT;
+    if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
+      throw new AuthenticationException();
+    }
+    return signedJWT;
   }
 }

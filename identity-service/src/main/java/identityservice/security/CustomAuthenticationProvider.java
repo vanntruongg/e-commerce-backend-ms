@@ -16,6 +16,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -25,28 +26,20 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class CustomAuthenticationProvider implements AuthenticationProvider {
-  private final UserService userService;
+  private final UserDetailsServiceImpl userDetailsService;
   private final PasswordEncoder passwordEncoder;
-
-  private Collection<? extends GrantedAuthority> getAuthorities(User user) {
-    List<SimpleGrantedAuthority> simpleGrantedAuthorityList = new ArrayList<>();
-    for (Role role : user.getRoles()) {
-      simpleGrantedAuthorityList.add(new SimpleGrantedAuthority(role.getName()));
-    }
-    return simpleGrantedAuthorityList;
-  }
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
     String username = authentication.getName();
     String password = authentication.getCredentials().toString();
 
-    User user = userService.findUserByEmail(username);
+    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-    if (!passwordEncoder.matches(password, user.getPassword())) {
+    if (!passwordEncoder.matches(password, userDetails.getPassword())) {
       throw new FormException(ErrorCode.FORM_ERROR, MessageConstant.PASSWORD_INCORRECT,  new Throwable("password"));
     }
-    return new UsernamePasswordAuthenticationToken(user, password, getAuthorities(user));
+    return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
   }
 
   @Override
