@@ -2,7 +2,7 @@ package addressdataservice.controller;
 
 import addressdataservice.common.CommonResponse;
 import addressdataservice.constant.MessageConstant;
-import addressdataservice.service.UserAddressService;
+import addressdataservice.service.OrderDeliveryAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,16 +14,16 @@ import static addressdataservice.constant.ApiEndpoint.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(INTERNAL + ADDRESS + USER)
-public class InternalUserAddressController {
-  private final UserAddressService userAddressService;
+@RequestMapping(INTERNAL + ADDRESS)
+public class InternalAddressController {
+  private final OrderDeliveryAddressService orderDeliveryAddressService;
 
-  @GetMapping(GET + ID_PARAM)
-  public ResponseEntity<CommonResponse<Object>> getUserAddressById(@PathVariable("id") Integer addressId) {
+  @GetMapping(ORDER + GET + ID_PARAM)
+  public ResponseEntity<CommonResponse<Object>> getOrderDeliveryAddressByAddressId(@PathVariable("id") Integer addressId) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(userAddressService.getUserAddressById(addressId))
+            .data(orderDeliveryAddressService.getDeliveryAddressById(addressId))
             .build());
   }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 public class OrderDto {
   private int orderId;
   private String email;
-  private UserAddress address;
+  private int addressId;
   private String notes;
   private double totalPrice;
   private String orderStatus;

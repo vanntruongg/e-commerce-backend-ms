@@ -14,7 +14,7 @@ public class InternalApiEndpoint {
   public static final String ADDRESS = "/address";
   public static final String USER = "/user";
   public static final String PRODUCT_SERVICE_URL = "http://localhost:9002" + INTERNAL + PRODUCT;
-  public static final String USER_ADDRESS_SERVICE_URL = "http://localhost:9006" + INTERNAL + ADDRESS + USER;
+  public static final String ADDRESS_SERVICE_URL = "http://localhost:9006" + INTERNAL + ADDRESS;
   public static final String CART_SERVICE_URL = "http://localhost:9004" + INTERNAL + CART;
   public static final String MAIL_SERVICE_URL = "http://localhost:9003" + NOTIFICATION + INTERNAL + MAIL;
   //  params
@@ -32,7 +32,6 @@ public class InternalApiEndpoint {
   public static final String CART_DELETE_ITEMS = DELETE + ITEMS;
 
   public static final String MAIL_CONFIRM_ORDER = CONFIRM + ORDER;
-  public static final String GET_ADDRESS_BY_ID = GET + ID_PARAM;
 
 
 }

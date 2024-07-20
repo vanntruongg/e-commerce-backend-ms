@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 public class ApiEndpoint {
   public static final String ADDRESS = "/address";
   public static final String INTERNAL = "/internal";
+  public static final String ORDER = "/order";
   public static final String GET = "/get";
   public static final String DATA = "/data";
   public static final String USER = "/user";

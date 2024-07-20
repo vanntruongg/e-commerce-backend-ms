@@ -1,4 +1,4 @@
-package orderservice.controller;
+package paymentservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -6,22 +6,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import orderservice.common.CommonResponse;
-import orderservice.constant.MessageConstant;
-import orderservice.service.PaymentService;
+import paymentservice.common.CommonResponse;
+import paymentservice.constant.MessageConstant;
+import paymentservice.service.PaymentService;
+import paymentservice.constant.ApiEndpoint;
 
 import java.io.UnsupportedEncodingException;
 
-import static orderservice.constant.ApiEndpoint.GET_URL_PAYMENT;
-import static orderservice.constant.ApiEndpoint.ORDER;
-
 @RestController
-@RequestMapping(ORDER)
+@RequestMapping(ApiEndpoint.PAYMENT)
 @RequiredArgsConstructor
 public class PaymentController {
   private final PaymentService paymentService;
 
-  @GetMapping(GET_URL_PAYMENT)
+  @GetMapping(ApiEndpoint.GET_URL_PAYMENT)
   public ResponseEntity<CommonResponse<Object>> getOrderPayment(@RequestParam("amount") long amount) throws UnsupportedEncodingException {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)

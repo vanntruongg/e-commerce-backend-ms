@@ -45,7 +45,7 @@ public class UserAddressServiceImpl implements UserAddressService {
 
   @Override
   @Transactional
-  public Boolean createUserAddress(UserAddressRequest request) {
+  public AddressResponse createUserAddress(UserAddressRequest request) {
 //    check and set default address if it's first address
     List<UserAddress> userAddresses = userAddressRepository.findAllByUserEmail(request.getUserEmail());
     Boolean isDefault = userAddresses.isEmpty() || request.getIsDefault();
@@ -72,10 +72,11 @@ public class UserAddressServiceImpl implements UserAddressService {
             .userEmail(request.getUserEmail())
             .build();
     userAddressRepository.save(userAddress);
-    return true;
+    return modelMapper.map(userAddress, AddressResponse.class);
   }
 
-  private UserAddress findById(Integer id) {
+  @Override
+  public UserAddress findById(Integer id) {
     return userAddressRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.NOT_FOUND));
   }
 
@@ -131,21 +132,8 @@ public class UserAddressServiceImpl implements UserAddressService {
     if (addresses.size() > 1 && userAddress.getIsDefault()) return false;
 
     userAddressRepository.delete(userAddress);
-    return true;
-  }
 
-  @Override
-  public InternalUserAddressResponse getUserAddressById(Integer addressId) {
-    UserAddress userAddress = findById(addressId);
-    return InternalUserAddressResponse.builder()
-            .id(userAddress.getId())
-            .name(userAddress.getName())
-            .phone(userAddress.getPhone())
-            .street(userAddress.getStreet())
-            .ward(userAddress.getWard().getName())
-            .district(userAddress.getDistrict().getName())
-            .province(userAddress.getProvince().getName())
-            .build();
+    return true;
   }
 
 }

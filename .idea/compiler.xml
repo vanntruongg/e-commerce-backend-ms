@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="cart-service" />
         <module name="inventory-service" />
+        <module name="payment-service" />
         <module name="book-service" />
         <module name="api-gateway" />
         <module name="product-service" />
@@ -25,7 +26,6 @@
       <module name="nest-store-microservices (1)" target="1.5" />
       <module name="nest-store-microservices (2)" target="1.5" />
       <module name="notification-service (2)" target="17" />
-      <module name="order-service (2)" target="17" />
       <module name="server" target="17" />
       <module name="user-service" target="17" />
     </bytecodeTargetLevel>
@@ -45,7 +45,7 @@
       <module name="notification-service" options="-parameters" />
       <module name="notification-service (2)" options="-parameters" />
       <module name="order-service" options="-parameters" />
-      <module name="order-service (2)" options="-parameters" />
+      <module name="payment-service" options="-parameters" />
       <module name="product-service" options="-parameters" />
       <module name="server" options="-parameters" />
       <module name="user-service" options="-parameters" />

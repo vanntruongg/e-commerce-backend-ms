@@ -1,8 +1,8 @@
-package orderservice.service.impl;
+package paymentservice.service.impl;
 
 import org.springframework.stereotype.Service;
-import orderservice.config.VNPayConfig;
-import orderservice.service.PaymentService;
+import paymentservice.config.VNPayConfig;
+import paymentservice.service.PaymentService;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

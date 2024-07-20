@@ -12,8 +12,8 @@ import java.util.Map;
 
 import static orderservice.constant.InternalApiEndpoint.*;
 
-@FeignClient(name = "address-data-service", url = USER_ADDRESS_SERVICE_URL)
+@FeignClient(name = "address-data-service", url = ADDRESS_SERVICE_URL)
 public interface UserAddressClient {
-  @GetMapping(GET_ADDRESS_BY_ID)
+  @GetMapping(ORDER + GET + ID_PARAM)
   CommonResponse<UserAddress> getUserAddressById(@PathVariable("id") Integer addressId);
 }
