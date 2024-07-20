@@ -21,13 +21,4 @@ public interface OrderService {
 
   Boolean updateStatus(int id, String status);
 
-  Map<String, Long> getTotalOrderCountByStatus();
-
-  Map<Integer, Integer> getCountOrderByMonth();
-
-  Double getAllRevenue();
-
-  Map<Integer, Double> getRevenue(Integer year, Integer month);
-
-  Map<Integer, Long> statisticOrder(Integer year, Integer month);
 }

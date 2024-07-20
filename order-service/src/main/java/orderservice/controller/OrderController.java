@@ -83,40 +83,4 @@ public class OrderController {
             .build());
   }
 
-  @GetMapping(GET_TOTAL_ORDER)
-  public ResponseEntity<CommonResponse<Object>> getTotalOrderCountByStatus() {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.FIND_SUCCESS)
-            .data(orderService.getTotalOrderCountByStatus())
-            .build());
-  }
-
-  @GetMapping(COUNT_ORDER_BY_MONTH)
-  public ResponseEntity<CommonResponse<Object>> getCountOrderByMonth() {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.FIND_SUCCESS)
-            .data(orderService.getCountOrderByMonth())
-            .build());
-  }
-
-  @GetMapping(STATISTIC_REVENUE)
-  public ResponseEntity<CommonResponse<Object>> getRevenue(@RequestParam("year") Integer year, @RequestParam(value = "month", required = false) Integer month) {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.FIND_SUCCESS)
-            .data(orderService.getRevenue(year, month))
-            .build());
-  }
-
-  @GetMapping(STATISTIC_ORDER)
-  public ResponseEntity<CommonResponse<Object>> statisticOrder(@RequestParam("year") Integer year, @RequestParam(value = "month", required = false) Integer month) {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.FIND_SUCCESS)
-            .data(orderService.statisticOrder(year, month))
-            .build());
-  }
-
 }
