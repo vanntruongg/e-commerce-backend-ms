@@ -13,6 +13,7 @@ public class MessageConstant {
 
 //  actions
   public static final String FIND = "Tìm";
+  public static final String PAYMENT_SUCCESS = "Thanh toán thành công";
   private static final String UPDATE = "Cập nhật";
 
   //  status

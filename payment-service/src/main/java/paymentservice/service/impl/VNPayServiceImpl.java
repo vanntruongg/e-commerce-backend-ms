@@ -2,19 +2,29 @@ package paymentservice.service.impl;
 
 import org.springframework.stereotype.Service;
 import paymentservice.config.VNPayConfig;
-import paymentservice.service.PaymentService;
+import paymentservice.dto.PaymentRequest;
+import paymentservice.dto.PaymentResponse;
+import paymentservice.service.PaymentProcessingService;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-public class VNPayServiceImpl implements PaymentService {
+public class VNPayServiceImpl implements PaymentProcessingService {
+
 
   @Override
-  public String createUrlPaymentOrder(long amount) throws UnsupportedEncodingException {
+  public PaymentResponse processPayment(PaymentRequest paymentRequest) {
+//    String urlPayment = createUrlPaymentOrder(paymentRequest.getAmount());
+    return PaymentResponse.builder()
+//            .urlPayment(urlPayment)
+            .urlPayment("Link thanh toán VN Pay")
+            .build();
+  }
+
+  private String createUrlPaymentOrder(long amount) {
     String vnp_Version = "2.1.0";
     String vnp_Command = "pay";
     String orderType = "other";
@@ -57,15 +67,15 @@ public class VNPayServiceImpl implements PaymentService {
     while (itr.hasNext()) {
       String fieldName = itr.next();
       String fieldValue = vnp_Params.get(fieldName);
-      if ((fieldValue != null) && (fieldValue.length() > 0)) {
+      if ((fieldValue != null) && (!fieldValue.isEmpty())) {
         //Build hash data
         hashData.append(fieldName);
         hashData.append('=');
-        hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+        hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
         //Build query
-        query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+        query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
         query.append('=');
-        query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+        query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
         if (itr.hasNext()) {
           query.append('&');
           hashData.append('&');
@@ -75,7 +85,7 @@ public class VNPayServiceImpl implements PaymentService {
     String queryUrl = query.toString();
     String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.secretKey, hashData.toString());
     queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-    String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
-    return paymentUrl;
+    return VNPayConfig.vnp_PayUrl + "?" + queryUrl;
   }
+
 }

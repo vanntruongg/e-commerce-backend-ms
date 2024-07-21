@@ -5,11 +5,11 @@ server:
 spring:
   application:
     name: payment-service
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/NEST-Store-OrderDB
-#    username: vantruong
-#    password: vantruong
-#    driver-class-name: org.postgresql.Driver
+  datasource:
+    url: jdbc:postgresql://localhost:5432/NEST-Store-PaymentDB
+    username: vantruong
+    password: vantruong
+    driver-class-name: org.postgresql.Driver
   jpa:
     properties:
       hibernate:
