@@ -11,9 +11,10 @@ spring:
   mail:
     default-encoding: UTF-8
     host: smtp.gmail.com
-    username: vantruong.ct263ctu@gmail.com
+    username: neststore.vtt@gmail.com
     # https://myaccount.google.com/u/1/apppasswords
-    password: ymwuovhcpviucpjn
+#    password: ymwuovhcpviucpjn
+    password: yhtpnbgtljrfjcjb
     port: 587
     protocol: smtp
     test-connection: false
