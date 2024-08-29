@@ -2,24 +2,31 @@ package com.vantruong.order.controller;
 
 import com.vantruong.order.constant.ApiEndpoint;
 import com.vantruong.order.constant.MessageConstant;
+import com.vantruong.order.enums.OrderStatus;
+import com.vantruong.order.service.handler.PaymentOrderHandler;
+import com.vantruong.order.service.payment.VNPayService;
+import com.vantruong.order.service.payment.impl.VNPayServiceImpl;
 import lombok.RequiredArgsConstructor;
 import com.vantruong.order.common.CommonResponse;
 import com.vantruong.order.dto.OrderRequest;
-import com.vantruong.order.service.OrderService;
+import com.vantruong.order.service.order.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping(ApiEndpoint.ORDER)
 @RequiredArgsConstructor
 public class OrderController {
   private final OrderService orderService;
+  private final PaymentOrderHandler paymentOrderHandler;
 
   @GetMapping(ApiEndpoint.ORDERS)
   public ResponseEntity<CommonResponse<Object>> getAllOrder() {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
-            .message(MessageConstant.FIND)
+            .message(MessageConstant.FIND_SUCCESS)
             .data(orderService.getAllOrder())
             .build());
   }
@@ -29,7 +36,7 @@ public class OrderController {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.ORDER_SUCCESS)
-            .data(orderService.placeOrder(orderRequest))
+            .data(paymentOrderHandler.placeOrder(orderRequest))
             .build());
   }
 
@@ -78,7 +85,7 @@ public class OrderController {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.UPDATE_SUCCESS)
-            .data(orderService.updateStatus(id, status))
+            .data(orderService.updateOrderStatus(id, OrderStatus.findOrderStatus(status)))
             .build());
   }
 

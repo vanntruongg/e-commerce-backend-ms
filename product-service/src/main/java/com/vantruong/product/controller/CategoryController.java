@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.vantruong.product.service.CategoryService;
 import com.vantruong.product.common.CommonResponse;
-import com.vantruong.product.entity.dto.CategoryDto;
+import com.vantruong.product.dto.CategoryDto;
 
 @RestController
 @RequestMapping(ApiEndpoint.PRODUCT + ApiEndpoint.CATEGORY)

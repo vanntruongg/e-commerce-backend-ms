@@ -1,6 +1,5 @@
 package com.vantruong.order.dto;
 
-import com.vantruong.order.entity.OrderDetail;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +17,9 @@ public class OrderDto {
   private String notes;
   private double totalPrice;
   private String orderStatus;
+  private String paymentStatus;
+  private String paymentMethod;
+  private String created;
   private LocalDateTime createdDate;
-  private List<OrderDetail> orderDetail;
+  private List<OrderDetailDto> orderDetail;
 }

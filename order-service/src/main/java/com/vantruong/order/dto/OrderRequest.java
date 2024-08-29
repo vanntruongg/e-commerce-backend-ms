@@ -10,8 +10,8 @@ import java.util.List;
 @Getter
 @Setter
 public class OrderRequest {
-  @NotNull
-  private Integer orderId;
+//  @NotNull
+//  private Integer orderId;
   @NotNull
   private String email;
   @NotNull

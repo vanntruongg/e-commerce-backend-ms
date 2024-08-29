@@ -8,15 +8,16 @@ public class ApiEndpoint {
 
   //  params
   public static final String EMAIL_PARAM = "/{email}";
+  public static final String ID_PARAM = "/{id}";
 
   // actions
   public static final String GET = "/get";
   public static final String CREATE = "/create";
 
-  public static final String USER = "/user";
-
-  public static final String USER_GET_ALL = "/get-all";
-
-  public static final String USER_GET_BY_EMAIL = GET + EMAIL_PARAM;
-  public static final String USER_CREATE = CREATE;
+  public static final String INVENTORY = "/inventory";
+  public static final String INTERNAL = "/internal";
+  public static final String CHECK = "/check";
+  public static final String QUANTITY = "/quantity";
+  public static final String SIZE = "/size";
+  public static final String ID = "/id";
 }

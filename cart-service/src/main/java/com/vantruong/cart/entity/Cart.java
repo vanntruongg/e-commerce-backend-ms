@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -15,6 +16,5 @@ import java.util.List;
 public class Cart {
   @Id
   private String email;
-  private List<Item> items;
-  private double totalPrice;
+  private List<CartItem> items;
 }

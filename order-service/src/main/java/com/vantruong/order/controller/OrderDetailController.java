@@ -1,7 +1,7 @@
 package com.vantruong.order.controller;
 
 import lombok.RequiredArgsConstructor;
-import com.vantruong.order.service.OrderDetailService;
+import com.vantruong.order.service.order.OrderDetailService;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

@@ -1,6 +1,22 @@
 package com.vantruong.product.service.impl;
 
+import com.vantruong.common.dto.SizeQuantityDto;
+import com.vantruong.common.dto.request.ProductInventoryRequest;
+import com.vantruong.common.dto.response.ProductInventoryResponse;
+import com.vantruong.common.dto.response.ProductResponse;
+import com.vantruong.common.exception.ErrorCode;
+import com.vantruong.common.exception.NotFoundException;
+import com.vantruong.product.common.CommonResponse;
 import com.vantruong.product.constant.MessageConstant;
+import com.vantruong.product.converter.CategoryConverter;
+import com.vantruong.product.converter.ProductConverter;
+import com.vantruong.product.dto.ProductDto;
+import com.vantruong.product.entity.Category;
+import com.vantruong.product.entity.Product;
+import com.vantruong.product.entity.ProductImage;
+import com.vantruong.product.repository.ProductRepository;
+import com.vantruong.product.repository.client.InventoryClient;
+import com.vantruong.product.service.CategoryService;
 import com.vantruong.product.service.ProductService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -8,14 +24,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.vantruong.product.entity.dto.ProductDto;
-import com.vantruong.product.exception.ErrorCode;
-import com.vantruong.product.exception.NotFoundException;
-import com.vantruong.product.service.CategoryService;
-import com.vantruong.product.entity.Category;
-import com.vantruong.product.entity.Product;
-import com.vantruong.product.entity.dto.ProductResponse;
-import com.vantruong.product.repository.ProductRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,74 +34,69 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
   ProductRepository productRepository;
   CategoryService categoryService;
+  ProductConverter productConverter;
+  InventoryClient inventoryClient;
   //  private final ProductSpecification specification;
-   static int PAGE_SIZE = 8;
+  static int PAGE_SIZE = 8;
 
-  private Pageable createPagingAndSort(String order, int pageNo, int pageSize) {
+  private Pageable createPaging(int pageNo, int pageSize) {
     pageNo = Math.max(0, pageNo - 1);
-    Sort sort = Sort.unsorted();
-
-    if (order != null && (order.equalsIgnoreCase("desc") || order.equalsIgnoreCase("asc"))) {
-      sort = Sort.by(Sort.Direction.fromString(order.toUpperCase()), "price");
-    }
-
-    if(pageSize == 0)
+    if (pageSize == 0)
       pageSize = PAGE_SIZE;
 
-    return PageRequest.of(pageNo, pageSize, sort);
+    return PageRequest.of(pageNo, pageSize);
   }
 
   @Override
-  public Page<Product> getAllProduct(int categoryId, String order, int pageNo, int pageSize) {
+  public Page<ProductResponse> getAllProduct(int categoryId, String order, int pageNo, int pageSize) {
+    Pageable pageable = createPaging(pageNo, pageSize);
+    List<ProductResponse> productResponses;
+
+//    nếu không truyền category
     if (categoryId != 0) {
-      List<Product> productList = getAllProductByCategoryId(categoryId);
-      Pageable pageable = createPagingAndSort(order, pageNo, pageSize);
+      productResponses = getAllProductByCategoryId(categoryId);
 
       // sort list product before using paging because PageImpl not sort
-      List<Product> sortedList = sortList(productList, order);
+      List<ProductResponse> sortedList = sortList(productResponses, order);
+
+//      tính toán phạm vi phân trang
       int first = Math.min(Long.valueOf(pageable.getOffset()).intValue(), sortedList.size());
       int last = Math.min(first + pageable.getPageSize(), sortedList.size());
 
       return new PageImpl<>(sortedList.subList(first, last), pageable, sortedList.size());
+    } else {
+      List<ProductResponse> allProducts = productRepository.findAll(createPaging(pageNo, pageSize))
+              .stream()
+              .map(productConverter::convertToProductResponse)
+              .toList();
+      List<ProductResponse> sortedList = sortList(allProducts, order);
+      return new PageImpl<>(sortedList, pageable, productRepository.count());
     }
-    return productRepository.findAll(createPagingAndSort(order, pageNo, pageSize));
   }
 
   @Override
   public ProductResponse getProductWithCategoryById(int id) {
     Product product = getProductById(id);
     List<Category> categories = categoryService.getAllLevelParentByCategory(product.getCategory().getId());
-    return ProductResponse.builder()
-            .product(product)
-            .categories(categories)
-            .build();
+    List<SizeQuantityDto> sizeQuantityDtos = inventoryClient.getInventoryByProductId(product.getId()).getData();
+    return productConverter.convertToProductResponseAndCategories(product, categories, sizeQuantityDtos);
   }
 
-  @Override
-  public Product getProductById(int id) {
+
+  private Product getProductById(int id) {
     return productRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.PRODUCT_NOT_FOUND));
   }
 
   /**
    * recursion func
+   *
    * @param id
    * @return
    */
   @Override
-  public List<Product> getAllProductByCategoryId(int id) {
-//    List<Category> categories = categoryService.getSubCategoriesByParentId(id);
-//
-//    if (categories.isEmpty()) {
-//      return productRepository.findAllByCategoryId(id);
-//    } else {
-//      List<Product> productList = new ArrayList<>();
-//      for (Category category : categories) {
-//        List<Product> products = getAllProductByCategoryId(category.getId());
-//        productList.addAll(products);
-//      }
-//      return productList;
-//    }
-    return productRepository.findAllByCategoryAndSubcategories(id);
+  public List<ProductResponse> getAllProductByCategoryId(int id) {
+    List<Product> products = productRepository.findAllByCategoryAndSubcategories(id);
+    return productConverter.convertToListProductResponse(products);
   }
 
   /**
@@ -101,14 +104,13 @@ public class ProductServiceImpl implements ProductService {
    * @param order:   asc || desc
    * @return List
    */
-  @Override
-  public List<Product> sortList(List<Product> products, String order) {
+  private List<ProductResponse> sortList(List<ProductResponse> products, String order) {
     // if order empty return list product not sort
     if (order.isEmpty()) {
       return products;
     }
-    Comparator<Product> comparator = Comparator.comparing(Product::getPrice);
-    if (order.equalsIgnoreCase("desc")) {
+    Comparator<ProductResponse> comparator = Comparator.comparing(ProductResponse::getPrice);
+    if ("desc".equalsIgnoreCase(order)) {
       comparator = comparator.reversed();
     }
     return products.stream()
@@ -117,21 +119,30 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public Product createProduct(ProductDto productDto) {
+  public ProductResponse createProduct(ProductDto productDto) {
     Category category = categoryService.getCategoryById(productDto.getCategoryId());
     Product product = new Product();
     convertProductDtoToProduct(product, productDto);
     product.setCategory(category);
-    return productRepository.save(product);
+    Product productSaved = productRepository.save(product);
+    return productConverter.convertToProductResponse(productSaved);
   }
 
   private void convertProductDtoToProduct(Product product, ProductDto productDto) {
+    List<ProductImage> productImages = new ArrayList<>();
+    for (String imageUrl : productDto.getImageUrl()) {
+      ProductImage productImageBuilder = ProductImage.builder()
+              .product(product)
+              .imageUrl(imageUrl)
+              .build();
+      productImages.add(productImageBuilder);
+    }
+
     product.setName(productDto.getName());
     product.setPrice(productDto.getPrice());
     product.setMaterial(productDto.getMaterial());
     product.setStyle(productDto.getStyle());
-    product.setImageUrl(productDto.getImageUrl());
-    product.setStock(productDto.getStock());
+    product.setImages(productImages);
   }
 
   /**
@@ -140,35 +151,10 @@ public class ProductServiceImpl implements ProductService {
    * @return list product with name like %name% and ignoreCase
    */
   @Override
-  public List<Product> findProductByName(String name, int limit) {
-    return productRepository.findProductByNameContainingIgnoreCase(name.trim(), Limit.of(limit));
-  }
-
-  @Override
-  public int getStockById(int id) {
-    Optional<Product> product = productRepository.findById(id);
-    return product.map(Product::getStock).orElse(0);
-  }
-
-  @Override
-  @Transactional
-  public Boolean updateProductQuantityByOrder(Map<Integer, Integer> stockUpdate) {
-    List<Product> products = new ArrayList<>();
-    for (Map.Entry<Integer, Integer> productIdAndQuantity : stockUpdate.entrySet()) {
-      int productId = productIdAndQuantity.getKey();
-      int quantity = productIdAndQuantity.getValue();
-
-      Product product = getProductById(productId);
-      int newQuantity = product.getStock() - quantity;
-      if (newQuantity < 0) {
-        return false;
-      } else {
-        product.setStock(newQuantity);
-        products.add(product);
-      }
-    }
-    productRepository.saveAll(products);
-    return true;
+  public List<ProductResponse> findProductByName(String name, int limit) {
+    return productConverter.convertToListProductResponse(
+            productRepository.findProductByNameContainingIgnoreCase(name.trim(), Limit.of(limit))
+    );
   }
 
   @Override
@@ -182,8 +168,12 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public List<Product> getAll() {
-    return productRepository.findAll();
+  public List<ProductResponse> getAll() {
+    Sort sort = Sort.by(Sort.Order.asc("id"));
+    List<Product> products = productRepository.findAll(sort);
+    List<Integer> productIds = products.stream().map(Product::getId).toList();
+    CommonResponse<ProductInventoryResponse> inventoryResponse = inventoryClient.getAllInventoryByProductIds(ProductInventoryRequest.builder().productIds(productIds).build());
+    return productConverter.convertToListProductResponse(products, inventoryResponse.getData().getProductInventoryResponse());
   }
 
   @Override
@@ -192,12 +182,14 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public List<Product> getProductsByCategoryId(int id, int limit) {
-    return productRepository.findAllByCategoryId(id, Limit.of(limit));
+  public List<ProductResponse> getProductsByCategoryId(int id, int limit) {
+    return productConverter.convertToListProductResponse(productRepository.findAllByCategoryId(id, Limit.of(limit)));
   }
 
   @Override
-  public List<Product> getProductsByIds(List<Integer> productIds) {
-    return productRepository.findAllById(productIds);
+  public List<ProductResponse> getProductsByIds(List<Integer> productIds) {
+    List<Product> products = productRepository.findAllById(productIds);
+    return productConverter.convertToListProductResponse(products);
   }
+
 }

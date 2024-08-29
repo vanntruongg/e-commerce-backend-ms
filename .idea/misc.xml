@@ -11,11 +11,16 @@
         <option value="$PROJECT_DIR$/book-service/pom.xml" />
         <option value="$PROJECT_DIR$/address-data-service/pom.xml" />
         <option value="$PROJECT_DIR$/payment-service/pom.xml" />
+        <option value="$PROJECT_DIR$/chatbot-service/pom.xml" />
+        <option value="$PROJECT_DIR$/common-dtos/pom.xml" />
+        <option value="$PROJECT_DIR$/parent-pom/pom.xml" />
+        <option value="$PROJECT_DIR$/order-orchestrator/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/auth-service/client/pom.xml" />
+        <option value="$PROJECT_DIR$/chat-bot-service/pom.xml" />
         <option value="$PROJECT_DIR$/email-service/pom.xml" />
       </set>
     </option>

@@ -1,6 +1,10 @@
 package com.vantruong.identity.service.Impl;
 
+import com.vantruong.common.exception.DuplicateException;
+import com.vantruong.common.exception.ErrorCode;
+import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.identity.common.Utils;
+import com.vantruong.identity.constant.MessageConstant;
 import com.vantruong.identity.dto.UserDto;
 import com.vantruong.identity.dto.request.ChangePasswordRequest;
 import com.vantruong.identity.dto.request.RegisterRequest;
@@ -8,20 +12,17 @@ import com.vantruong.identity.dto.request.ResetPasswordRequest;
 import com.vantruong.identity.dto.request.SendMailVerifyUserRequest;
 import com.vantruong.identity.entity.Role;
 import com.vantruong.identity.entity.Token;
+import com.vantruong.identity.entity.User;
 import com.vantruong.identity.enums.AccountStatus;
 import com.vantruong.identity.enums.ERole;
 import com.vantruong.identity.enums.TokenType;
 import com.vantruong.identity.exception.*;
 import com.vantruong.identity.repository.UserRepository;
 import com.vantruong.identity.repository.client.MailClient;
+import com.vantruong.identity.security.SecurityContextHelper;
 import com.vantruong.identity.service.RoleService;
 import com.vantruong.identity.service.TokenService;
 import com.vantruong.identity.service.UserService;
-import com.vantruong.identity.constant.MessageConstant;
-import identityservice.dto.request.*;
-import com.vantruong.identity.entity.User;
-import identityservice.exception.*;
-import com.vantruong.identity.security.SecurityContextHelper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -78,7 +79,7 @@ public class UserServiceImpl implements UserService {
               .build();
       mailClient.sendVerificationEmail(request);
       return true;
-    } catch (DuplicationException ex) {
+    } catch (DuplicateException ex) {
       log.error("Error during user registration: {}", ex.getMessage(), ex);
       throw ex;
     }

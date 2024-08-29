@@ -1,19 +1,25 @@
 package com.vantruong.cart.service;
 
-import com.vantruong.cart.dto.CartItemDto;
-import com.vantruong.cart.dto.CartResponse;
-import com.vantruong.cart.dto.UpdateQuantityRequest;
-import com.vantruong.cart.dto.internal.RemoveItemsCartRequest;
+import com.vantruong.cart.dto.request.AddToCartRequest;
+import com.vantruong.cart.dto.request.DeleteCartRequest;
+import com.vantruong.cart.dto.response.CartResponse;
+import com.vantruong.cart.dto.request.UpdateCartRequest;
+import com.vantruong.common.dto.SizeQuantityDto;
+import com.vantruong.common.dto.request.DeleteCartItemsRequest;
+
+import java.util.List;
 
 
 public interface CartService {
   CartResponse getCartById(String email);
 
-  Boolean addToCart(CartItemDto cartItemDto);
+  Boolean addToCart(AddToCartRequest cartItemDto);
 
-  Boolean removeFromCart(String emailUser, int productId);
+  Boolean removeFromCart(DeleteCartRequest request);
 
-  Boolean updateQuantity(UpdateQuantityRequest request);
+  Boolean updateQuantity(UpdateCartRequest request);
 
-  Boolean removeItemsFromCart(RemoveItemsCartRequest removeItemsCartRequest);
+  void removeItemsFromCart(DeleteCartItemsRequest removeItemsCartRequest);
+
+  List<SizeQuantityDto> getByEmailAndProductId(String email, int productId);
 }

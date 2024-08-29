@@ -1,5 +1,6 @@
 package com.vantruong.notification.dto;
 
+import com.vantruong.common.entity.OrderDetail;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,5 +20,5 @@ public class OrderDto {
   private double totalPrice;
   private String orderStatus;
   private String paymentMethod;
-  private List<OrderDetailDto> orderDetail;
+  private List<OrderDetail> orderDetail;
 }

@@ -1,13 +1,15 @@
 package com.vantruong.product.service.impl;
 
+import com.vantruong.common.dto.response.CategoryResponse;
+import com.vantruong.common.exception.ErrorCode;
+import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.product.constant.MessageConstant;
+import com.vantruong.product.converter.CategoryConverter;
+import com.vantruong.product.dto.AllLevelCategoryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.vantruong.product.exception.ErrorCode;
-import com.vantruong.product.exception.NotFoundException;
 import com.vantruong.product.entity.Category;
-import com.vantruong.product.entity.dto.CategoryDto;
-import com.vantruong.product.entity.dto.CategoryResponse;
+import com.vantruong.product.dto.CategoryDto;
 import com.vantruong.product.repository.CategoryRepository;
 import com.vantruong.product.service.CategoryService;
 
@@ -19,24 +21,26 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
   private final CategoryRepository categoryRepository;
+  private final CategoryConverter categoryConverter;
 
   @Override
-  public Category createCategory(CategoryDto categoryDto) {
+  public CategoryResponse createCategory(CategoryDto categoryDto) {
     Category category = Category.builder()
             .name(categoryDto.getName())
             .image(categoryDto.getImage())
             .parentCategory(categoryDto.getParentCategory())
             .build();
-    return categoryRepository.save(category);
+    categoryRepository.save(category);
+    return categoryConverter.convertToCategoryResponse(category);
   }
 
   @Override
-  public List<CategoryResponse> getALlCategory() {
+  public List<AllLevelCategoryDto> getALlCategory() {
     List<Category> categories = categoryRepository.findTopLevelCategory();
-    List<CategoryResponse> result = new ArrayList<>();
-    for (Category category: categories) {
-      List<CategoryResponse> categoryResponses = getAllLevelChildrenByCategory(category.getId());
-      CategoryResponse categoryResponse = CategoryResponse.builder()
+    List<AllLevelCategoryDto> result = new ArrayList<>();
+    for (Category category : categories) {
+      List<AllLevelCategoryDto> categoryResponses = getAllLevelChildrenByCategory(category.getId());
+      AllLevelCategoryDto categoryResponse = AllLevelCategoryDto.builder()
               .category(category)
               .subCategories(categoryResponses)
               .build();
@@ -46,12 +50,18 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public List<Category> getTopLevelCategory() {
-    return categoryRepository.findTopLevelCategory();
+  public List<CategoryResponse> getTopLevelCategory() {
+    List<Category> categories = categoryRepository.findTopLevelCategory();
+    return categoryConverter.convertToListCategoryResponse(categories);
   }
 
   @Override
-  public List<Category> getSubCategoriesByParentId(int parentId) {
+  public List<CategoryResponse> getSubCategoriesByParentId(int parentId) {
+    List<Category> categories = categoryRepository.findSubcategoriesByParentId(parentId);
+    return categoryConverter.convertToListCategoryResponse(categories);
+  }
+
+  private List<Category> findSubCategoriesByParentId(int parentId) {
     return categoryRepository.findSubcategoriesByParentId(parentId);
   }
 
@@ -77,22 +87,22 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public List<CategoryResponse> getAllLevelChildrenByCategory(int categoryId) {
-    List<CategoryResponse> result = new ArrayList<>();
+  public List<AllLevelCategoryDto> getAllLevelChildrenByCategory(int categoryId) {
+    List<AllLevelCategoryDto> result = new ArrayList<>();
     getAllChildrenByCategoryRecursive(categoryId, result);
     return result;
   }
 
 
-  private void getAllChildrenByCategoryRecursive(int categoryId, List<CategoryResponse> result) {
-    List<Category> children = getSubCategoriesByParentId(categoryId);
+  private void getAllChildrenByCategoryRecursive(int categoryId, List<AllLevelCategoryDto> result) {
+    List<Category> children = findSubCategoriesByParentId(categoryId);
 
     /* Each time the recursive call is made,
       the list of categories is set to the subcategory */
     for (Category child : children) {
-      CategoryResponse categoryResponse = new CategoryResponse();
+      AllLevelCategoryDto categoryResponse = new AllLevelCategoryDto();
       categoryResponse.setCategory(child);
-      List<CategoryResponse> subCategories = new ArrayList<>();
+      List<AllLevelCategoryDto> subCategories = new ArrayList<>();
       categoryResponse.setSubCategories(subCategories);
       result.add(categoryResponse);
       getAllChildrenByCategoryRecursive(child.getId(), subCategories);

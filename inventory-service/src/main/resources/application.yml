@@ -1,6 +1,6 @@
-# USER-SERVICE
+# Inventory-service
 server:
-  port: 9003
+  port: 9008
 spring:
   application:
     name: inventory-service
@@ -9,7 +9,18 @@ spring:
       database: NEST-Store-InventoryDB
       host: localhost
       port: 27017
-
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      group-id: inventory-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 eureka:
   client:
     service-url:

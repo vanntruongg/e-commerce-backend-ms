@@ -130,7 +130,7 @@
         </div>
     </div>
     <h3 class="subtitle">Thông tin thanh toán</h3>
-    <p><strong>Phương thức thanh toán:</strong> <span th:text="${order.paymentMethod}"></span></p>
+<!--    <p><strong>Phương thức thanh toán:</strong> <span th:text="${order.paymentMethod}"></span></p>-->
     <div class="order-items">
         <h2>Sản phẩm đã đặt</h2>
         <div th:each="item : ${order.orderDetail}">
@@ -138,19 +138,20 @@
                 <img th:src="${item.productImage}" alt="Product Image" class="product-image">
                 <div class="product-info">
                     <p class="product-name" th:text="${item.productName}"></p>
-                    <p class="product-price"><span th:text="${item.productPrice}"></span> x <span
+                    <p class="product-name" th:text="${item.productSize}"></p>
+                    <p class="product-price"><span th:text="${#numbers.formatDecimal(item.productPrice, 3, 'COMMA', 0, 'POINT')} + '₫'"></span> x <span
                             th:text="${item.quantity}"></span></p>
                 </div>
             </div>
         </div>
     </div>
-    <div class="section-links">
-        <a href="http://localhost:3000" target="_blank">NEST STORE</a>
-        <a href="http://localhost:3000/shop" target="_blank">Cửa hàng</a>
-        <a href="http://localhost:3000/contact" target="_blank">Liên hệ</a>
-    </div>
+<!--    <div class="section-links">-->
+<!--        <a href="http://localhost:3000" target="_blank">NEST STORE</a>-->
+<!--        <a href="http://localhost:3000/shop" target="_blank">Cửa hàng</a>-->
+<!--        <a href="http://localhost:3000/contact" target="_blank">Liên hệ</a>-->
+<!--    </div>-->
     <div class="footer">
-        <p>Nếu có bất kỳ câu hỏi nào về đơn hàng của bạn, Vui lòng liên hệ với chúng tôi theo địa chỉ email vantruong.ct263ctu@gmail.com.</p>
+        <p>Nếu có bất kỳ câu hỏi nào về đơn hàng của bạn, Vui lòng liên hệ với chúng tôi theo địa chỉ email neststore.vtt@gmail.com.</p>
     </div>
 </div>
 </body>

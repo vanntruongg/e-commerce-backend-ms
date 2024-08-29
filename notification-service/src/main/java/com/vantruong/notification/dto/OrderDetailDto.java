@@ -19,4 +19,5 @@ public class OrderDetailDto {
   private float productPrice;
 
   private String productImage;
+  private String productSize;
 }

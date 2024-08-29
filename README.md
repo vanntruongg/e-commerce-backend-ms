@@ -20,8 +20,10 @@ This project is aimed at developing a fashion e-commerce website using microserv
 
 ### Microservices
 1. **Identity Service**: Handles user authentication, registration, and profile management.
-2. **Product Service**: Manages products, categories.
-3. **Cart Service**: Manages shopping cart for users.
-4. **Order Service**: Process and manages orders, including checkout and payment integration.
+2. **Address Service**: Handles user authentication, registration, and profile management.
+3. **Product Service**: Manages products, categories.
+4. **Cart Service**: Manages shopping cart for users.
+5. **Order Service**: Process and manages orders, including checkout and payment integration.
+6. **Payment Service**: Process and manages orders, including checkout and payment integration.
 
 

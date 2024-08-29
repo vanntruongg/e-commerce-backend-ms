@@ -21,6 +21,7 @@ public class ApiEndpoint {
   public static final String ORDERS = "/orders";
   public static final String ORDER_DETAIL = "/order-detail";
   public static final String METHODS = "/methods";
+  public static final String PAYMENT_METHOD = "/payment-method";
   public static final String COUNT = "/count";
   public static final String YEAR = "/year";
   public static final String YEAR_PARAM = "/{year}";
@@ -39,5 +40,12 @@ public class ApiEndpoint {
   public static final String GET_BY_ID = GET + ID_PARAM;
   public static final String UPDATE_STATUS = UPDATE + STATUS;
   public static final String COUNT_ORDER_BY_MONTH = COUNT + ORDER + MONTH;
+
+  public static final String PAYMENTS = "/payments";
+  public static final String PAY = "/pay";
+
+  public static final String GET_BY_ORDER_ID = GET + ORDER + ID_PARAM;
+  public static final String UPDATE_PAYMENT_STATUS = UPDATE + STATUS + ID_PARAM;
+  public static final String VN_PAY_CALLBACK = "/vnpay-callback";
 
 }

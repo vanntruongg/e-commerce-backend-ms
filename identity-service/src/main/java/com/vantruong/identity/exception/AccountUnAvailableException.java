@@ -1,12 +1,14 @@
 package com.vantruong.identity.exception;
 
+import com.vantruong.common.exception.ErrorDetail;
+
 public class AccountUnAvailableException extends RuntimeException {
   private final transient ErrorDetail errorDetail;
   public AccountUnAvailableException(int errorCode, String message) {
     super(message);
     this.errorDetail = ErrorDetail.builder()
             .errorCode(errorCode)
-            .errorMessage(message)
+            .message(message)
             .build();
   }
 
@@ -14,7 +16,7 @@ public class AccountUnAvailableException extends RuntimeException {
     super(message, cause);
     this.errorDetail = ErrorDetail.builder()
             .errorCode(errorCode)
-            .errorMessage(message)
+            .message(message)
             .build();
   }
 }

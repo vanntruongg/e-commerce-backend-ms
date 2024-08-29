@@ -1,7 +1,7 @@
 package com.vantruong.order.repository.client;
 
-import com.vantruong.order.constant.InternalApiEndpoint;
-import com.vantruong.order.dto.UserAddress;
+import com.vantruong.common.constant.InternalApiEndpoint;
+import com.vantruong.common.dto.UserAddress;
 import com.vantruong.order.common.CommonResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

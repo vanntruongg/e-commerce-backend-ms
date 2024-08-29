@@ -8,35 +8,42 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="cart-service" />
+        <module name="address-service" />
+        <module name="book-service" />
+        <module name="common-dtos" />
+        <module name="product-service" />
+        <module name="eureka-server" />
+        <module name="notification-service" />
+        <module name="order-orchestrator" />
         <module name="inventory-service" />
         <module name="payment-service" />
-        <module name="book-service" />
         <module name="api-gateway" />
-        <module name="product-service" />
-        <module name="address-data-service" />
         <module name="order-service" />
-        <module name="eureka-server" />
         <module name="identity-service" />
-        <module name="notification-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="chat-bot-service" target="17" />
       <module name="client" target="17" />
       <module name="email-service" target="17" />
       <module name="nest-store-microservices (1)" target="1.5" />
       <module name="nest-store-microservices (2)" target="1.5" />
       <module name="notification-service (2)" target="17" />
+      <module name="product-service (1)" target="17" />
+      <module name="product-service (2)" target="17" />
       <module name="server" target="17" />
       <module name="user-service" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="address-data-service" options="-parameters" />
+      <module name="address-service" options="-parameters" />
       <module name="api-gateway" options="-parameters" />
       <module name="book-service" options="-parameters" />
       <module name="cart-service" options="-parameters" />
+      <module name="chat-bot-service" options="-parameters" />
       <module name="client" options="-parameters" />
+      <module name="common-dtos" options="-parameters" />
       <module name="email-service" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="identity-service" options="-parameters" />
@@ -44,9 +51,12 @@
       <module name="nest-store-backend" options="" />
       <module name="notification-service" options="-parameters" />
       <module name="notification-service (2)" options="-parameters" />
+      <module name="order-orchestrator" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="payment-service" options="-parameters" />
       <module name="product-service" options="-parameters" />
+      <module name="product-service (1)" options="-parameters" />
+      <module name="product-service (2)" options="-parameters" />
       <module name="server" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>

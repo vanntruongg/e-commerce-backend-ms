@@ -4,7 +4,6 @@ import com.vantruong.identity.dto.UserDto;
 import com.vantruong.identity.dto.request.ChangePasswordRequest;
 import com.vantruong.identity.dto.request.RegisterRequest;
 import com.vantruong.identity.dto.request.ResetPasswordRequest;
-import identityservice.dto.request.*;
 import com.vantruong.identity.entity.User;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.vantruong.identity.security;
 
-import com.vantruong.identity.exception.ErrorCode;
+import com.vantruong.common.exception.ErrorCode;
 import com.vantruong.identity.entity.User;
 import com.vantruong.identity.exception.FormException;
 import com.vantruong.identity.repository.UserRepository;

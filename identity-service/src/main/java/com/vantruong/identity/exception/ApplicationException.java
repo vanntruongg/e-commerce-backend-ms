@@ -1,5 +1,6 @@
 package com.vantruong.identity.exception;
 
+import com.vantruong.common.exception.ErrorDetail;
 import lombok.Getter;
 
 @Getter
@@ -9,14 +10,14 @@ public class ApplicationException extends RuntimeException {
     super(errorMessage);
     this.errorDetail = ErrorDetail.builder()
             .errorCode(errorCode)
-            .errorMessage(errorMessage)
+            .message(errorMessage)
             .build();
   }
   public ApplicationException(int errorCode, String errorMessage, Throwable cause) {
     super(errorMessage, cause);
     this.errorDetail = ErrorDetail.builder()
             .errorCode(errorCode)
-            .errorMessage(errorMessage)
+            .message(errorMessage)
             .build();
   }
 }

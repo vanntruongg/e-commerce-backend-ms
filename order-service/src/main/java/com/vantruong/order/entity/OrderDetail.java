@@ -34,6 +34,9 @@ public class OrderDetail extends BaseEntity {
   @Column(name = "product_image")
   private String productImage;
 
+  @Column(name = "product_size")
+  private String productSize;
+
   @ManyToOne
   @JoinColumn(name = "o_id", referencedColumnName = "o_id")
   @JsonIgnore

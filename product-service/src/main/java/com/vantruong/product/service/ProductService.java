@@ -1,38 +1,31 @@
 package com.vantruong.product.service;
 
+import com.vantruong.common.dto.response.ProductResponse;
 import org.springframework.data.domain.Page;
-import com.vantruong.product.entity.dto.ProductDto;
+import com.vantruong.product.dto.ProductDto;
 import com.vantruong.product.entity.Product;
-import com.vantruong.product.entity.dto.ProductResponse;
 
 import java.util.List;
 import java.util.Map;
 
 public interface ProductService {
-  Page<Product> getAllProduct(int categoryId, String order, int pageNo, int pageSize);
+  Page<ProductResponse> getAllProduct(int categoryId, String order, int pageNo, int pageSize);
 
   ProductResponse getProductWithCategoryById(int id);
-  Product getProductById(int id);
 
-  List<Product> getAllProductByCategoryId(int id);
+  List<ProductResponse> getAllProductByCategoryId(int id);
 
-  List<Product> sortList(List<Product> products, String order);
+  ProductResponse createProduct(ProductDto productDto);
 
-  Product createProduct(ProductDto productDto);
-
-  List<Product> findProductByName(String name, int limit);
-
-  int getStockById(int id);
-
-  Boolean updateProductQuantityByOrder(Map<Integer, Integer> stockUpdate);
+  List<ProductResponse> findProductByName(String name, int limit);
 
   Boolean updateProduct(ProductDto productDto);
 
-  List<Product> getAll();
+  List<ProductResponse> getAll();
 
   Long getProductCount();
 
-  List<Product> getProductsByCategoryId(int id, int limit);
+  List<ProductResponse> getProductsByCategoryId(int id, int limit);
 
-  List<Product> getProductsByIds(List<Integer> productIds);
+  List<ProductResponse> getProductsByIds(List<Integer> productIds);
 }

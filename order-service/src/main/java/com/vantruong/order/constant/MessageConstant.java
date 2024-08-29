@@ -13,6 +13,7 @@ public class MessageConstant {
 
 //  actions
   public static final String FIND = "Tìm";
+  public static final String PRODUCT_QUANTITY_NOT_AVAILABLE = "Số lượng sản phẩm không có sẵn.";
   private static final String UPDATE = "Cập nhật";
 
   //  status
@@ -28,4 +29,10 @@ public class MessageConstant {
   public static final String FIND_SUCCESS = String.format(CHAR_SEQUENCE_2, FIND, SUCCESS);
   public static final String UPDATE_SUCCESS = String.format(CHAR_SEQUENCE_2, UPDATE, SUCCESS);
   public static final String ORDER_NOT_FOUND = "Không tìm thấy đơn hàng!";
+
+
+  //  actions
+  public static final String PAYMENT_SUCCESS = "Thanh toán thành công";
+  //  status
+
 }

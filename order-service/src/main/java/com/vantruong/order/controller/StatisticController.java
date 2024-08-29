@@ -3,13 +3,13 @@ package com.vantruong.order.controller;
 import com.vantruong.order.common.CommonResponse;
 import com.vantruong.order.constant.ApiEndpoint;
 import com.vantruong.order.constant.MessageConstant;
-import com.vantruong.order.service.StatisticService;
+import com.vantruong.order.service.order.StatisticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(ApiEndpoint.STATISTIC)
+@RequestMapping(ApiEndpoint.ORDER + ApiEndpoint.STATISTIC)
 @RequiredArgsConstructor
 public class StatisticController {
   private final StatisticService statisticService;

@@ -1,27 +1,27 @@
 package com.vantruong.identity.service.Impl;
 
 import com.nimbusds.jose.JOSEException;
+import com.vantruong.common.exception.ErrorCode;
+import com.vantruong.common.exception.NotFoundException;
+import com.vantruong.identity.common.Utils;
+import com.vantruong.identity.constant.MessageConstant;
 import com.vantruong.identity.dto.request.*;
+import com.vantruong.identity.dto.response.AuthenticationResponse;
 import com.vantruong.identity.dto.response.IntrospectResponse;
+import com.vantruong.identity.entity.InvalidatedToken;
 import com.vantruong.identity.entity.Token;
+import com.vantruong.identity.entity.User;
 import com.vantruong.identity.enums.AccountStatus;
 import com.vantruong.identity.enums.TokenType;
 import com.vantruong.identity.exception.*;
-import com.vantruong.identity.service.AuthService;
-import com.vantruong.identity.service.TokenService;
-import com.vantruong.identity.common.Utils;
-import com.vantruong.identity.constant.MessageConstant;
-import identityservice.dto.request.*;
-import com.vantruong.identity.dto.response.AuthenticationResponse;
-import com.vantruong.identity.entity.InvalidatedToken;
-import com.vantruong.identity.entity.User;
-import identityservice.exception.*;
 import com.vantruong.identity.repository.InvalidatedTokenRepository;
 import com.vantruong.identity.repository.UserRepository;
 import com.vantruong.identity.repository.client.MailClient;
 import com.vantruong.identity.security.JwtService;
 import com.vantruong.identity.security.UserDetailsImpl;
 import com.vantruong.identity.security.UserDetailsServiceImpl;
+import com.vantruong.identity.service.AuthService;
+import com.vantruong.identity.service.TokenService;
 import com.vantruong.identity.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -159,26 +159,5 @@ public class AuthServiceImpl implements AuthService {
     return true;
 
 
-
   }
-//  @Override
-//  public Boolean logout(LogoutRequest request) {
-//    var auth = SecurityContextHolder.getContext().getAuthentication();
-//    if (auth == null) {
-//      return false;
-//    }
-//
-//    User user = null;
-//    if (auth instanceof UsernamePasswordAuthenticationToken) {
-//      user = (User) auth.getPrincipal();
-//    }
-//
-//    if (user != null) {
-//      new SecurityContextLogoutHandler().logout(request, response, auth);
-//      SecurityContextHolder.getContext().setAuthentication(null);
-//      auth.setAuthenticated(false);
-//      return true;
-//    }
-//    return false;
-//  }
 }

@@ -25,18 +25,19 @@ public class RouteValidator {
           "/api/v1/product/get/.*",
           "/api/v1/product/category/get/.*",
 
-//          "/api/v1/book",
-//          "/api/v1/book/category",
-//          "/api/v1/book/get/.*",
-//          "/api/v1/book/category/get/.*",
 //          other endpoints
           "/api/v1/eureka",
 
 //          address
-          "/api/v1/address/user/create"
+          "/api/v1/address/user/create",
+          //          address
+          "/api/v1/inventory/.*",
+//          payment
+          "/api/v1/order-orchestrator/vnpay-callback"
   );
 
   public boolean isPublicEndpoint(ServerHttpRequest request) {
-    return openApiEndpoints.stream().anyMatch(publicEndpoint -> request.getURI().getPath().matches(publicEndpoint));
+    return openApiEndpoints.stream()
+            .anyMatch(publicEndpoint -> request.getURI().getPath().matches(publicEndpoint));
   }
 }

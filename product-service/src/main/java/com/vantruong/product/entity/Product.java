@@ -3,6 +3,9 @@ package com.vantruong.product.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+import java.util.Set;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -28,13 +31,16 @@ public class Product extends BaseEntity {
   @Column(name = "p_styles")
   private String style;
 
-  @Column(name = "p_image_url")
-  private String imageUrl;
+//  @Column(name = "p_image_url")
+//  private String imageUrl;
+
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ProductImage> images;
 
   @ManyToOne
   @JoinColumn(name = "cat_id", referencedColumnName = "cat_id")
   private Category category;
 
-  @Column(name = "p_stock")
-  private int stock;
+//  @Column(name = "p_stock")
+//  private int stock;
 }

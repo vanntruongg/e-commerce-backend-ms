@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.vantruong.product.common.CommonResponse;
-import com.vantruong.product.entity.dto.ProductDto;
+import com.vantruong.product.dto.ProductDto;
+
+import static com.vantruong.product.constant.ApiEndpoint.GET_ALL;
 
 
 @RestController
@@ -24,7 +26,7 @@ public class ProductController {
             .build());
   }
 
-  @GetMapping
+  @GetMapping()
   public ResponseEntity<CommonResponse<Object>> getAllProduct(
           @RequestParam(name = "category", defaultValue = "0") int categoryId,
           @RequestParam(name = "order") String order,
@@ -35,6 +37,16 @@ public class ProductController {
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
             .data(productService.getAllProduct(categoryId, order, pageNo, pageSize))
+            .build());
+  }
+
+
+  @GetMapping(GET_ALL)
+  public ResponseEntity<CommonResponse<Object>> getAllProduct() {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.FIND_SUCCESS)
+            .data(productService.getAll())
             .build());
   }
 
@@ -62,14 +74,6 @@ public class ProductController {
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
             .data(productService.getProductsByCategoryId(id, limit))
-            .build());
-  }
-  @GetMapping(ApiEndpoint.PRODUCT_GET_STOCK_BY_ID)
-  public ResponseEntity<CommonResponse<Object>> getStockById(@PathVariable("id") int id) {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.FIND_SUCCESS)
-            .data(productService.getStockById(id))
             .build());
   }
 

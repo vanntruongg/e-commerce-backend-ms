@@ -52,13 +52,30 @@ spring:
             - Path=${app.api-prefix}/order/**
           filters:
             - StripPrefix=2
-        - id: address-data-service
+        - id: address-service
           uri: http://localhost:9006
           predicates:
             - Path=${app.api-prefix}/address/**
           filters:
             - StripPrefix=2
-
+        - id: payment-service
+          uri: http://localhost:9007
+          predicates:
+            - Path=${app.api-prefix}/payments/**
+          filters:
+            - StripPrefix=2
+        - id: inventory-service
+          uri: http://localhost:9008
+          predicates:
+            - Path=${app.api-prefix}/inventory/**
+          filters:
+            - StripPrefix=2
+        - id: order-orchestrator
+          uri: http://localhost:9009
+          predicates:
+            - Path=${app.api-prefix}/order-orchestrator/**
+          filters:
+            - StripPrefix=2
 eureka:
   client:
     service-url:

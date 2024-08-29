@@ -1,25 +1,30 @@
 package com.vantruong.product.service;
 
-import com.vantruong.product.entity.dto.CategoryDto;
-import com.vantruong.product.entity.dto.CategoryResponse;
+import com.vantruong.common.dto.response.CategoryResponse;
+import com.vantruong.product.dto.AllLevelCategoryDto;
+import com.vantruong.product.dto.CategoryDto;
 import com.vantruong.product.entity.Category;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CategoryService {
-  List<CategoryResponse> getALlCategory();
+  //  controler
+  List<AllLevelCategoryDto> getALlCategory();
 
-  List<Category> getSubCategoriesByParentId(int parentId);
+  CategoryResponse createCategory(CategoryDto categoryDto);
+
+  List<CategoryResponse> getTopLevelCategory();
+
+  List<CategoryResponse> getSubCategoriesByParentId(int parentId);
+
+  List<AllLevelCategoryDto> getAllLevelChildrenByCategory(int categoryId);
+
+  //  internal
   Optional<Category> getParentCategoryByCategoryId(int categoryId);
 
   List<Category> getAllLevelParentByCategory(int categoryId);
 
   Category getCategoryById(int id);
 
-  List<CategoryResponse> getAllLevelChildrenByCategory(int categoryId);
-
-  List<Category> getTopLevelCategory();
-
-  Category createCategory(CategoryDto categoryDto);
 }

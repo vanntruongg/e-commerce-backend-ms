@@ -1,5 +1,7 @@
 package com.vantruong.identity.exception;
 
+import com.vantruong.common.exception.ErrorDetail;
+
 public class UnVerifiedAccountException extends RuntimeException {
   private final transient ErrorDetail errorDetail;
 
@@ -7,7 +9,7 @@ public class UnVerifiedAccountException extends RuntimeException {
     super(message);
     this.errorDetail = ErrorDetail.builder()
             .errorCode(errorCode)
-            .errorMessage(message)
+            .message(message)
             .build();
   }
 
@@ -15,7 +17,7 @@ public class UnVerifiedAccountException extends RuntimeException {
     super(message, cause);
     this.errorDetail = ErrorDetail.builder()
             .errorCode(errorCode)
-            .errorMessage(message)
+            .message(message)
             .build();
   }
 }

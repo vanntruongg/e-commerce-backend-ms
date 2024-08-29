@@ -1,8 +1,8 @@
 package com.vantruong.identity.service.Impl;
 
+import com.vantruong.common.exception.ErrorCode;
+import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.identity.entity.Token;
-import com.vantruong.identity.exception.ErrorCode;
-import com.vantruong.identity.exception.NotFoundException;
 import com.vantruong.identity.repository.TokenRepository;
 import com.vantruong.identity.service.TokenService;
 import com.vantruong.identity.constant.MessageConstant;

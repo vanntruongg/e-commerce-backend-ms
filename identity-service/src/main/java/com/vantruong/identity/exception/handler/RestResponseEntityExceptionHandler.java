@@ -1,8 +1,10 @@
 package com.vantruong.identity.exception.handler;
 
+import com.vantruong.common.exception.DuplicateException;
+import com.vantruong.common.exception.ErrorCode;
+import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.identity.common.CommonResponse;
 import com.vantruong.identity.exception.*;
-import identityservice.exception.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +37,7 @@ public class RestResponseEntityExceptionHandler {
             .build());
   }
 
-  @ExceptionHandler(value = DuplicationException.class)
+  @ExceptionHandler(value = DuplicateException.class)
   public ResponseEntity<CommonResponse<Object>> duplicateException(Exception ex, WebRequest request) {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(CommonResponse.builder()
             .isSuccess(false)

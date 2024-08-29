@@ -1,12 +1,12 @@
 package com.vantruong.identity.service.Impl;
 
+import com.vantruong.common.exception.ErrorCode;
+import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.identity.dto.response.PermissionResponse;
 import com.vantruong.identity.dto.response.RoleResponse;
 import com.vantruong.identity.constant.MessageConstant;
 import com.vantruong.identity.dto.request.RoleRequest;
 import com.vantruong.identity.entity.Role;
-import com.vantruong.identity.exception.ErrorCode;
-import com.vantruong.identity.exception.NotFoundException;
 import com.vantruong.identity.repository.RoleRepository;
 import com.vantruong.identity.service.PermissionService;
 import com.vantruong.identity.service.RoleService;
