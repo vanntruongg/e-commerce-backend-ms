@@ -36,6 +36,7 @@ public class InternalApiEndpoint {
   public static final String QUANTITY = "/quantity";
   public static final String LIST = "/list";
   public static final String PAYMENT_URL = "/payment-url";
+  public static final String CALCULATE = "/calculate";
 
   // inventory
 
@@ -56,4 +57,5 @@ public class InternalApiEndpoint {
 //  product - inventory
   public static final String GET_ALL_BY_PRODUCT_IDS = GET + PRODUCT_IDS;
   public static final String GET_BY_PRODUCT_ID = GET + ID_PARAM;
+  public static final String CALCULATE_BY_PRODUCT_IDS = CALCULATE + PRODUCT_IDS;
 }

@@ -32,4 +32,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
   @Query("select count(p) from Product p")
   Long getProductCount();
 
+  double findPriceById(Integer productId);
+
 }

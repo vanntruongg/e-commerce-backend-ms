@@ -108,7 +108,7 @@ public class CartServiceImpl implements CartService {
             .build();
   }
 
-  private boolean addNewCartItemToCart(Cart cart, AddToCartRequest request) {
+  private void addNewCartItemToCart(Cart cart, AddToCartRequest request) {
     List<CartItem> cartItems = cart.getItems();
     if (cartItems == null) {
       cartItems = new ArrayList<>();
@@ -117,7 +117,6 @@ public class CartServiceImpl implements CartService {
     cartItems.add(cartItem);
     cart.setItems(cartItems);
     cartRepository.save(cart);
-    return true;
   }
 
 
@@ -127,29 +126,33 @@ public class CartServiceImpl implements CartService {
    * đã có size đó => update quantity
    * */
   @Transactional
-  public Boolean addToCart(AddToCartRequest request) {
+  public long addToCart(AddToCartRequest request) {
     Cart cart = findByIdOrCreate(request.getEmail());
     List<CartItem> cartItems = cart.getItems();
 
     if (cartItems == null) {
-      return addNewCartItemToCart(cart, request);
+      addNewCartItemToCart(cart, request);
+      return count(request.getEmail());
     }
     CartItem cartItem = cartItems.stream()
             .filter(ct -> ct.getProductId().equals(request.getProductId()))
             .findFirst()
             .orElse(null);
     if (cartItem == null) {
-      return addNewCartItemToCart(cart, request);
+      addNewCartItemToCart(cart, request);
+      return count(request.getEmail());
     }
     List<SizeQuantity> sizeQuantities = cartItem.getSizeQuantities();
     SizeQuantity existedSizeQuantity = findSizeQuantity(cartItem, request.getSize());
     if (existedSizeQuantity != null) {
-      return updateSizeQuantity(
+      updateSizeQuantity(
               request.getEmail(),
               request.getProductId(),
               request.getSize(),
               request.getQuantity()
       );
+      return count(request.getEmail());
+
     } else {
       SizeQuantity sizeQuantity = SizeQuantity.builder()
               .size(request.getSize())
@@ -157,7 +160,7 @@ public class CartServiceImpl implements CartService {
               .build();
       sizeQuantities.add(sizeQuantity);
       cartRepository.save(cart);
-      return true;
+      return count(request.getEmail());
     }
   }
 
@@ -179,7 +182,7 @@ public class CartServiceImpl implements CartService {
 
   @Override
   @Transactional
-  public Boolean removeFromCart(DeleteCartRequest request) {
+  public long removeFromCart(DeleteCartRequest request) {
     Cart cart = findById(request.getEmail());
 
     CartItem cartItem = findCartItemByProductId(cart, request.getProductId());
@@ -188,14 +191,15 @@ public class CartServiceImpl implements CartService {
       sizeQuantities.removeIf(sizeQuantity -> sizeQuantity.getSize().equals(request.getSize()));
 
       cartRepository.save(cart);
-      return true;
     }
-    return false;
+    return count(request.getEmail());
   }
 
   @Override
-  public Boolean updateQuantity(UpdateCartRequest request) {
-    return changeCartItemQuantity(request.getEmail(), request.getProductId(), request.getSize(), request.getQuantity());
+  public long updateQuantity(UpdateCartRequest request) {
+    changeCartItemQuantity(request.getEmail(), request.getProductId(), request.getSize(), request.getQuantity());
+    return count(request.getEmail());
+
   }
 
   private Boolean updateSizeQuantity(String email, Integer productId, String size, Integer quantity) {
@@ -293,5 +297,17 @@ public class CartServiceImpl implements CartService {
               ).toList();
     }
     return null;
+  }
+
+  @Override
+  public long count(String email) {
+    Cart cart = findById(email);
+    List<CartItem> cartItems = cart.getItems();
+
+    if (cartItems.isEmpty()) return 0;
+
+    return cartItems.stream()
+            .mapToLong(item -> (long) item.getSizeQuantities().size()
+            ).sum();
   }
 }

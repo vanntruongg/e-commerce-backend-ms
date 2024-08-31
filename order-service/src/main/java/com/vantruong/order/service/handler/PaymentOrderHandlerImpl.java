@@ -46,7 +46,7 @@ public class PaymentOrderHandlerImpl implements PaymentOrderHandler {
       OrderEvent orderEvent = orderConverter.orderToKafka(newOrder);
       kafkaProducer.sendOrder(orderEvent);
     } else if (paymentMethod.getMethod().equals(EPaymentMethod.VN_PAY)) {
-      urlPayment = getPaymentUrl(newOrder.getOrderId(), orderRequest.getTotalPrice());
+      urlPayment = getPaymentUrl(newOrder.getOrderId(), newOrder.getTotalPrice());
     }
     return OrderCreateResponse.builder()
             .paymentMethod(paymentMethod)

@@ -1,10 +1,13 @@
 package com.vantruong.order.service.order.impl;
 
+import com.vantruong.common.dto.response.ProductResponse;
 import com.vantruong.order.dto.OrderDetailDto;
+import com.vantruong.order.dto.OrderDetailRequest;
 import com.vantruong.order.entity.Order;
 import com.vantruong.order.entity.OrderDetail;
 import com.vantruong.order.repository.OrderDetailRepository;
 import com.vantruong.order.repository.client.CartClient;
+import com.vantruong.order.repository.client.ProductClient;
 import com.vantruong.order.service.order.OrderDetailService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +15,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,12 +23,16 @@ import java.util.List;
 public class OrderDetailServiceImpl implements OrderDetailService {
   OrderDetailRepository orderDetailRepository;
   CartClient cartClient;
+  ProductClient productClient;
 
   @Override
   @Transactional
-  public List<OrderDetail> createOrderDetails(Order order, List<OrderDetailDto> orderDetailDTOs) {
+  public List<OrderDetail> createOrderDetails(Order order, List<OrderDetailRequest> orderDetailDTOs) {
     List<OrderDetail> orderDetails = orderDetailDTOs.stream()
-            .map(orderDetailDto -> convertToOrderDetail(order, orderDetailDto))
+            .map(orderDetailDto -> {
+              ProductResponse productResponse = productClient.getProductById(orderDetailDto.getProductId()).getData();
+              return convertToOrderDetail(order, orderDetailDto, productResponse);
+            })
             .toList();
 
     return orderDetailRepository.saveAll(orderDetails);
@@ -50,14 +56,14 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 //    return convertToListOrderDetailDto(orderDetailRepository.findAllByOrder(order));
 //  }
 
-  private OrderDetail convertToOrderDetail(Order order, OrderDetailDto orderDetailDto) {
+  private OrderDetail convertToOrderDetail(Order order, OrderDetailRequest orderDetailRequest, ProductResponse productResponse) {
     return OrderDetail.builder()
-            .productId(orderDetailDto.getProductId())
-            .productName(orderDetailDto.getProductName())
-            .quantity(orderDetailDto.getQuantity())
-            .productPrice(orderDetailDto.getProductPrice())
-            .productImage(orderDetailDto.getProductImage())
-            .productSize(orderDetailDto.getProductSize())
+            .productId(orderDetailRequest.getProductId())
+            .quantity(orderDetailRequest.getQuantity())
+            .productSize(orderDetailRequest.getSize())
+            .productName(productResponse.getName())
+            .productPrice(productResponse.getPrice())
+            .productImage(productResponse.getImages().get(0).getImageUrl())
             .order(order)
             .build();
   }

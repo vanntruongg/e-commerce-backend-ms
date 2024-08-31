@@ -16,11 +16,11 @@ public class OrderRequest {
   private String email;
   @NotNull
   private Integer addressId;
-  @NotNull
-  private Double totalPrice;
+//  @NotNull
+//  private Double totalPrice;
   private String notes;
   @NotNull
   private Integer paymentMethodId;
   @NotEmpty
-  private List<OrderDetailDto> listProduct;
+  private List<OrderDetailRequest> listProduct;
 }

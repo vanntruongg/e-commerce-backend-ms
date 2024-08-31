@@ -96,7 +96,7 @@ public class OrderConverter {
             .quantity(orderDetail.getQuantity())
             .productPrice(orderDetail.getProductPrice())
             .productImage(orderDetail.getProductImage())
-            .productSize(orderDetail.getProductSize())
+            .size(orderDetail.getProductSize())
             .build();
   }
 

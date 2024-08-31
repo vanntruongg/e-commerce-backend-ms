@@ -37,6 +37,15 @@ public class CartController {
             .build());
   }
 
+  @GetMapping(CART_COUNT)
+  public ResponseEntity<CommonResponse<Object>> updateQuantity(@RequestParam("email") String email) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.SUCCESS)
+            .data(cartService.count(email))
+            .build());
+  }
+
   @PostMapping(ADD_TO_CART)
   public ResponseEntity<CommonResponse<Object>> addToCart(@RequestBody @Valid AddToCartRequest cartItemDto) {
     return ResponseEntity.ok().body(CommonResponse.builder()

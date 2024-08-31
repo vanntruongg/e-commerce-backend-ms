@@ -13,13 +13,15 @@ import java.util.List;
 public interface CartService {
   CartResponse getCartById(String email);
 
-  Boolean addToCart(AddToCartRequest cartItemDto);
+  long addToCart(AddToCartRequest cartItemDto);
 
-  Boolean removeFromCart(DeleteCartRequest request);
+  long removeFromCart(DeleteCartRequest request);
 
-  Boolean updateQuantity(UpdateCartRequest request);
+  long updateQuantity(UpdateCartRequest request);
 
   void removeItemsFromCart(DeleteCartItemsRequest removeItemsCartRequest);
 
   List<SizeQuantityDto> getByEmailAndProductId(String email, int productId);
+
+  long count(String email);
 }

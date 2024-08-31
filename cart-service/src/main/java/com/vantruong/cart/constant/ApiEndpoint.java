@@ -22,6 +22,7 @@ public class ApiEndpoint {
   public static final String ITEMS = "/items";
   public static final String CART_DELETE_ITEMS = DELETE + ITEMS;
   public static final String INTERNAL = "/internal";
+  public static final String CART_COUNT = "/count";
   private static final String UPDATE = "/update";
 
   public static final String CART_GET_ALL = "/items";

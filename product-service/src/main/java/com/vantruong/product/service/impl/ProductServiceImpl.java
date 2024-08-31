@@ -8,7 +8,6 @@ import com.vantruong.common.exception.ErrorCode;
 import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.product.common.CommonResponse;
 import com.vantruong.product.constant.MessageConstant;
-import com.vantruong.product.converter.CategoryConverter;
 import com.vantruong.product.converter.ProductConverter;
 import com.vantruong.product.dto.ProductDto;
 import com.vantruong.product.entity.Category;
@@ -23,9 +22,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,7 +68,10 @@ public class ProductServiceImpl implements ProductService {
     } else {
       List<ProductResponse> allProducts = productRepository.findAll(createPaging(pageNo, pageSize))
               .stream()
-              .map(productConverter::convertToProductResponse)
+              .map(product -> {
+                List<SizeQuantityDto> sizeQuantityDtos = inventoryClient.getInventoryByProductId(product.getId()).getData();
+                return productConverter.convertToProductResponse(product, sizeQuantityDtos);
+              })
               .toList();
       List<ProductResponse> sortedList = sortList(allProducts, order);
       return new PageImpl<>(sortedList, pageable, productRepository.count());
@@ -83,8 +87,24 @@ public class ProductServiceImpl implements ProductService {
   }
 
 
-  private Product getProductById(int id) {
+  public Product getProductById(int id) {
     return productRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.PRODUCT_NOT_FOUND));
+  }
+
+  @Override
+  public Double calculateTotalPriceByProductIds(Map<Integer, Integer> productQuantities) {
+
+    double totalPrice = 0.0;
+    for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
+      Integer productId = entry.getKey();
+      Integer quantity = entry.getValue();
+
+      double price = productRepository.findPriceById(productId);
+
+      totalPrice += price * quantity;
+
+    }
+    return totalPrice;
   }
 
   /**
@@ -95,8 +115,11 @@ public class ProductServiceImpl implements ProductService {
    */
   @Override
   public List<ProductResponse> getAllProductByCategoryId(int id) {
-    List<Product> products = productRepository.findAllByCategoryAndSubcategories(id);
-    return productConverter.convertToListProductResponse(products);
+    return productRepository.findAllByCategoryAndSubcategories(id).stream()
+            .map(product -> {
+              List<SizeQuantityDto> sizeQuantityDtos = inventoryClient.getInventoryByProductId(product.getId()).getData();
+              return productConverter.convertToProductResponse(product, sizeQuantityDtos);
+            }).toList();
   }
 
   /**

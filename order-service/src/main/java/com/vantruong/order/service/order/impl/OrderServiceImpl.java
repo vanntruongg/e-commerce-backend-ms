@@ -1,15 +1,14 @@
 package com.vantruong.order.service.order.impl;
 
-import com.vantruong.common.dto.UserAddress;
 import com.vantruong.common.dto.request.ProductQuantityRequest;
+import com.vantruong.common.dto.response.ProductResponse;
 import com.vantruong.common.exception.ErrorCode;
 import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.common.exception.ProductQuantityNotAvailableException;
 import com.vantruong.order.constant.MessageConstant;
-import com.vantruong.order.dto.OrderDetailDto;
+import com.vantruong.order.dto.OrderDetailRequest;
 import com.vantruong.order.dto.OrderDto;
 import com.vantruong.order.dto.OrderRequest;
-import com.vantruong.order.dto.OrderSendMailRequest;
 import com.vantruong.order.entity.Order;
 import com.vantruong.order.entity.OrderDetail;
 import com.vantruong.order.entity.PaymentMethod;
@@ -19,6 +18,7 @@ import com.vantruong.order.enums.PaymentStatus;
 import com.vantruong.order.repository.OrderRepository;
 import com.vantruong.order.repository.client.InventoryClient;
 import com.vantruong.order.repository.client.MailClient;
+import com.vantruong.order.repository.client.ProductClient;
 import com.vantruong.order.repository.client.UserAddressClient;
 import com.vantruong.order.service.order.OrderDetailService;
 import com.vantruong.order.service.order.OrderService;
@@ -31,6 +31,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +43,13 @@ public class OrderServiceImpl implements OrderService {
   PaymentMethodService paymentMethodService;
   MailClient mailClient;
   UserAddressClient userAddressClient;
+  ProductClient productClient;
+
+  private ProductResponse getProduct(Integer productId) {
+    var response = productClient.getProductById(productId);
+    return response.getData();
+  }
+
   InventoryClient inventoryClient;
   OrderConverter orderConverter;
 
@@ -61,9 +70,18 @@ public class OrderServiceImpl implements OrderService {
 
     PaymentMethod paymentMethod = paymentMethodService.findById(orderRequest.getPaymentMethodId());
     OrderStatus orderStatus = paymentMethod.getMethod().equals(EPaymentMethod.COD) ? OrderStatus.PENDING_CONFIRM : OrderStatus.PENDING_PAYMENT;
+
+//    get product form product service to calculator total price;
+    List<Integer> productIds = orderRequest.getListProduct().stream()
+            .map(OrderDetailRequest::getProductId)
+            .toList();
+
+
+    var totalPrice = calculateTotalPriceByProductId(orderRequest.getListProduct());
+
     Order newOrder = Order.builder()
             .email(orderRequest.getEmail())
-            .totalPrice(orderRequest.getTotalPrice())
+            .totalPrice(totalPrice)
             .notes(orderRequest.getNotes())
             .orderStatus(orderStatus)
             .paymentStatus(PaymentStatus.UNPAID)
@@ -78,12 +96,21 @@ public class OrderServiceImpl implements OrderService {
     return orderSaved;
   }
 
-  private boolean validateProductQuantities(List<OrderDetailDto> listProduct) {
+  private Double calculateTotalPriceByProductId(List<OrderDetailRequest> products) {
+    Map<Integer, Integer> productQuantities = products.stream()
+            .collect(Collectors.toMap(
+                    OrderDetailRequest::getProductId,
+                    OrderDetailRequest::getQuantity
+            ));
+    return productClient.calculateTotalPriceByProductIds(productQuantities).getData();
+  }
+
+  private boolean validateProductQuantities(List<OrderDetailRequest> listProduct) {
     List<ProductQuantityRequest> request = listProduct.stream()
             .map(orderDetailDto ->
                     ProductQuantityRequest.builder()
                             .productId(orderDetailDto.getProductId())
-                            .size(orderDetailDto.getProductSize())
+                            .size(orderDetailDto.getSize())
                             .quantity(orderDetailDto.getQuantity())
                             .build()
             )

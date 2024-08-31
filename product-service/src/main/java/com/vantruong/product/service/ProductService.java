@@ -28,4 +28,8 @@ public interface ProductService {
   List<ProductResponse> getProductsByCategoryId(int id, int limit);
 
   List<ProductResponse> getProductsByIds(List<Integer> productIds);
+
+ Product getProductById(int id);
+
+  Double calculateTotalPriceByProductIds(Map<Integer, Integer> productQuantities);
 }
