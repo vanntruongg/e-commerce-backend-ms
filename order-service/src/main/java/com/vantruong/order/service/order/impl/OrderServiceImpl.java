@@ -1,7 +1,6 @@
 package com.vantruong.order.service.order.impl;
 
 import com.vantruong.common.dto.request.ProductQuantityRequest;
-import com.vantruong.common.dto.response.ProductResponse;
 import com.vantruong.common.exception.ErrorCode;
 import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.common.exception.ProductQuantityNotAvailableException;
@@ -9,6 +8,7 @@ import com.vantruong.order.constant.MessageConstant;
 import com.vantruong.order.dto.OrderDetailRequest;
 import com.vantruong.order.dto.OrderDto;
 import com.vantruong.order.dto.OrderRequest;
+import com.vantruong.order.entity.DeliveryAddress;
 import com.vantruong.order.entity.Order;
 import com.vantruong.order.entity.OrderDetail;
 import com.vantruong.order.entity.PaymentMethod;
@@ -17,9 +17,8 @@ import com.vantruong.order.enums.OrderStatus;
 import com.vantruong.order.enums.PaymentStatus;
 import com.vantruong.order.repository.OrderRepository;
 import com.vantruong.order.repository.client.InventoryClient;
-import com.vantruong.order.repository.client.MailClient;
 import com.vantruong.order.repository.client.ProductClient;
-import com.vantruong.order.repository.client.UserAddressClient;
+import com.vantruong.order.service.order.DeliveryAddressService;
 import com.vantruong.order.service.order.OrderDetailService;
 import com.vantruong.order.service.order.OrderService;
 import com.vantruong.order.service.payment.PaymentMethodService;
@@ -30,9 +29,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,14 +40,8 @@ public class OrderServiceImpl implements OrderService {
   OrderRepository orderRepository;
   OrderDetailService orderDetailService;
   PaymentMethodService paymentMethodService;
-  MailClient mailClient;
-  UserAddressClient userAddressClient;
+  DeliveryAddressService deliveryAddressService;
   ProductClient productClient;
-
-  private ProductResponse getProduct(Integer productId) {
-    var response = productClient.getProductById(productId);
-    return response.getData();
-  }
 
   InventoryClient inventoryClient;
   OrderConverter orderConverter;
@@ -69,13 +62,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     PaymentMethod paymentMethod = paymentMethodService.findById(orderRequest.getPaymentMethodId());
-    OrderStatus orderStatus = paymentMethod.getMethod().equals(EPaymentMethod.COD) ? OrderStatus.PENDING_CONFIRM : OrderStatus.PENDING_PAYMENT;
-
-//    get product form product service to calculator total price;
-    List<Integer> productIds = orderRequest.getListProduct().stream()
-            .map(OrderDetailRequest::getProductId)
-            .toList();
-
+    OrderStatus orderStatus = paymentMethod.getSlug().equals(EPaymentMethod.COD) ? OrderStatus.PENDING_CONFIRM : OrderStatus.PENDING_PAYMENT;
 
     var totalPrice = calculateTotalPriceByProductId(orderRequest.getListProduct());
 
@@ -86,9 +73,10 @@ public class OrderServiceImpl implements OrderService {
             .orderStatus(orderStatus)
             .paymentStatus(PaymentStatus.UNPAID)
             .paymentMethod(paymentMethod)
-            .addressId(orderRequest.getAddressId())
             .build();
     Order orderSaved = orderRepository.save(newOrder);
+
+    deliveryAddressService.createDeliveryAddress(orderRequest.getName(), orderRequest.getPhone(), orderRequest.getAddress(), orderSaved);
 
     List<OrderDetail> orderDetails = orderDetailService.createOrderDetails(orderSaved, orderRequest.getListProduct());
     orderSaved.setOrderDetails(orderDetails);
@@ -96,12 +84,16 @@ public class OrderServiceImpl implements OrderService {
     return orderSaved;
   }
 
-  private Double calculateTotalPriceByProductId(List<OrderDetailRequest> products) {
-    Map<Integer, Integer> productQuantities = products.stream()
-            .collect(Collectors.toMap(
-                    OrderDetailRequest::getProductId,
-                    OrderDetailRequest::getQuantity
-            ));
+  private Double calculateTotalPriceByProductId(List<OrderDetailRequest> requests) {
+    Map<Integer, Integer> productQuantities = new HashMap<>();
+
+    for (OrderDetailRequest request: requests) {
+      Integer productId = request.getProductId();
+      Integer quantity = request.getQuantity();
+      productQuantities.merge(productId, quantity, Integer::sum);
+    }
+
+
     return productClient.calculateTotalPriceByProductIds(productQuantities).getData();
   }
 
@@ -160,8 +152,8 @@ public class OrderServiceImpl implements OrderService {
   public OrderDto getOrderById(int id) {
     Order order = orderRepository.findById(id).orElseThrow(() ->
             new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.ORDER_NOT_FOUND));
-
-    return orderConverter.convertToOrderDto(order, orderConverter.convertToListOrderDetailDto(order.getOrderDetails()));
+    DeliveryAddress deliveryAddress = deliveryAddressService.getByOrder(order);
+    return orderConverter.convertToOrderDto(order, orderConverter.convertToListOrderDetailDto(order.getOrderDetails()), deliveryAddress);
   }
 
   @Override

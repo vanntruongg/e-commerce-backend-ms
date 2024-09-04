@@ -15,14 +15,14 @@ public class PaymentMethod {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
-  private int paymentMethodId;
-
-  @Column(name = "name")
-  private String name;
+  private int id;
 
   @Column(name = "method")
+  private String method;
+
+  @Column(name = "slug")
   @Enumerated(EnumType.STRING)
-  private EPaymentMethod method;
+  private EPaymentMethod slug;
 
   @Column(name = "description")
   private String description;

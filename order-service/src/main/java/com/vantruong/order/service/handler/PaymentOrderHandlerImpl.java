@@ -5,12 +5,14 @@ import com.vantruong.common.event.OrderEvent;
 import com.vantruong.common.event.OrderEventStatus;
 import com.vantruong.order.dto.OrderCreateResponse;
 import com.vantruong.order.dto.OrderRequest;
+import com.vantruong.order.entity.DeliveryAddress;
 import com.vantruong.order.entity.Order;
 import com.vantruong.order.entity.PaymentMethod;
 import com.vantruong.order.enums.EPaymentMethod;
 import com.vantruong.order.enums.OrderStatus;
 import com.vantruong.order.enums.PaymentStatus;
 import com.vantruong.order.producer.KafkaProducer;
+import com.vantruong.order.service.order.DeliveryAddressService;
 import com.vantruong.order.service.order.OrderService;
 import com.vantruong.order.service.payment.PaymentMethodService;
 import com.vantruong.order.service.payment.VNPayService;
@@ -33,6 +35,7 @@ public class PaymentOrderHandlerImpl implements PaymentOrderHandler {
   KafkaProducer kafkaProducer;
   OrderConverter orderConverter;
   PaymentMethodService paymentMethodService;
+  DeliveryAddressService deliveryAddressService;
 
   @Override
   @Transactional
@@ -40,12 +43,13 @@ public class PaymentOrderHandlerImpl implements PaymentOrderHandler {
     PaymentMethod paymentMethod = paymentMethodService.findById(orderRequest.getPaymentMethodId());
 
     Order newOrder = orderService.createNewOrder(orderRequest);
+    DeliveryAddress deliveryAddress = deliveryAddressService.getByOrder(newOrder);
 
     String urlPayment = null;
-    if(paymentMethod.getMethod().equals(EPaymentMethod.COD)) {
-      OrderEvent orderEvent = orderConverter.orderToKafka(newOrder);
+    if(paymentMethod.getSlug().equals(EPaymentMethod.COD)) {
+      OrderEvent orderEvent = orderConverter.orderToKafka(newOrder, deliveryAddress);
       kafkaProducer.sendOrder(orderEvent);
-    } else if (paymentMethod.getMethod().equals(EPaymentMethod.VN_PAY)) {
+    } else if (paymentMethod.getSlug().equals(EPaymentMethod.VN_PAY)) {
       urlPayment = getPaymentUrl(newOrder.getOrderId(), newOrder.getTotalPrice());
     }
     return OrderCreateResponse.builder()
@@ -64,8 +68,9 @@ public class PaymentOrderHandlerImpl implements PaymentOrderHandler {
 
     String orderId = params.get("vnp_OrderInfo").split(":")[1].trim();
     Order order = orderService.findById(Integer.parseInt(orderId));
+    DeliveryAddress deliveryAddress = deliveryAddressService.getByOrder(order);
 
-    OrderEvent orderEvent = orderConverter.orderToKafka(order);
+    OrderEvent orderEvent = orderConverter.orderToKafka(order, deliveryAddress);
     if (paymentResponse) {
       orderService.updateOrderStatus(Integer.parseInt(orderId), OrderStatus.PENDING_CONFIRM);
       orderService.updatePaymentStatus(Integer.parseInt(orderId), PaymentStatus.PAID);

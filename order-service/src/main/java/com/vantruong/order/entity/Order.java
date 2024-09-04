@@ -19,19 +19,19 @@ import java.util.List;
 public class Order extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "o_id")
+  @Column(name = "order_id")
   private int orderId;
 
   @Column(name = "email")
   private String email;
 
-  @Column(name = "o_notes")
-  private String notes;
-
-  @Column(name = "O_total_price")
+  @Column(name = "total_price")
   private double totalPrice;
 
-  @Column(name = "o_status")
+  @Column(name = "notes")
+  private String notes;
+
+  @Column(name = "order_status")
   private OrderStatus orderStatus;
 
   @Column(name = "payment_status")
@@ -42,8 +42,8 @@ public class Order extends BaseEntity {
   @JoinColumn(name = "payment_method")
   private PaymentMethod paymentMethod;
 
-  @Column(name = "address_id")
-  private Integer addressId;
+//  @Column(name = "address_id")
+//  private Integer addressId;
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
   private List<OrderDetail> orderDetails = new ArrayList<>();

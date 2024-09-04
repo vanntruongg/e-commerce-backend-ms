@@ -15,8 +15,12 @@ public class OrderRequest {
   @NotNull
   private String email;
   @NotNull
-  private Integer addressId;
-//  @NotNull
+  private String name;
+  @NotNull
+  private String phone;
+  @NotNull
+  private String address;
+  //  @NotNull
 //  private Double totalPrice;
   private String notes;
   @NotNull

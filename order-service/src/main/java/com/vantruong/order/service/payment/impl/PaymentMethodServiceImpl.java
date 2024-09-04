@@ -9,17 +9,14 @@ import com.vantruong.order.repository.PaymentMethodRepository;
 import com.vantruong.order.service.payment.PaymentMethodService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentMethodServiceImpl implements PaymentMethodService {
   private final PaymentMethodRepository paymentMethodRepository;
-  private final ModelMapper modelMapper;
 
   @Override
   public PaymentMethod findById(int paymentMethodId) {
@@ -30,11 +27,15 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
   @Override
   public List<PaymentMethodDto> findAll() {
     List<PaymentMethod> paymentMethods = paymentMethodRepository.findAll();
-    Type typeToken = new TypeToken<List<PaymentMethodDto>>() {}.getType();
-//    return paymentMethods.stream()
-//            .map(paymentMethod -> modelMapper.map(paymentMethod, PaymentMethodDto.class))
-//            .collect(Collectors.toList());
-    return modelMapper.map(paymentMethods, typeToken);
+
+    return paymentMethods.stream()
+            .map(paymentMethod -> PaymentMethodDto.builder()
+                    .id(paymentMethod.getId())
+                    .method(paymentMethod.getMethod())
+                    .slug(paymentMethod.getSlug())
+                    .description(paymentMethod.getDescription())
+                    .build())
+            .toList();
   }
 
 }

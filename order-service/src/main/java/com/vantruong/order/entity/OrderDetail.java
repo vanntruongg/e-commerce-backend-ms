@@ -19,11 +19,11 @@ public class OrderDetail extends BaseEntity {
   @Column(name = "od_id")
   private int orderDetailId;
 
+  @Column(name = "quantity")
+  private int quantity;
+
   @Column(name = "product_id")
   private int productId;
-
-  @Column(name = "od_quantity")
-  private int quantity;
 
   @Column(name = "product_name")
   private String productName;
@@ -38,7 +38,7 @@ public class OrderDetail extends BaseEntity {
   private String productSize;
 
   @ManyToOne
-  @JoinColumn(name = "o_id", referencedColumnName = "o_id")
+  @JoinColumn(name = "order_id", referencedColumnName = "order_id")
   @JsonIgnore
   private Order order;
 

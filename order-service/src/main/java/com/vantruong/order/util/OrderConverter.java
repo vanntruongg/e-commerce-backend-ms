@@ -10,7 +10,9 @@ import com.vantruong.common.util.DateTimeFormatter;
 import com.vantruong.order.dto.OrderDetailDto;
 import com.vantruong.order.dto.OrderDto;
 import com.vantruong.order.dto.OrderSendMailRequest;
+import com.vantruong.order.entity.DeliveryAddress;
 import com.vantruong.order.entity.Order;
+import com.vantruong.order.service.order.DeliveryAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +23,9 @@ import java.util.List;
 public class OrderConverter {
   private final DateTimeFormatter dateTimeFormatter;
   private final AddressFormatter addressFormatter;
+  private final DeliveryAddressService deliveryAddressService;
 
-  public OrderEvent orderToKafka(Order order) {
+  public OrderEvent orderToKafka(Order order, DeliveryAddress deliveryAddress) {
     List<OrderDetail> orderDetails = order.getOrderDetails().stream()
             .map(orderDetail -> OrderDetail.builder()
                     .orderDetailId(orderDetail.getOrderDetailId())
@@ -37,7 +40,9 @@ public class OrderConverter {
     return OrderEvent.builder()
             .orderId(order.getOrderId())
             .email(order.getEmail())
-            .addressId(order.getAddressId())
+            .name(deliveryAddress.getName())
+            .phone(deliveryAddress.getPhone())
+            .address(deliveryAddress.getAddress())
             .totalPrice(order.getTotalPrice())
             .orderStatus(OrderEventStatus.NEW)
             .paymentStatus(PaymentStatus.PAYMENT_SUCCESS)
@@ -46,20 +51,22 @@ public class OrderConverter {
             .build();
   }
 
-  public List<OrderEvent> listOrderToKafka(List<Order> orders) {
-    return orders.stream().map(this::orderToKafka).toList();
-  }
+//  public List<OrderEvent> listOrderToKafka(List<Order> orders) {
+//    return orders.stream().map(this::orderToKafka).toList();
+//  }
 
-  public OrderDto convertToOrderDto(Order order, List<OrderDetailDto> orderDetail) {
+  public OrderDto convertToOrderDto(Order order, List<OrderDetailDto> orderDetail, DeliveryAddress deliveryAddress) {
     return OrderDto.builder()
             .orderId(order.getOrderId())
             .email(order.getEmail())
+            .name(deliveryAddress.getName())
+            .phone(deliveryAddress.getPhone())
+            .address(deliveryAddress.getAddress())
             .notes(order.getNotes())
-            .addressId(order.getAddressId())
             .totalPrice(order.getTotalPrice())
-            .orderStatus(order.getOrderStatus().getName())
+            .orderStatus(order.getOrderStatus().name())
             .paymentStatus(order.getPaymentStatus().name())
-            .paymentMethod(order.getPaymentMethod().getName())
+            .paymentMethod(order.getPaymentMethod().getMethod())
             .created(dateTimeFormatter.format(order.getCreatedDate()))
             .createdDate(order.getCreatedDate())
             .orderDetail(orderDetail)
@@ -76,15 +83,17 @@ public class OrderConverter {
             .phone(userAddress.getPhone())
             .address(addressFormatter.formatAddress(userAddress))
             .totalPrice(order.getTotalPrice())
-            .orderStatus(order.getOrderStatus().getName())
+            .orderStatus(order.getOrderStatus().getOrderStatus())
             .createdDate(order.getCreatedDate())
             .orderDetail(orderDetail)
             .build();
   }
 
   public List<OrderDto> convertToListOrderDto(List<Order> orders) {
-    return orders.stream().map(order ->
-            convertToOrderDto(order, convertToListOrderDetailDto(order.getOrderDetails()))
+    return orders.stream().map(order -> {
+            DeliveryAddress deliveryAddress = deliveryAddressService.getByOrder(order);
+            return  convertToOrderDto(order, convertToListOrderDetailDto(order.getOrderDetails()), deliveryAddress);
+            }
     ).toList();
   }
 
