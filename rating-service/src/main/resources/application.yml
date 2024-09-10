@@ -1,0 +1,29 @@
+# Inventory-service
+server:
+  port: 9010
+spring:
+  application:
+    name: rating-service
+  data:
+    mongodb:
+      database: NEST-Store-RatingDB
+      host: localhost
+      port: 27017
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      group-id: rating-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka/
+jwt:
+  secret: cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
