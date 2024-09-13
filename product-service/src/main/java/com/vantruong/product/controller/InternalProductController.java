@@ -6,7 +6,6 @@ import com.vantruong.product.constant.MessageConstant;
 import com.vantruong.product.converter.ProductConverter;
 import com.vantruong.product.service.ProductService;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +19,18 @@ import static com.vantruong.common.constant.InternalApiEndpoint.GET_BY_PRODUCT_I
 
 @RestController
 @RequestMapping(InernalApiEndpoint.INTERNAL + InernalApiEndpoint.PRODUCT)
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class InternalProductController {
   ProductService productService;
   ProductConverter productConverter;
 
+  public InternalProductController(ProductService productService, ProductConverter productConverter) {
+    this.productService = productService;
+    this.productConverter = productConverter;
+  }
+
   @PostMapping(InernalApiEndpoint.GET_BY_IDS)
-  public ResponseEntity<CommonResponse<Object>> getProductsByIds(@RequestBody List<Integer> productIds) {
+  public ResponseEntity<CommonResponse<Object>> getProductsByIds(@RequestBody List<Long> productIds) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.SUCCESS)
@@ -37,7 +40,7 @@ public class InternalProductController {
 
 
   @PostMapping(GET_BY_PRODUCT_ID)
-  public ResponseEntity<CommonResponse<Object>> getProductsById(@PathVariable("id") Integer id) {
+  public ResponseEntity<CommonResponse<Object>> getProductsById(@PathVariable("id") Long id) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.SUCCESS)
@@ -46,11 +49,11 @@ public class InternalProductController {
   }
 
   @PostMapping(CALCULATE_BY_PRODUCT_IDS)
-  public ResponseEntity<CommonResponse<Object>> calculateTotalPriceByProductIds(Map<Integer, Integer> productQuantities) {
+  public ResponseEntity<CommonResponse<Object>> calculateTotalOrderPrice(@RequestBody Map<Long, Integer> productQuantities) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.SUCCESS)
-            .data(productService.calculateTotalPriceByProductIds(productQuantities))
+            .data(productService.calculateTotalOrderPrice(productQuantities))
             .build());
   }
 

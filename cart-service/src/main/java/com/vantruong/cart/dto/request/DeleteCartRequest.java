@@ -5,6 +5,6 @@ import lombok.Getter;
 @Getter
 public class DeleteCartRequest {
   private String email;
-  private int productId;
+  private Long productId;
   private String size;
 }

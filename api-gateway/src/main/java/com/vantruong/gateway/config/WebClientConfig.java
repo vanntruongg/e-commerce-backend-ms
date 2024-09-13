@@ -1,6 +1,6 @@
 package com.vantruong.gateway.config;
 
-import com.vantruong.gateway.repository.IdentityClient;
+import com.vantruong.gateway.client.IdentityClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;

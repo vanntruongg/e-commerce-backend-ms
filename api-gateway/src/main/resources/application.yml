@@ -8,6 +8,8 @@ app:
 spring:
 #  main:
 #    web-application-type: reactive
+  main:
+    web-application-type: reactive
   application:
     name: api-gateway
   cloud:
@@ -74,6 +76,12 @@ spring:
           uri: http://localhost:9009
           predicates:
             - Path=${app.api-prefix}/order-orchestrator/**
+          filters:
+            - StripPrefix=2
+        - id: rating-service
+          uri: http://localhost:9010
+          predicates:
+            - Path=${app.api-prefix}/ratings/**
           filters:
             - StripPrefix=2
 eureka:

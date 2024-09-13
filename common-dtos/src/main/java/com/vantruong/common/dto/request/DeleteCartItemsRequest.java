@@ -1,6 +1,6 @@
 package com.vantruong.common.dto.request;
 
-import com.vantruong.common.dto.CartItem;
+import com.vantruong.common.dto.cart.CartItemCommon;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,5 +12,5 @@ import java.util.List;
 @Builder
 public class DeleteCartItemsRequest {
   private String email;
-  private List<CartItem> items;
+  private List<CartItemCommon> items;
 }

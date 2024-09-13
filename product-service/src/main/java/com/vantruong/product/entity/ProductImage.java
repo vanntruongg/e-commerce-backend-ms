@@ -14,7 +14,7 @@ import lombok.*;
 public class ProductImage {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int id;
+  private Long id;
 
   @Column(name = "image_url")
   private String imageUrl;

@@ -1,6 +1,6 @@
 package com.vantruong.order.repository;
 
-import com.vantruong.order.enums.OrderStatus;
+import com.vantruong.order.entity.enumeration.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,11 +10,17 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Integer> {
+public interface OrderRepository extends JpaRepository<Order, Long> {
   List<Order> findOrderByOrderStatus(OrderStatus status);
 
   List<Order> findOrderByEmailAndOrderStatusOrderByCreatedDateDesc(String email, OrderStatus status);
 
+  @Query("SELECT CASE WHEN COUNT(o) > 0 THEN true ELSE false END " +
+          "from Order o inner join OrderItem oi on o.orderId = oi.order.orderId " +
+          "where o.email = :email " +
+          "and o.orderStatus = :orderStatus " +
+          "and oi.productId = :productId")
+  boolean existsByEmailAndProductIdAndOrderStatus(String email, Long productId, OrderStatus orderStatus);
   List<Order> findAllByEmailOrderByCreatedDateDesc(String email);
 
   @Query("select o.orderStatus, count(o) from Order o group by o.orderStatus")

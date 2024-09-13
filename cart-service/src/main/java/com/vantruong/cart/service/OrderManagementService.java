@@ -1,7 +1,7 @@
 package com.vantruong.cart.service;
 
 import com.vantruong.common.constant.KafkaTopics;
-import com.vantruong.common.dto.CartItem;
+import com.vantruong.common.dto.cart.CartItemCommon;
 import com.vantruong.common.dto.request.DeleteCartItemsRequest;
 import com.vantruong.common.event.OrderEvent;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +20,10 @@ public class OrderManagementService {
   @KafkaListener(topics = KafkaTopics.CART_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
   public void processCartRequest(OrderEvent orderEvent) {
     try {
-      List<CartItem> cartItems = orderEvent.getOrderDetails().stream()
-              .map(orderDetail -> CartItem.builder()
-                      .productId(orderDetail.getProductId())
-                      .size(orderDetail.getProductSize())
+      List<CartItemCommon> cartItems = orderEvent.getOrderItems().stream()
+              .map(orderItemDto -> CartItemCommon.builder()
+                      .productId(orderItemDto.productId())
+                      .size(orderItemDto.productSize())
                       .build()).toList();
       DeleteCartItemsRequest deleteCartItemsRequest = DeleteCartItemsRequest.builder()
               .email(orderEvent.getEmail())

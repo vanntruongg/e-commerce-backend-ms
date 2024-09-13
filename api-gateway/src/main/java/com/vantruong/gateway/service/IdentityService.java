@@ -3,7 +3,7 @@ package com.vantruong.gateway.service;
 import com.vantruong.gateway.dto.request.IntrospectRequest;
 import com.vantruong.gateway.common.CommonResponse;
 import com.vantruong.gateway.dto.response.IntrospectResponse;
-import com.vantruong.gateway.repository.IdentityClient;
+import com.vantruong.gateway.client.IdentityClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

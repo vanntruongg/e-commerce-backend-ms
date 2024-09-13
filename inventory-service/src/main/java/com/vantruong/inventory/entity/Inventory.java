@@ -15,6 +15,6 @@ import java.util.List;
 public class Inventory {
   @Id
   private String id;
-  private Integer productId;
+  private Long productId;
   private List<SizeQuantity> sizes;
 }

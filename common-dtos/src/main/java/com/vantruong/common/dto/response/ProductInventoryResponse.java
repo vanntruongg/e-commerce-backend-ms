@@ -1,6 +1,6 @@
 package com.vantruong.common.dto.response;
 
-import com.vantruong.common.dto.SizeQuantityDto;
+import com.vantruong.common.dto.inventory.SizeQuantityDto;
 import lombok.*;
 
 import java.util.List;
@@ -12,5 +12,5 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductInventoryResponse {
-  private Map<Integer, List<SizeQuantityDto>> productInventoryResponse;
+  private Map<Long, List<SizeQuantityDto>> productInventoryResponse;
 }

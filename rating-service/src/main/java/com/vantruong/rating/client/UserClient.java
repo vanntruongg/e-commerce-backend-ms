@@ -10,6 +10,6 @@ import static com.vantruong.common.constant.InternalApiEndpoint.IDENTITY_SERVICE
 @FeignClient(name = "identity-service", url = IDENTITY_SERVICE_URL)
 public interface UserClient {
 
-  @GetMapping("/users/profile")
+  @GetMapping("/user/profile")
   CommonResponse<UserCommonDto> getUserProfile();
 }

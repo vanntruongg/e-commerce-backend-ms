@@ -11,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class CartItem {
-  private Integer productId;
+  private Long productId;
   private List<SizeQuantity> sizeQuantities;
 }

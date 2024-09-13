@@ -1,5 +1,6 @@
 package com.vantruong.rating.dto;
 
+import com.vantruong.common.util.DateTimeFormatter;
 import com.vantruong.rating.entity.Rating;
 import lombok.Builder;
 
@@ -15,9 +16,10 @@ public record RatingDto(
         String createdBy,
         String lastName,
         String firstName,
-        LocalDateTime createdDate
+        String createdDate
 ) {
   public static RatingDto fromEntity(Rating rating) {
+    DateTimeFormatter dateTimeFormatter = new DateTimeFormatter();
     return new RatingDto(
             rating.getId(),
             rating.getContent(),
@@ -27,7 +29,7 @@ public record RatingDto(
             rating.getCreatedBy(),
             rating.getLastName(),
             rating.getFirstName(),
-            rating.getCreatedDate()
+            dateTimeFormatter.format(rating.getCreatedDate())
     );
   }
 }

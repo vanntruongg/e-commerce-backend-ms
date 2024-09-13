@@ -1,7 +1,7 @@
 package com.vantruong.notification.repository;
 
 import com.vantruong.common.constant.InternalApiEndpoint;
-import com.vantruong.common.dto.UserAddress;
+import com.vantruong.common.dto.user.UserAddress;
 import com.vantruong.notification.common.CommonResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

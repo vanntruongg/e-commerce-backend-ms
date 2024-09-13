@@ -4,45 +4,47 @@ import com.vantruong.cart.common.CommonResponse;
 import com.vantruong.cart.dto.request.AddToCartRequest;
 import com.vantruong.cart.dto.request.DeleteCartRequest;
 import com.vantruong.cart.dto.request.UpdateCartRequest;
+import com.vantruong.cart.service.CartService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.vantruong.cart.constant.MessageConstant;
-import com.vantruong.cart.service.CartService;
 
 import static com.vantruong.cart.constant.ApiEndpoint.*;
 
 @RestController
 @RequestMapping(CART)
-@RequiredArgsConstructor
 public class CartController {
   private final CartService cartService;
 
+  public CartController(CartService cartService) {
+    this.cartService = cartService;
+  }
+
   @GetMapping(CART_GET_ALL)
-  public ResponseEntity<CommonResponse<Object>> getAll(@RequestParam("email") String email) {
+  public ResponseEntity<CommonResponse<Object>> getAll() {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(cartService.getCartById(email))
+            .data(cartService.getCartById())
             .build());
   }
 
-  @GetMapping(CART_GET_BY_ID_AND_PRODUCT_ID)
-  public ResponseEntity<CommonResponse<Object>> getByEmailAndProductId(@RequestParam("email") String email, @RequestParam("productId") int productId) {
+  @GetMapping(CART_GET_BY_PRODUCT_ID)
+  public ResponseEntity<CommonResponse<Object>> getByEmailAndProductId(@RequestParam("productId") Long productId) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(cartService.getByEmailAndProductId(email, productId))
+            .data(cartService.getByEmailAndProductId(productId))
             .build());
   }
 
   @GetMapping(CART_COUNT)
-  public ResponseEntity<CommonResponse<Object>> updateQuantity(@RequestParam("email") String email) {
+  public ResponseEntity<CommonResponse<Object>> updateQuantity() {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.SUCCESS)
-            .data(cartService.count(email))
+            .data(cartService.count())
             .build());
   }
 

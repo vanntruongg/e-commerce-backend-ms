@@ -1,6 +1,6 @@
 package com.vantruong.order.dto;
 
-import com.vantruong.order.entity.PaymentMethod;
+import com.vantruong.order.entity.enumeration.PaymentMethod;
 import lombok.*;
 
 @Getter

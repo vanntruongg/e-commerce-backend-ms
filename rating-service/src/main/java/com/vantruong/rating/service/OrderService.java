@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 public class OrderService {
   private final OrderClient orderClient;
 
-  public OrderExistsByProductAndUser checkOrderExistsByProductAndUserWithStatus(Long productId) {
-    CommonResponse<OrderExistsByProductAndUser> response = orderClient.checkOrderExistsByProductAndUserWithStatus(productId);
+  public OrderExistsByProductAndUser checkOrderExistsByProductAndUserWithStatus(String email, Long productId) {
+    CommonResponse<OrderExistsByProductAndUser> response = orderClient.checkOrderExistsByProductAndUserWithStatus(email, productId);
     return response.getData();
   }
 }

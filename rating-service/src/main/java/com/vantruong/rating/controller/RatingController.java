@@ -30,15 +30,15 @@ public class RatingController {
   }
 
   @PostMapping
-  public ResponseEntity<CommonResponse<Object>> createRating(RatingPost ratingPost) {
+  public ResponseEntity<CommonResponse<Object>> createRating(@RequestBody RatingPost ratingPost) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
-            .message(MessageConstant.FIND_SUCCESS)
+            .message(MessageConstant.CREATE_RATING_SUCCESS)
             .data(ratingService.createRating(ratingPost))
             .build());
   }
 
-  @DeleteMapping(ID_PARAM)
+  @DeleteMapping(DELETE + ID_PARAM)
   public ResponseEntity<CommonResponse<Object>> deleteRating(@PathVariable("id") String ratingId) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
@@ -47,7 +47,7 @@ public class RatingController {
             .build());
   }
 
-  @PostMapping(GET_AVERAGE_RATING_OF_PRODUCT)
+  @GetMapping(GET_AVERAGE_RATING_OF_PRODUCT)
   public ResponseEntity<CommonResponse<Object>> getAverageStarRatingOfProduct(
           @PathVariable("productId") Long productId
   ) {
@@ -55,6 +55,17 @@ public class RatingController {
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
             .data(ratingService.calculateAverageStar(productId))
+            .build());
+  }
+
+  @GetMapping(GET_RATING_BREAKDOWN)
+  public ResponseEntity<CommonResponse<Object>> getRatingBreakdown(
+          @PathVariable("productId") Long productId
+  ) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.FIND_SUCCESS)
+            .data(ratingService.getRatingBreakdown(productId))
             .build());
   }
 }

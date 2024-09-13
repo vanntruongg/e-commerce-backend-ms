@@ -1,13 +1,12 @@
 package com.vantruong.order.entity;
 
-import com.vantruong.order.enums.EPaymentMethod;
-import com.vantruong.order.enums.PaymentStatus;
+import com.vantruong.order.entity.enumeration.PaymentMethod;
+import com.vantruong.order.entity.enumeration.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import com.vantruong.order.enums.OrderStatus;
+import com.vantruong.order.entity.enumeration.OrderStatus;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -20,31 +19,28 @@ public class Order extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "order_id")
-  private int orderId;
-
-  @Column(name = "email")
+  private Long orderId;
   private String email;
-
   @Column(name = "total_price")
   private double totalPrice;
-
-  @Column(name = "notes")
   private String notes;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "order_status")
   private OrderStatus orderStatus;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "payment_status")
   private PaymentStatus paymentStatus;
 
+  @Column(name = "payment_method")
   @Enumerated(EnumType.STRING)
-  @ManyToOne
-  @JoinColumn(name = "payment_method")
   private PaymentMethod paymentMethod;
 
-//  @Column(name = "address_id")
-//  private Integer addressId;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "order_address_id", referencedColumnName = "oa_id")
+  private OrderAddress orderAddress;
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-  private List<OrderDetail> orderDetails = new ArrayList<>();
+  private Set<OrderItem> orderItems;
 }

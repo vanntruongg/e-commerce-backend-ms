@@ -4,8 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class UpdateCartRequest {
-  private String email;
-  private int productId;
+  private Long productId;
   private String size;
   private int quantity;
 }

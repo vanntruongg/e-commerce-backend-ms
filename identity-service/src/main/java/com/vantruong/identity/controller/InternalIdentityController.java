@@ -5,7 +5,6 @@ import com.vantruong.identity.common.CommonResponse;
 import com.vantruong.identity.dto.request.IntrospectRequest;
 import com.vantruong.identity.service.AuthService;
 import com.vantruong.identity.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +16,15 @@ import static com.vantruong.identity.constant.InternalApiEndpoint.*;
 
 @RestController
 @RequestMapping(INTERNAL + IDENTITY)
-@RequiredArgsConstructor
 public class InternalIdentityController {
 
   private final AuthService identityService;
   private final UserService userService;
+
+  public InternalIdentityController(AuthService identityService, UserService userService) {
+    this.identityService = identityService;
+    this.userService = userService;
+  }
 
   @PostMapping(INTROSPECT)
   public ResponseEntity<CommonResponse<Object>> authenticate(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
@@ -35,6 +38,13 @@ public class InternalIdentityController {
   public ResponseEntity<CommonResponse<Object>> existedByEmail(@RequestParam("email") String email) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .data(userService.existedByEmail(email))
+            .build());
+  }
+
+  @GetMapping(USER_PROFILE)
+  public ResponseEntity<CommonResponse<Object>> getProfile() {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .data(userService.getProfile())
             .build());
   }
 }

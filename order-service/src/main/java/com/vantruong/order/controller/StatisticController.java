@@ -3,16 +3,21 @@ package com.vantruong.order.controller;
 import com.vantruong.order.common.CommonResponse;
 import com.vantruong.order.constant.ApiEndpoint;
 import com.vantruong.order.constant.MessageConstant;
-import com.vantruong.order.service.order.StatisticService;
-import lombok.RequiredArgsConstructor;
+import com.vantruong.order.service.StatisticService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(ApiEndpoint.ORDER + ApiEndpoint.STATISTIC)
-@RequiredArgsConstructor
 public class StatisticController {
   private final StatisticService statisticService;
+
+  public StatisticController(StatisticService statisticService) {
+    this.statisticService = statisticService;
+  }
 
   @GetMapping(ApiEndpoint.GET_TOTAL_ORDER)
   public ResponseEntity<CommonResponse<Object>> getTotalOrderCountByStatus() {
@@ -23,17 +28,11 @@ public class StatisticController {
             .build());
   }
 
-//  @GetMapping(COUNT_ORDER_BY_MONTH)
-//  public ResponseEntity<CommonResponse<Object>> getCountOrderByMonth() {
-//    return ResponseEntity.ok().body(CommonResponse.builder()
-//            .isSuccess(true)
-//            .message(MessageConstant.FIND_SUCCESS)
-//            .data(statisticService.getCountOrderByMonth())
-//            .build());
-//  }
-
   @GetMapping(ApiEndpoint.REVENUE)
-  public ResponseEntity<CommonResponse<Object>> getRevenue(@RequestParam("year") Integer year, @RequestParam(value = "month", required = false) Integer month) {
+  public ResponseEntity<CommonResponse<Object>> getRevenue(
+          @RequestParam("year") Integer year,
+          @RequestParam(value = "month", required = false) Integer month
+  ) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
@@ -42,7 +41,10 @@ public class StatisticController {
   }
 
   @GetMapping(ApiEndpoint.ORDER)
-  public ResponseEntity<CommonResponse<Object>> statisticOrder(@RequestParam("year") Integer year, @RequestParam(value = "month", required = false) Integer month) {
+  public ResponseEntity<CommonResponse<Object>> statisticOrder(
+          @RequestParam("year") Integer year,
+          @RequestParam(value = "month", required = false) Integer month
+  ) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)

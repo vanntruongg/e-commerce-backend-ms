@@ -7,10 +7,8 @@ import lombok.Getter;
 
 @Getter
 public class AddToCartRequest {
-  @NotEmpty
-  private String email;
   @NotNull
-  private int productId;
+  private Long productId;
   private String size;
   @Min(value = 0, message = "Quantity must be non-negative")
   private int quantity;

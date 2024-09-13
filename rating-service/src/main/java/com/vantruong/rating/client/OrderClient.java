@@ -13,5 +13,8 @@ import static com.vantruong.common.constant.InternalApiEndpoint.ORDER_SERVICE_UR
 public interface OrderClient {
 
   @GetMapping(CHECK_ORDER_BY_USER_PRODUCT_STATUS)
-  CommonResponse<OrderExistsByProductAndUser> checkOrderExistsByProductAndUserWithStatus(@PathVariable("id") Long productId);
+  CommonResponse<OrderExistsByProductAndUser> checkOrderExistsByProductAndUserWithStatus(
+          @PathVariable("email") String email,
+          @PathVariable("id") Long productId
+  );
 }

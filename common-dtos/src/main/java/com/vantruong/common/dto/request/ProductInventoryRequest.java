@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductInventoryRequest {
-  private List<Integer> productIds;
+  private List<Long> productIds;
 }

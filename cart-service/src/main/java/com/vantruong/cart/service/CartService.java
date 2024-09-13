@@ -1,27 +1,324 @@
 package com.vantruong.cart.service;
 
+import com.vantruong.cart.constant.MessageConstant;
 import com.vantruong.cart.dto.request.AddToCartRequest;
 import com.vantruong.cart.dto.request.DeleteCartRequest;
-import com.vantruong.cart.dto.response.CartResponse;
 import com.vantruong.cart.dto.request.UpdateCartRequest;
-import com.vantruong.common.dto.SizeQuantityDto;
+import com.vantruong.cart.dto.response.CartItemResponse;
+import com.vantruong.cart.dto.response.CartResponse;
+import com.vantruong.cart.entity.Cart;
+import com.vantruong.cart.entity.CartItem;
+import com.vantruong.cart.entity.SizeQuantity;
+import com.vantruong.cart.exception.ErrorCode;
+import com.vantruong.cart.exception.InsufficientProductQuantityException;
+import com.vantruong.cart.exception.NotFoundException;
+import com.vantruong.cart.repository.CartRepository;
+import com.vantruong.cart.repository.client.InventoryClient;
+import com.vantruong.cart.repository.client.ProductClient;
+import com.vantruong.common.dto.cart.CartItemCommon;
+import com.vantruong.common.dto.inventory.SizeQuantityDto;
 import com.vantruong.common.dto.request.DeleteCartItemsRequest;
+import com.vantruong.common.dto.request.ProductQuantityRequest;
+import com.vantruong.common.dto.response.ProductResponse;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+@Service
+@Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
+public class CartService {
+  CartRepository cartRepository;
+  ProductClient productClient;
+  InventoryClient inventoryClient;
+  AuthService authService;
+
+  public Cart findById() {
+    String email = authService.getUserId();
+    return cartRepository.findById(email).orElseThrow(()
+            -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.CART_NOT_FOUND));
+  }
+
+  private Cart findByIdOrCreate() {
+    String email = authService.getUserId();
+    return cartRepository.findById(email).orElseGet(() -> {
+      Cart cart = new Cart(email, new ArrayList<>());
+      return cartRepository.save(cart);
+    });
+  }
+
+  private List<ProductResponse> getProductsByIds(List<CartItem> items) {
+    List<Long> itemIds = items.stream().map(CartItem::getProductId).toList();
+    return productClient.getProductByIds(itemIds).getData();
+  }
+
+  private Map<Long, ProductResponse> getProductMapById(List<ProductResponse> products) {
+    return products.stream().collect(Collectors.toMap(ProductResponse::getId, p -> p));
+  }
+
+  public CartResponse getCartById() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+    Cart cart = findByIdOrCreate();
+    List<CartItemResponse> cartItemResponses = new ArrayList<>();
+    if (Objects.nonNull(cart.getItems())) {
+      List<ProductResponse> products = getProductsByIds(cart.getItems());
+
+      Map<Long, ProductResponse> productMap = getProductMapById(products);
+
+      cartItemResponses = cart.getItems().stream().map(item -> {
+        ProductResponse product = productMap.get(item.getProductId());
+        List<SizeQuantity> sizeQuantities = item.getSizeQuantities();
+        List<SizeQuantityDto> sizeQuantityDtos = new ArrayList<>();
+        if (sizeQuantities != null) {
+          sizeQuantityDtos = sizeQuantities.stream()
+                  .map(sizeQuantity -> SizeQuantityDto.builder()
+                          .size(sizeQuantity.getSize())
+                          .quantity(sizeQuantity.getQuantity())
+                          .build()
+                  )
+                  .toList();
+        }
+        return CartItemResponse.builder()
+                .product(product)
+                .sizeQuantities(sizeQuantityDtos)
+                .build();
+      }).toList();
+    }
+
+    return CartResponse.builder()
+            .items(cartItemResponses)
+            .build();
+  }
+
+  private CartItem buildCartItem(Long productId, String size, Integer quantity) {
+    List<SizeQuantity> sizeQuantities = new ArrayList<>();
+    SizeQuantity sizeQuantity = SizeQuantity.builder()
+            .size(size)
+            .quantity(quantity)
+            .build();
+    sizeQuantities.add(sizeQuantity);
+    return CartItem.builder()
+            .productId(productId)
+            .sizeQuantities(sizeQuantities)
+            .build();
+  }
+
+  private void addNewCartItemToCart(Cart cart, AddToCartRequest request) {
+    List<CartItem> cartItems = cart.getItems();
+    if (cartItems == null) {
+      cartItems = new ArrayList<>();
+    }
+    CartItem cartItem = buildCartItem(request.getProductId(), request.getSize(), request.getQuantity());
+    cartItems.add(cartItem);
+    cart.setItems(cartItems);
+    cartRepository.save(cart);
+  }
 
 
-public interface CartService {
-  CartResponse getCartById(String email);
+  /*
+   * giỏ hàng chưa có sản phẩm cần thêm
+   * đã có sản phẩm mà size khác
+   * đã có size đó => update quantity
+   * */
+  @Transactional
+  public long addToCart(AddToCartRequest request) {
+    Cart cart = findByIdOrCreate();
+    List<CartItem> cartItems = cart.getItems();
 
-  long addToCart(AddToCartRequest cartItemDto);
+    if (cartItems == null) {
+      addNewCartItemToCart(cart, request);
+      return count();
+    }
+    CartItem cartItem = cartItems.stream()
+            .filter(ct -> ct.getProductId().equals(request.getProductId()))
+            .findFirst()
+            .orElse(null);
+    if (cartItem == null) {
+      addNewCartItemToCart(cart, request);
+      return count();
+    }
+    List<SizeQuantity> sizeQuantities = cartItem.getSizeQuantities();
+    if (sizeQuantities == null) {
+      sizeQuantities = new ArrayList<>();
+    }
+    SizeQuantity existedSizeQuantity = findSizeQuantity(cartItem, request.getSize());
+    if (existedSizeQuantity != null) {
+      updateSizeQuantity(
+              request.getProductId(),
+              request.getSize(),
+              request.getQuantity()
+      );
 
-  long removeFromCart(DeleteCartRequest request);
+    } else {
+      SizeQuantity sizeQuantity = SizeQuantity.builder()
+              .size(request.getSize())
+              .quantity(request.getQuantity())
+              .build();
+      sizeQuantities.add(sizeQuantity);
+      cartItem.setSizeQuantities(sizeQuantities);
+      cartRepository.save(cart);
+    }
+    return count();
+  }
 
-  long updateQuantity(UpdateCartRequest request);
+  private CartItem findCartItemByProductId(Cart cart, Long productId) {
+    if (cart.getItems() == null) return null;
+    return cart.getItems().stream()
+            .filter(cartItem -> cartItem.getProductId().equals(productId))
+            .findFirst()
+            .orElse(null);
+  }
 
-  void removeItemsFromCart(DeleteCartItemsRequest removeItemsCartRequest);
+  private SizeQuantity findSizeQuantity(CartItem cartItem, String size) {
+    if (cartItem.getSizeQuantities() == null) return null;
+    return cartItem.getSizeQuantities().stream()
+            .filter(item -> item.getSize().equals(size))
+            .findFirst()
+            .orElse(null);
+  }
 
-  List<SizeQuantityDto> getByEmailAndProductId(String email, int productId);
+  @Transactional
+  public long removeFromCart(DeleteCartRequest request) {
+    Cart cart = findById();
 
-  long count(String email);
+    CartItem cartItem = findCartItemByProductId(cart, request.getProductId());
+    if (cartItem != null) {
+      List<SizeQuantity> sizeQuantities = cartItem.getSizeQuantities();
+      sizeQuantities.removeIf(sizeQuantity -> sizeQuantity.getSize().equals(request.getSize()));
+
+      if (sizeQuantities.isEmpty()) {
+        cart.getItems().remove(cartItem);
+      }
+      cartRepository.save(cart);
+    }
+    return count();
+  }
+
+  public long updateQuantity(UpdateCartRequest request) {
+    changeCartItemQuantity(request.getProductId(), request.getSize(), request.getQuantity());
+    return count();
+
+  }
+
+  private void updateSizeQuantity(Long productId, String size, Integer quantity) {
+    Cart cart = findById();
+
+    CartItem cartItem = findCartItemByProductId(cart, productId);
+    if (cartItem == null) {
+      return;
+    }
+
+    SizeQuantity sizeQuantity = findSizeQuantity(cartItem, size);
+    if (sizeQuantity == null) {
+      return;
+    }
+
+    int newQuantity = sizeQuantity.getQuantity() + quantity;
+    Integer stock = getQuantityInStock(productId, size);
+    if (stock == null || newQuantity > stock) {
+      throw new InsufficientProductQuantityException(
+              ErrorCode.UNPROCESSABLE_ENTITY,
+              MessageConstant.INSUFFICIENT_PRODUCT_QUANTITY
+      );
+    }
+
+    sizeQuantity.setQuantity(newQuantity);
+    cartRepository.save(cart);
+
+  }
+
+  private void changeCartItemQuantity(Long productId, String size, Integer quantity) {
+    Cart cart = findById();
+
+    CartItem cartItem = findCartItemByProductId(cart, productId);
+    if (cartItem == null) {
+      return;
+    }
+
+    SizeQuantity sizeQuantity = findSizeQuantity(cartItem, size);
+    if (sizeQuantity == null) {
+      return;
+    }
+
+    Integer stock = getQuantityInStock(productId, size);
+    if (stock == null || quantity > stock) {
+      throw new InsufficientProductQuantityException(
+              ErrorCode.UNPROCESSABLE_ENTITY,
+              MessageConstant.INSUFFICIENT_PRODUCT_QUANTITY
+      );
+    }
+
+    sizeQuantity.setQuantity(quantity);
+    cartRepository.save(cart);
+
+  }
+
+  private Integer getQuantityInStock(Long productId, String size) {
+    ProductQuantityRequest checkProductQuantityRequest = ProductQuantityRequest.builder()
+            .productId(productId)
+            .size(size)
+            .build();
+    return inventoryClient.checkProductQuantityById(checkProductQuantityRequest).getData();
+  }
+
+  public void removeItemsFromCart(DeleteCartItemsRequest request) {
+    Cart cart = cartRepository.findById(request.getEmail()).orElseThrow(()
+            -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.CART_NOT_FOUND));
+    for (CartItemCommon item : request.getItems()) {
+      CartItem cartItem = findCartItemByProductId(cart, item.getProductId());
+      if (cartItem != null) {
+        List<SizeQuantity> sizeQuantities = cartItem.getSizeQuantities();
+        if (sizeQuantities != null) {
+          sizeQuantities.removeIf(it -> it.getSize().equals(item.getSize()));
+          if (sizeQuantities.isEmpty()) {
+            cart.getItems().remove(cartItem);
+          }
+        }
+      }
+    }
+    cartRepository.save(cart);
+  }
+
+  public List<SizeQuantityDto> getByEmailAndProductId(Long productId) {
+    Cart cart = findById();
+    CartItem cartItem = findCartItemByProductId(cart, productId);
+
+    if (cartItem != null) {
+      List<SizeQuantity> sizeQuantities = cartItem.getSizeQuantities();
+      if (sizeQuantities == null) return null;
+      return sizeQuantities.stream()
+              .map(sizeQuantity ->
+                      SizeQuantityDto.builder()
+                              .size(sizeQuantity.getSize())
+                              .quantity(sizeQuantity.getQuantity())
+                              .build()
+              ).toList();
+    }
+    return null;
+  }
+
+  public long count() {
+    Cart cart = findById();
+    List<CartItem> cartItems = cart.getItems();
+
+    if (cartItems == null || cartItems.isEmpty()) return 0;
+    return cartItems.stream()
+            .mapToLong(item -> {
+                      if (item.getSizeQuantities() == null) return 0;
+                      return item.getSizeQuantities().size();
+                    }
+            ).sum();
+  }
 }

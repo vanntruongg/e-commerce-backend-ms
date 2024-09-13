@@ -1,6 +1,6 @@
 package com.vantruong.common.util;
 
-import com.vantruong.common.dto.UserAddress;
+import com.vantruong.common.dto.user.UserAddress;
 import org.springframework.stereotype.Component;
 
 @Component

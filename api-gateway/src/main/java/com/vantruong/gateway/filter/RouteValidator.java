@@ -4,7 +4,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @Component
 public class RouteValidator {
@@ -29,11 +28,13 @@ public class RouteValidator {
           "/api/v1/eureka",
 
 //          address
-          "/api/v1/address/user/create",
-          //          address
+//          "/api/v1/address/user/create",
+//          inventory
           "/api/v1/inventory/.*",
 //          payment
-          "/api/v1/order-orchestrator/vnpay-callback"
+          "/api/v1/order-orchestrator/vnpay-callback",
+//          rating
+          "/api/v1/ratings/get/.*"
   );
 
   public boolean isPublicEndpoint(ServerHttpRequest request) {

@@ -25,21 +25,21 @@ public class UserAddressController {
             .build());
   }
 
-  @GetMapping(EMAIL_PARAM)
-  public ResponseEntity<CommonResponse<Object>> getAllAddressByUserId(@PathVariable(VARIABLE_EMAIL) String email) {
+  @GetMapping()
+  public ResponseEntity<CommonResponse<Object>> getAllAddressByUserId() {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(userAddressService.getAllAddressByUserId(email))
+            .data(userAddressService.getAllAddressByUserId())
             .build());
   }
 
-  @GetMapping(DEFAULT + EMAIL_PARAM)
-  public ResponseEntity<CommonResponse<Object>> getAddressDefault(@PathVariable(VARIABLE_EMAIL) String email) {
+  @GetMapping(DEFAULT)
+  public ResponseEntity<CommonResponse<Object>> getAddressDefault() {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(userAddressService.getAddressDefault(email))
+            .data(userAddressService.getAddressDefault())
             .build());
   }
 
@@ -57,27 +57,25 @@ public class UserAddressController {
             .build());
   }
 
-  @PostMapping( UPDATE + DEFAULT)
+  @PostMapping(UPDATE + DEFAULT)
   public ResponseEntity<CommonResponse<Object>> setDefaultAddress(
-          @RequestParam("email") String email,
           @RequestParam("addressId") Integer addressId
   ) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.UPDATE_ADDRESS_SUCCESS)
-            .data(userAddressService.setDefaultAddress(email, addressId))
+            .data(userAddressService.setDefaultAddress(addressId))
             .build());
   }
 
-  @DeleteMapping( DELETE)
+  @DeleteMapping(DELETE)
   public ResponseEntity<CommonResponse<Object>> deleteAddress(
-          @RequestParam("email") String email,
           @RequestParam("addressId") Integer addressId
   ) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.DELETE_SUCCESS)
-            .data(userAddressService.deleteAddress(email, addressId))
+            .data(userAddressService.deleteAddress(addressId))
             .build());
   }
 

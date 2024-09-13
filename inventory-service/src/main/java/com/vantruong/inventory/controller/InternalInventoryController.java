@@ -5,7 +5,6 @@ import com.vantruong.common.dto.request.ProductQuantityRequest;
 import com.vantruong.inventory.common.CommonResponse;
 import com.vantruong.inventory.constant.MessageConstant;
 import com.vantruong.inventory.service.InternalInventoryService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,10 +15,13 @@ import static com.vantruong.common.constant.InternalApiEndpoint.INTERNAL;
 import static com.vantruong.common.constant.InternalApiEndpoint.INVENTORY;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping(INTERNAL + INVENTORY)
 public class InternalInventoryController {
   private final InternalInventoryService internalInventoryService;
+
+  public InternalInventoryController(InternalInventoryService internalInventoryService) {
+    this.internalInventoryService = internalInventoryService;
+  }
 
   @PostMapping(CHECK + PRODUCT + QUANTITY)
   public ResponseEntity<CommonResponse<Object>> checkProductQuantity(@RequestBody ProductQuantityRequest request) {
@@ -49,7 +51,7 @@ public class InternalInventoryController {
   }
 
   @GetMapping(GET_BY_PRODUCT_ID)
-  public ResponseEntity<CommonResponse<Object>> getInventoryByProductId(@PathVariable("id") Integer productId) {
+  public ResponseEntity<CommonResponse<Object>> getInventoryByProductId(@PathVariable("id") Long productId) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.SUCCESS)

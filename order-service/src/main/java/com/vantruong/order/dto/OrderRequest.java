@@ -1,5 +1,6 @@
 package com.vantruong.order.dto;
 
+import com.vantruong.order.entity.enumeration.PaymentMethod;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -10,21 +11,15 @@ import java.util.List;
 @Getter
 @Setter
 public class OrderRequest {
-//  @NotNull
-//  private Integer orderId;
-  @NotNull
-  private String email;
   @NotNull
   private String name;
   @NotNull
   private String phone;
   @NotNull
   private String address;
-  //  @NotNull
-//  private Double totalPrice;
   private String notes;
   @NotNull
-  private Integer paymentMethodId;
+  private PaymentMethod paymentMethod;
   @NotEmpty
-  private List<OrderDetailRequest> listProduct;
+  private List<OrderItemRequest> orderItemRequests;
 }

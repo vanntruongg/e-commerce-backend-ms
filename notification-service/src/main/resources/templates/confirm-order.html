@@ -133,7 +133,7 @@
 <!--    <p><strong>Phương thức thanh toán:</strong> <span th:text="${order.paymentMethod}"></span></p>-->
     <div class="order-items">
         <h2>Sản phẩm đã đặt</h2>
-        <div th:each="item : ${order.orderDetail}">
+        <div th:each="item : ${order.orderItems}">
             <div class="order-item">
                 <img th:src="${item.productImage}" alt="Product Image" class="product-image">
                 <div class="product-info">

@@ -1,22 +1,26 @@
 package com.vantruong.identity.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.vantruong.identity.entity.Role;
+import com.vantruong.identity.entity.User;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
-@Getter
-@Builder
-@Setter
-public class UserDto {
-  private String email;
-  private String firstName;
-  private String lastName;
-  private LocalDate dob;
-  private String phone;
-  private String address;
-  private String imageUrl;
-  private List<String> roles;
+public record UserDto(String email,
+                      String firstName,
+                      String lastName,
+                      LocalDate dob,
+                      String phone,
+                      String imageUrl,
+                      Set<Role> roles
+) {
+  public static UserDto fromEntity(User user) {
+    return new UserDto(user.getEmail(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getDateOfBirth(),
+            user.getPhone(),
+            user.getImageUrl(),
+            user.getRoles());
+  }
 }

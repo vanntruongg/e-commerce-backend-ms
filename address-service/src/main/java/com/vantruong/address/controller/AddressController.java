@@ -3,17 +3,19 @@ package com.vantruong.address.controller;
 import com.vantruong.address.common.CommonResponse;
 import com.vantruong.address.constant.MessageConstant;
 import com.vantruong.address.service.AddressService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.vantruong.address.constant.ApiEndpoint.*;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping(ADDRESS)
 public class AddressController {
   private final AddressService addressService;
+
+  public AddressController(AddressService addressService) {
+    this.addressService = addressService;
+  }
 
   @GetMapping(GET + DATA)
   public ResponseEntity<CommonResponse<Object>> getAddress(@RequestParam(value = "parentCode", defaultValue = "null") String parentCode) {

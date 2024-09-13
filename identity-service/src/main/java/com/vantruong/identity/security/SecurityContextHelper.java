@@ -2,7 +2,6 @@ package com.vantruong.identity.security;
 
 import com.vantruong.identity.entity.Role;
 import com.vantruong.identity.exception.AuthenticationException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,9 +11,12 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 @Component(value = "securityContextHelper")
-@RequiredArgsConstructor
 public class SecurityContextHelper {
   private final UserDetailsServiceImpl userDetailsService;
+
+  public SecurityContextHelper(UserDetailsServiceImpl userDetailsService) {
+    this.userDetailsService = userDetailsService;
+  }
 
   public UserDetailsImpl getUserDetails() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

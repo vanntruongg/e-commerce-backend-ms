@@ -32,9 +32,9 @@ public class OrderSagaOrchestrator {
 
   @KafkaListener(topics = KafkaTopics.ORDER_CREATED_TOPIC)
   public void onOrderUpdated(OrderEvent orderEvent) {
-    if (orderEvent.getOrderStatus() == OrderEventStatus.NEW) {
+    if (orderEvent.getOrderEventStatus() == OrderEventStatus.NEW) {
       kafkaProducer.send(KafkaTopics.INVENTORY_TOPIC, orderEvent);
-    } else if (orderEvent.getOrderStatus() == OrderEventStatus.ROLLBACK) {
+    } else if (orderEvent.getOrderEventStatus() == OrderEventStatus.ROLLBACK) {
       CompletableFuture<String> resultFuture = sagaResults.remove(orderEvent.getOrderId().toString());
       if (resultFuture != null) {
         compensateOrder(orderEvent);
@@ -46,13 +46,13 @@ public class OrderSagaOrchestrator {
   @KafkaListener(topics = KafkaTopics.INVENTORY_RESPONSE)
   public void onInventoryUpdated(OrderEvent orderEvent) {
     CompletableFuture<String> resultFuture = sagaResults.get(orderEvent.getOrderId().toString());
-    if (orderEvent.getOrderStatus() == OrderEventStatus.NEW) {
+    if (orderEvent.getOrderEventStatus() == OrderEventStatus.NEW) {
       completeOrder(orderEvent);
       if (resultFuture != null) {
         resultFuture.complete("Order completed successfully");
         sagaResults.remove(orderEvent.getOrderId().toString());
       }
-    } else if (orderEvent.getOrderStatus() == OrderEventStatus.ROLLBACK) {
+    } else if (orderEvent.getOrderEventStatus() == OrderEventStatus.ROLLBACK) {
       compensateOrder(orderEvent);
       if (resultFuture != null) {
         resultFuture.completeExceptionally(new RuntimeException("Order processing failed and rolled back."));

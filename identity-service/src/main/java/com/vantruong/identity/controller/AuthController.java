@@ -5,11 +5,10 @@ import com.vantruong.identity.common.CommonResponse;
 import com.vantruong.identity.constant.UserApiEndpoint;
 import com.vantruong.identity.dto.request.LoginRequest;
 import com.vantruong.identity.dto.request.RefreshTokenRequest;
-import com.vantruong.identity.service.AuthService;
 import com.vantruong.identity.constant.MessageConstant;
 import com.vantruong.identity.dto.request.LogoutRequest;
+import com.vantruong.identity.service.AuthService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,10 +21,12 @@ import static com.vantruong.identity.constant.AuthApiEndpoint.*;
 
 @RestController
 @RequestMapping(IDENTITY + AUTH)
-@RequiredArgsConstructor
 public class AuthController {
-
   private final AuthService authService;
+
+  public AuthController(AuthService authService) {
+    this.authService = authService;
+  }
 
   @PostMapping(LOGIN)
   public ResponseEntity<CommonResponse<Object>> login(@RequestBody LoginRequest request) {

@@ -1,26 +1,23 @@
 package com.vantruong.order.controller;
 
+import com.vantruong.order.common.CommonResponse;
 import com.vantruong.order.constant.ApiEndpoint;
 import com.vantruong.order.constant.MessageConstant;
-import com.vantruong.order.enums.OrderStatus;
-import com.vantruong.order.service.handler.PaymentOrderHandler;
-import com.vantruong.order.service.payment.VNPayService;
-import com.vantruong.order.service.payment.impl.VNPayServiceImpl;
-import lombok.RequiredArgsConstructor;
-import com.vantruong.order.common.CommonResponse;
 import com.vantruong.order.dto.OrderRequest;
-import com.vantruong.order.service.order.OrderService;
+import com.vantruong.order.entity.enumeration.OrderStatus;
+import com.vantruong.order.service.OrderService;
+import com.vantruong.order.service.PaymentOrderService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping(ApiEndpoint.ORDER)
 @RequiredArgsConstructor
 public class OrderController {
   private final OrderService orderService;
-  private final PaymentOrderHandler paymentOrderHandler;
+  private final PaymentOrderService paymentOrderService;
+
 
   @GetMapping(ApiEndpoint.ORDERS)
   public ResponseEntity<CommonResponse<Object>> getAllOrder() {
@@ -36,21 +33,21 @@ public class OrderController {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.ORDER_SUCCESS)
-            .data(paymentOrderHandler.placeOrder(orderRequest))
+            .data(paymentOrderService.placeOrder(orderRequest))
             .build());
   }
 
-  @GetMapping(ApiEndpoint.GET_BY_EMAIL)
-  public ResponseEntity<CommonResponse<Object>> getOrderByEmail(@RequestParam("email") String email) {
+  @GetMapping(ApiEndpoint.GET_BY_USER)
+  public ResponseEntity<CommonResponse<Object>> getOrderByUser() {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(orderService.getOrderByEmail(email))
+            .data(orderService.getOrderByUser())
             .build());
   }
 
   @GetMapping(ApiEndpoint.GET_BY_ID)
-  public ResponseEntity<CommonResponse<Object>> getOrderById(@PathVariable("id") int id) {
+  public ResponseEntity<CommonResponse<Object>> getOrderById(@PathVariable("id") Long id) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
@@ -67,20 +64,18 @@ public class OrderController {
             .build());
   }
 
-  @GetMapping(ApiEndpoint.GET_BY_EMAIL_AND_STATUS)
-  public ResponseEntity<CommonResponse<Object>> getOrderByEmailAndStatus(
-          @RequestParam("email") String email,
-          @RequestParam("status") String status) {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.FIND_SUCCESS)
-            .data(orderService.getOrderByEmailAndStatus(email, status))
-            .build());
-  }
+//  @GetMapping(ApiEndpoint.GET_BY_USER_AND_STATUS)
+//  public ResponseEntity<CommonResponse<Object>> getOrderOfUserByStatus(@RequestParam("status") String status) {
+//    return ResponseEntity.ok().body(CommonResponse.builder()
+//            .isSuccess(true)
+//            .message(MessageConstant.FIND_SUCCESS)
+//            .data(orderService.getOrderOfUserByStatus(status))
+//            .build());
+//  }
 
   @PostMapping(ApiEndpoint.UPDATE_STATUS)
   public ResponseEntity<CommonResponse<Object>> updateStatus(
-          @RequestParam("id") int id,
+          @RequestParam("id") Long id,
           @RequestParam("status") String status) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)

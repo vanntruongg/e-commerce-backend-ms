@@ -7,28 +7,29 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="order-orchestrator" />
+        <module name="rating-service" />
         <module name="cart-service" />
         <module name="address-service" />
-        <module name="book-service" />
-        <module name="common-dtos" />
-        <module name="product-service" />
-        <module name="eureka-server" />
-        <module name="notification-service" />
-        <module name="order-orchestrator" />
         <module name="inventory-service" />
-        <module name="payment-service" />
+        <module name="common-dtos" />
         <module name="api-gateway" />
+        <module name="product-service" />
         <module name="order-service" />
+        <module name="eureka-server" />
         <module name="identity-service" />
+        <module name="notification-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="book-service" target="17" />
       <module name="chat-bot-service" target="17" />
       <module name="client" target="17" />
       <module name="email-service" target="17" />
       <module name="nest-store-microservices (1)" target="1.5" />
       <module name="nest-store-microservices (2)" target="1.5" />
       <module name="notification-service (2)" target="17" />
+      <module name="payment-service" target="17" />
       <module name="product-service (1)" target="17" />
       <module name="product-service (2)" target="17" />
       <module name="server" target="17" />
@@ -57,6 +58,7 @@
       <module name="product-service" options="-parameters" />
       <module name="product-service (1)" options="-parameters" />
       <module name="product-service (2)" options="-parameters" />
+      <module name="rating-service" options="-parameters" />
       <module name="server" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>

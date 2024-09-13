@@ -33,10 +33,11 @@ public class ApiEndpoint {
   public static final String UPDATE = "/update";
   public static final String STATISTIC = "/statistic";
   public static final String GET_TOTAL_ORDER = "/total-order";
+  public static final String USER = "/user";
   public static final String CREATE_ORDER = CREATE;
-  public static final String GET_BY_EMAIL = GET + EMAIL;
+  public static final String GET_BY_USER = GET + USER;
   public static final String GET_BY_STATUS = GET + STATUS;
-  public static final String GET_BY_EMAIL_AND_STATUS = GET + EMAIL + STATUS;
+  public static final String GET_BY_USER_AND_STATUS = GET + USER + STATUS;
   public static final String GET_BY_ID = GET + ID_PARAM;
   public static final String UPDATE_STATUS = UPDATE + STATUS;
   public static final String COUNT_ORDER_BY_MONTH = COUNT + ORDER + MONTH;

@@ -29,7 +29,6 @@
 		<module>order-service</module>
 		<module>cart-service</module>
 		<module>notification-service</module>
-		<module>book-service</module>
 		<module>address-service</module>
 		<module>payment-service</module>
 	</modules>

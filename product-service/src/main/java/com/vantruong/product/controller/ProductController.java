@@ -1,24 +1,29 @@
 package com.vantruong.product.controller;
 
+import com.vantruong.product.common.CommonResponse;
 import com.vantruong.product.constant.ApiEndpoint;
 import com.vantruong.product.constant.MessageConstant;
+import com.vantruong.product.dto.ProductPost;
+import com.vantruong.product.dto.ProductPut;
 import com.vantruong.product.service.ProductService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import com.vantruong.product.common.CommonResponse;
-import com.vantruong.product.dto.ProductDto;
 
 import static com.vantruong.product.constant.ApiEndpoint.GET_ALL;
 
 
 @RestController
 @RequestMapping(ApiEndpoint.PRODUCT)
-@RequiredArgsConstructor
 public class ProductController {
   private final ProductService productService;
+
+  public ProductController(ProductService productService) {
+    this.productService = productService;
+  }
+
   @PostMapping(ApiEndpoint.CREATE_PRODUCT)
-  public ResponseEntity<CommonResponse<Object>> createProduct(@RequestBody ProductDto productDto) {
+  public ResponseEntity<CommonResponse<Object>> createProduct(@RequestBody ProductPost productDto) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.CREATE_PRODUCT_SUCCESS)
@@ -28,15 +33,17 @@ public class ProductController {
 
   @GetMapping()
   public ResponseEntity<CommonResponse<Object>> getAllProduct(
-          @RequestParam(name = "category", defaultValue = "0") int categoryId,
-          @RequestParam(name = "order") String order,
-          @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
-          @RequestParam(name = "pageSize") int pageSize
+          @RequestParam(name = "category", defaultValue = "0", required = false) Long categoryId,
+          @RequestParam(name = "sortOrder", required = false) String sortOrder,
+          @RequestParam(name = "pageNo", defaultValue = "0", required = false) int pageNo,
+          @RequestParam(name = "pageSize", defaultValue = "8", required = false) int pageSize
   ) {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    System.out.println(authentication);
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(productService.getAllProduct(categoryId, order, pageNo, pageSize))
+            .data(productService.getAllProduct(categoryId, sortOrder, pageNo, pageSize))
             .build());
   }
 
@@ -51,25 +58,28 @@ public class ProductController {
   }
 
   @PostMapping(ApiEndpoint.UPDATE_PRODUCT)
-  public ResponseEntity<CommonResponse<Object>> updateProduct(@RequestBody ProductDto productDto) {
+  public ResponseEntity<CommonResponse<Object>> updateProduct(@RequestBody ProductPut productPut) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.UPDATE_SUCCESS)
-            .data(productService.updateProduct(productDto))
+            .data(productService.updateProduct(productPut))
             .build());
   }
 
   @GetMapping(ApiEndpoint.PRODUCT_GET_BY_ID)
-  public ResponseEntity<CommonResponse<Object>> getProductWithCategoryById(@PathVariable("id") int id) {
+  public ResponseEntity<CommonResponse<Object>> getProductById(@PathVariable("id") Long id) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(productService.getProductWithCategoryById(id))
+            .data(productService.getProductById(id))
             .build());
   }
 
   @GetMapping(ApiEndpoint.PRODUCT_GET_BY_CATEGORY_ID)
-  public ResponseEntity<CommonResponse<Object>> getProductsByCategoryId(@PathVariable("id") int id, @PathVariable("limit") int limit) {
+  public ResponseEntity<CommonResponse<Object>> getProductsByCategoryId(
+          @PathVariable("id") int id,
+          @PathVariable("limit") int limit
+  ) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)

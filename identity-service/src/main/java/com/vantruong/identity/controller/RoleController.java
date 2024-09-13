@@ -2,9 +2,8 @@ package com.vantruong.identity.controller;
 
 import com.vantruong.identity.common.CommonResponse;
 import com.vantruong.identity.dto.request.RoleRequest;
-import com.vantruong.identity.service.RoleService;
 import com.vantruong.identity.constant.MessageConstant;
-import lombok.RequiredArgsConstructor;
+import com.vantruong.identity.service.RoleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +12,13 @@ import static com.vantruong.identity.constant.CommonApiEndpoint.IDENTITY;
 import static com.vantruong.identity.constant.RoleApiEndpoint.ROLE;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping(IDENTITY + ROLE)
 public class RoleController {
   private final RoleService roleService;
+
+  public RoleController(RoleService roleService) {
+    this.roleService = roleService;
+  }
 
   @GetMapping
   public ResponseEntity<CommonResponse<Object>> getAll() {

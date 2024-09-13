@@ -2,14 +2,13 @@ package com.vantruong.identity.controller;
 
 import com.vantruong.identity.common.CommonResponse;
 import com.vantruong.identity.constant.UserApiEndpoint;
-import com.vantruong.identity.dto.UserDto;
+import com.vantruong.identity.dto.request.UserPut;
 import com.vantruong.identity.dto.request.ChangePasswordRequest;
 import com.vantruong.identity.dto.request.RegisterRequest;
 import com.vantruong.identity.dto.request.ResetPasswordRequest;
 import com.vantruong.identity.constant.MessageConstant;
 import com.vantruong.identity.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,13 +19,11 @@ import static com.vantruong.identity.constant.CommonApiEndpoint.IDENTITY;
 @RestController
 @RequestMapping(IDENTITY + UserApiEndpoint.USERS)
 @RequiredArgsConstructor
-@Slf4j
 public class UserController {
-
   private final UserService userService;
 
   @PostMapping(REGISTER)
-  public ResponseEntity<CommonResponse<Object>> addNewUser(@RequestBody RegisterRequest userDto) {
+  public ResponseEntity<CommonResponse<Object>> createUser(@RequestBody RegisterRequest userDto) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.REGISTER_SUCCESS)
@@ -56,13 +53,13 @@ public class UserController {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(userService.getProfile())
+            .data(userService.getUser())
             .build());
   }
 
 
   @PostMapping(UserApiEndpoint.UPDATE_USER)
-  public ResponseEntity<CommonResponse<Object>> updateUser(@RequestBody UserDto userDto) {
+  public ResponseEntity<CommonResponse<Object>> updateUser(@RequestBody UserPut userDto) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.UPDATE_USER_SUCCESS)

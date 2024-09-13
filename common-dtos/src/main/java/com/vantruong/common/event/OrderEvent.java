@@ -1,30 +1,26 @@
 package com.vantruong.common.event;
 
-import com.vantruong.common.entity.OrderDetail;
+import com.vantruong.common.dto.order.OrderItemCommonDto;
 import lombok.*;
 
-import java.util.List;
+import java.util.Set;
+
 
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class OrderEvent {
-  private Integer orderId;
-
+  private Long orderId;
   private String email;
-
   private String notes;
-
   private Double totalPrice;
-
-  private OrderEventStatus orderStatus;
-
+  private String orderStatus;
+  private OrderEventStatus orderEventStatus;
   private PaymentStatus paymentStatus;
-
-
-  private Integer addressId;
-
-  private List<OrderDetail> orderDetails;
+  private String name;
+  private String phone;
+  private String address;
+  private Set<OrderItemCommonDto> orderItems;
 }

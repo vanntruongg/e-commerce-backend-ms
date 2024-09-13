@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ProductQuantityRequest {
-  private Integer productId;
+  private Long productId;
   private String size;
   private Integer quantity;
 }

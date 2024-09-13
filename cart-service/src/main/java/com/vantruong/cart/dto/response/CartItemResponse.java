@@ -1,6 +1,6 @@
 package com.vantruong.cart.dto.response;
 
-import com.vantruong.common.dto.SizeQuantityDto;
+import com.vantruong.common.dto.inventory.SizeQuantityDto;
 import com.vantruong.common.dto.response.ProductResponse;
 import lombok.Builder;
 import lombok.Getter;

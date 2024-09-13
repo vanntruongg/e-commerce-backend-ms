@@ -26,7 +26,7 @@ public class ApiEndpoint {
   private static final String UPDATE = "/update";
 
   public static final String CART_GET_ALL = "/items";
-  public static final String CART_GET_BY_ID_AND_PRODUCT_ID = "/items" + "/get-by-email-and-product-id";
+  public static final String CART_GET_BY_PRODUCT_ID = "/items" + "/product-id";
   public static final String ADD_TO_CART = "/add";
   public static final String CART_DELETE = DELETE;
 

@@ -2,9 +2,8 @@ package com.vantruong.identity.controller;
 
 import com.vantruong.identity.common.CommonResponse;
 import com.vantruong.identity.dto.request.PermissionRequest;
-import com.vantruong.identity.service.PermissionService;
 import com.vantruong.identity.constant.MessageConstant;
-import lombok.RequiredArgsConstructor;
+import com.vantruong.identity.service.PermissionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +12,13 @@ import static com.vantruong.identity.constant.PermissionApiEndpoint.DELETE_PERMI
 import static com.vantruong.identity.constant.PermissionApiEndpoint.PERMISSIONS;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping(IDENTITY + PERMISSIONS)
 public class PermissionController {
   private final PermissionService permissionService;
+
+  public PermissionController(PermissionService permissionService) {
+    this.permissionService = permissionService;
+  }
 
   @PostMapping(CREATE)
   public ResponseEntity<CommonResponse<Object>> create(@RequestBody PermissionRequest request) {

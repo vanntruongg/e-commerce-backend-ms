@@ -17,7 +17,9 @@ public class InternalApiEndpoint {
   public static final String FORGOT_PASSWORD = "/forgot-password";
   public static final String INTROSPECT = "/introspect";
   public static final String USER = "/user";
+  public static final String PROFILE = "/profile";
   public static final String EXISTED = "/existed";
   public static final String USER_EXISTED_BY_EMAIL = USER + EXISTED;
 
+  public static final String USER_PROFILE = USER + PROFILE;
 }

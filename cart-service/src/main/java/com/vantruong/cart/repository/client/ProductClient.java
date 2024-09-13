@@ -15,7 +15,7 @@ import static com.vantruong.cart.constant.InternalApiEndpoint.PRODUCT_SERVICE_UR
 public interface ProductClient {
 
   @PostMapping(value = PRODUCT_GET_BY_IDS, produces = MediaType.APPLICATION_JSON_VALUE)
-  CommonResponse<List<ProductResponse>> getProductByIds(List<Integer> ids);
+  CommonResponse<List<ProductResponse>> getProductByIds(List<Long> ids);
 
 //  @GetMapping(PRODUCT_GET_STOCK_BY_ID)
 //  CommonResponse<Integer> getStockProductById(@PathVariable("id") int id);
