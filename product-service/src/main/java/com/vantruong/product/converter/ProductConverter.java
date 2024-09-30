@@ -1,12 +1,12 @@
 package com.vantruong.product.converter;
 
-import com.vantruong.common.dto.response.ProductImageResponse;
+import com.vantruong.common.dto.inventory.SizeQuantityDto;
 import com.vantruong.product.dto.ProductResponse;
 import com.vantruong.product.entity.Product;
-import com.vantruong.product.entity.ProductImage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -22,7 +22,23 @@ public class ProductConverter {
             product.getMaterial(),
             product.getStyle(),
             categoryConverter.convertToCategoryResponse(product.getCategory()),
-            convertToListProductImageResponse(product.getImages())
+            product.getImageUrl(),
+            product.getDescription(),
+            new ArrayList<>()
+    );
+  }
+
+  public ProductResponse convertToProductResponse(Product product, List<SizeQuantityDto> sizeQuantityDtoList) {
+    return new ProductResponse(
+            product.getId(),
+            product.getName(),
+            product.getPrice(),
+            product.getMaterial(),
+            product.getStyle(),
+            categoryConverter.convertToCategoryResponse(product.getCategory()),
+            product.getImageUrl(),
+            product.getDescription(),
+            sizeQuantityDtoList
     );
   }
 
@@ -30,12 +46,12 @@ public class ProductConverter {
     return products.stream().map(this::convertToProductResponse).toList();
   }
 
-  private ProductImageResponse convertToProductImage(ProductImage productImage) {
-    return new ProductImageResponse(productImage.getId(), productImage.getImageUrl());
-  }
+//  private ProductImageResponse convertToProductImage(ProductImage productImage) {
+//    return new ProductImageResponse(productImage.getId(), productImage.getImageUrl());
+//  }
 
-  public List<ProductImageResponse> convertToListProductImageResponse(List<ProductImage> productImages) {
-    return productImages.stream().map(this::convertToProductImage).toList();
-  }
+//  public List<ProductImageResponse> convertToListProductImageResponse(List<ProductImage> productImages) {
+//    return productImages.stream().map(this::convertToProductImage).toList();
+//  }
 
 }

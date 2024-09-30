@@ -1,5 +1,6 @@
 package com.vantruong.product.repository;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,7 +14,7 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
   @Query("select c from Category c where c.parentCategory is null")
-  List<Category> findTopLevelCategory();
+  List<Category> findTopLevelCategory(Sort.Order sort);
 
   @Query("select c from Category c where c.parentCategory.id = :parentId")
   List<Category> findSubcategoriesByParentId(Long parentId);

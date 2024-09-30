@@ -18,7 +18,11 @@ public class ApiEndpoint {
   public static final String RATINGS = "/ratings";
   public static final String AVERAGE_STAR = "/average-star";
   public static final String BREAKDOWN = "/breakdown";
+  public static final String UPVOTE = "/upvote";
+  public static final String MOST_UPVOTE = "/most-upvote";
   public static final String GET_RATING_LIST = GET + PRODUCTS + PRODUCT_ID;
   public static final String GET_AVERAGE_RATING_OF_PRODUCT = GET + PRODUCT + PRODUCT_ID + AVERAGE_STAR;
   public static final String GET_RATING_BREAKDOWN = GET + PRODUCT + PRODUCT_ID + BREAKDOWN;
+  public static final String GET_MOST_UPVOTE_RATING = GET + PRODUCT + PRODUCT_ID + MOST_UPVOTE;
+  public static final String UPVOTE_RATING = UPVOTE + ID_PARAM;
 }

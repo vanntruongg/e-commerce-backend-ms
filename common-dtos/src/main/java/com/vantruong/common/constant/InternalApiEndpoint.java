@@ -35,6 +35,7 @@ public class InternalApiEndpoint {
   public static final String EMAIL_PARAM = "/{email}";
   public static final String CONFIRM = "/confirm";
   public static final String ITEMS = "/items";
+  public static final String CREATE = "/create";
   public static final String UPDATE = "/update";
   public static final String CHECK = "/check";
   public static final String QUANTITY = "/quantity";
@@ -64,4 +65,6 @@ public class InternalApiEndpoint {
   public static final String GET_ALL_BY_PRODUCT_IDS = GET + PRODUCT_IDS;
   public static final String GET_BY_PRODUCT_ID = GET + ID_PARAM;
   public static final String CALCULATE_BY_PRODUCT_IDS = CALCULATE + PRODUCT_IDS;
+  public static final String CREATE_INVENTORY = CREATE + INVENTORY;
+
 }

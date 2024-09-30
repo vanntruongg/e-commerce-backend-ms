@@ -25,8 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -61,7 +60,7 @@ public class RatingService {
     }
 
     if (ratingRepository.existsByCreatedByAndProductId(userId, ratingPost.productId())) {
-      throw new ResourceExistedException(Constant.ErrorCode.RESOURCE_ALREADY_EXISTED, Constant.Message.RESOURCE_ALREADY_EXISTED);
+      throw new ResourceExistedException(Constant.ErrorCode.RESOURCE_ALREADY_EXISTED, Constant.Message.RATING_ALREADY_EXISTED);
     }
 
     UserCommonDto userCommonDto = userService.getUser();
@@ -70,9 +69,9 @@ public class RatingService {
             .content(ratingPost.content())
             .ratingStar(ratingPost.star())
             .productId(ratingPost.productId())
-            .productName(ratingPost.productName())
             .lastName(userCommonDto.lastName())
             .firstName(userCommonDto.firstName())
+            .upvoteUsers(new HashSet<>())
             .build();
     Rating savedRating = ratingRepository.save(rating);
 
@@ -106,7 +105,7 @@ public class RatingService {
             .mapToLong(RatingByStar::getTotalRatings)
             .sum();
     List<RatingStarPercentage> ratingStarPercentages = new ArrayList<>();
-    for (int i = 1; i <= 5; i++) {
+    for (int i = 5; i >= 1; i--) {
       ratingStarPercentages.add(new RatingStarPercentage(i, 0.0, 0));
     }
 
@@ -127,6 +126,40 @@ public class RatingService {
       }
     }
     return ratingStarPercentages;
+  }
+
+  public Boolean handleUpvoteRating(String ratingId) {
+    String email = AuthenticationUtils.extractUserId();
+
+    Rating rating = getRatingById(ratingId);
+
+    Set<String> upvoteRatingUsers = rating.getUpvoteUsers();
+
+    if (upvoteRatingUsers.contains(email)) {
+      upvoteRatingUsers.remove(email);
+    } else {
+      upvoteRatingUsers.add(email);
+    }
+
+    ratingRepository.save(rating);
+    return true;
+  }
+
+  public RatingDto findRatingWithMostUpVotes(Long productId) {
+    Rating rating = ratingRepository.findByProductId(productId).stream()
+            .max(Comparator.comparingInt((Rating r) -> r.getUpvoteUsers().size())
+                    .thenComparing(Rating::getCreatedDate, Comparator.reverseOrder()))
+            .orElse(null);
+
+    if (rating == null) {
+      return null;
+    }
+    return RatingDto.fromEntity(rating);
+  }
+
+  private Rating getRatingById(String id) {
+    return ratingRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.RATING_NOT_FOUND));
   }
 
 }

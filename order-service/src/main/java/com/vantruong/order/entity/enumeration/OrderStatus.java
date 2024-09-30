@@ -11,7 +11,7 @@ public enum OrderStatus {
   PENDING("PENDING"),
   ACCEPTED("ACCEPTED"),
   SHIPPING("SHIPPING"),
-  COMPLETED("COMPLETE"),
+  COMPLETED("COMPLETED"),
   CANCELED("CANCELED");
 
   private final String orderStatus;

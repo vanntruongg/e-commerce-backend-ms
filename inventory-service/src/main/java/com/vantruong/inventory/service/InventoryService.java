@@ -5,6 +5,7 @@ import com.vantruong.common.dto.request.ProductQuantityRequest;
 import com.vantruong.common.exception.Constant;
 import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.inventory.constant.MessageConstant;
+import com.vantruong.inventory.dto.InventoryPut;
 import com.vantruong.inventory.entity.Inventory;
 import com.vantruong.inventory.entity.SizeQuantity;
 import com.vantruong.inventory.repository.InventoryRepository;
@@ -35,7 +36,7 @@ public class InventoryService {
   public Integer getQuantityByProductIdAndSize(Long productId, String size) {
     Inventory inventory = findInventoryByProductId(productId);
     SizeQuantity sizeQuantity = inventory.getSizes().stream()
-            .filter(sizeQuantity1 -> sizeQuantity1.getSize().name().equals(size))
+            .filter(sizeQuantity1 -> sizeQuantity1.getSize().equals(size))
             .findFirst()
             .orElseThrow(() -> new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.NOT_FOUND));
     return sizeQuantity.getQuantity();
@@ -74,16 +75,25 @@ public class InventoryService {
 
   private Optional<SizeQuantity> findSizeQuantity(Inventory inventory, String size) {
     return inventory.getSizes().stream()
-            .filter(sq -> sq.getSize().name().equals(size))
+            .filter(sq -> sq.getSize().equals(size))
             .findFirst();
   }
 
   private List<SizeQuantityDto> convertToListSizeQuantityResponse(List<SizeQuantity> sizeQuantities) {
     return sizeQuantities.stream()
             .map(sizeQuantity -> SizeQuantityDto.builder()
-                    .size(sizeQuantity.getSize().name())
+                    .size(sizeQuantity.getSize())
                     .quantity(sizeQuantity.getQuantity())
                     .build())
             .collect(Collectors.toList());
+  }
+
+  public Boolean updateInventory(InventoryPut inventoryPut) {
+    Inventory inventory = inventoryRepository.findInventoryByProductId(inventoryPut.productId())
+            .orElseThrow(() -> new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.PRODUCT_NOT_FOUND));
+
+    inventory.setSizes(inventoryPut.sizeQuantity());
+    inventoryRepository.save(inventory);
+    return true;
   }
 }

@@ -1,10 +1,12 @@
 package com.vantruong.inventory.controller;
 
+import com.vantruong.common.dto.inventory.InventoryPost;
 import com.vantruong.common.dto.request.ProductInventoryRequest;
 import com.vantruong.common.dto.request.ProductQuantityRequest;
 import com.vantruong.inventory.common.CommonResponse;
 import com.vantruong.inventory.constant.MessageConstant;
 import com.vantruong.inventory.service.InternalInventoryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,11 +18,17 @@ import static com.vantruong.common.constant.InternalApiEndpoint.INVENTORY;
 
 @RestController
 @RequestMapping(INTERNAL + INVENTORY)
+@RequiredArgsConstructor
 public class InternalInventoryController {
   private final InternalInventoryService internalInventoryService;
 
-  public InternalInventoryController(InternalInventoryService internalInventoryService) {
-    this.internalInventoryService = internalInventoryService;
+  @PostMapping(CREATE_INVENTORY)
+  public ResponseEntity<CommonResponse<Object>> createInventory(@RequestBody InventoryPost inventoryPost) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.SUCCESS)
+            .data(internalInventoryService.createInventory(inventoryPost))
+            .build());
   }
 
   @PostMapping(CHECK + PRODUCT + QUANTITY)

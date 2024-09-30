@@ -1,15 +1,16 @@
 package com.vantruong.order.dto;
 
-import lombok.*;
 
-@Getter
-@Setter
+import lombok.Builder;
+
+import java.util.List;
+
 @Builder
-public class OrderItemDto {
-  private Long productId;
-  private String productName;
-  private int quantity;
-  private double productPrice;
-  private String size;
-  private String productImage;
+public record OrderItemDto(
+        Long productId,
+        String productName,
+        double productPrice,
+        String productImage,
+        List<SizeQuantity> sizeQuantityList
+) {
 }

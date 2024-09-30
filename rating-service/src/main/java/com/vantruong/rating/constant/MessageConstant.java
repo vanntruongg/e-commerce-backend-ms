@@ -22,4 +22,5 @@ public class MessageConstant {
   public static final String RATING_NOT_FOUND = "Không tìm thấy đánh giá sản phẩm!";
 
   public static final String CREATE_RATING_SUCCESS = "Đánh giá sản phẩm thành công";
+  public static final String UPVOTE_RATING_SUCCESS = "Đã thích đánh giá";
 }

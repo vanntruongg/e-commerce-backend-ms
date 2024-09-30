@@ -30,8 +30,13 @@ public class Product extends BaseEntity {
   @Column(name = "p_styles")
   private String style;
 
-  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<ProductImage> images;
+  @Column(name = "p_description", columnDefinition = "TEXT")
+  private String description;
+
+  @Column(name = "p_image")
+  private String imageUrl;
+//  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+//  private List<ProductImage> images;
 
   @ManyToOne
   @JoinColumn(name = "cat_id", referencedColumnName = "cat_id")

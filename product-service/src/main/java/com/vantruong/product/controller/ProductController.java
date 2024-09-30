@@ -32,28 +32,29 @@ public class ProductController {
   }
 
   @GetMapping()
-  public ResponseEntity<CommonResponse<Object>> getAllProduct(
+  public ResponseEntity<CommonResponse<Object>> getListProductByCustomer(
           @RequestParam(name = "category", defaultValue = "0", required = false) Long categoryId,
           @RequestParam(name = "sortOrder", required = false) String sortOrder,
           @RequestParam(name = "pageNo", defaultValue = "0", required = false) int pageNo,
           @RequestParam(name = "pageSize", defaultValue = "8", required = false) int pageSize
   ) {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    System.out.println(authentication);
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(productService.getAllProduct(categoryId, sortOrder, pageNo, pageSize))
+            .data(productService.getListProductByCustomer(categoryId, sortOrder, pageNo, pageSize))
             .build());
   }
 
 
   @GetMapping(GET_ALL)
-  public ResponseEntity<CommonResponse<Object>> getAllProduct() {
+  public ResponseEntity<CommonResponse<Object>> getAllProduct(
+          @RequestParam(name = "pageNo", defaultValue = "0", required = false) int pageNo,
+          @RequestParam(name = "pageSize", defaultValue = "8", required = false) int pageSize
+  ) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(productService.getAll())
+            .data(productService.getListProduct(pageNo, pageSize))
             .build());
   }
 

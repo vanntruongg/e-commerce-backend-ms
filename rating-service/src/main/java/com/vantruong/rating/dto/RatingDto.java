@@ -4,7 +4,7 @@ import com.vantruong.common.util.DateTimeFormatter;
 import com.vantruong.rating.entity.Rating;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.util.Set;
 
 @Builder
 public record RatingDto(
@@ -12,7 +12,7 @@ public record RatingDto(
         String content,
         int star,
         Long productId,
-        String productName,
+        Set<String> upvoteUsers,
         String createdBy,
         String lastName,
         String firstName,
@@ -25,7 +25,7 @@ public record RatingDto(
             rating.getContent(),
             rating.getRatingStar(),
             rating.getProductId(),
-            rating.getProductName(),
+            rating.getUpvoteUsers(),
             rating.getCreatedBy(),
             rating.getLastName(),
             rating.getFirstName(),

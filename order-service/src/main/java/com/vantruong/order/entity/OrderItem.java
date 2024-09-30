@@ -29,7 +29,7 @@ public class OrderItem extends BaseEntity {
   private String productName;
 
   @Column(name = "product_price")
-  private double productPrice;
+  private Double productPrice;
 
   @Column(name = "product_image")
   private String productImage;

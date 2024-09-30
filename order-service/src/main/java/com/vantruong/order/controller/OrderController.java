@@ -18,7 +18,6 @@ public class OrderController {
   private final OrderService orderService;
   private final PaymentOrderService paymentOrderService;
 
-
   @GetMapping(ApiEndpoint.ORDERS)
   public ResponseEntity<CommonResponse<Object>> getAllOrder() {
     return ResponseEntity.ok().body(CommonResponse.builder()
@@ -37,12 +36,16 @@ public class OrderController {
             .build());
   }
 
-  @GetMapping(ApiEndpoint.GET_BY_USER)
-  public ResponseEntity<CommonResponse<Object>> getOrderByUser() {
+  @GetMapping(ApiEndpoint.GET_MY_ORDER)
+  public ResponseEntity<CommonResponse<Object>> getAllMyOrder(
+          @RequestParam(value = "pageNo",defaultValue = "0") int pageNo,
+          @RequestParam(value = "pageSize",defaultValue = "5") int pageSize,
+          @RequestParam(value = "orderStatus",defaultValue = "ALL") String orderStatus
+  ) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(orderService.getOrderByUser())
+            .data(orderService.getAllMyOrder(pageNo, pageSize, orderStatus))
             .build());
   }
 
@@ -63,15 +66,6 @@ public class OrderController {
             .data(orderService.getOrderByStatus(status))
             .build());
   }
-
-//  @GetMapping(ApiEndpoint.GET_BY_USER_AND_STATUS)
-//  public ResponseEntity<CommonResponse<Object>> getOrderOfUserByStatus(@RequestParam("status") String status) {
-//    return ResponseEntity.ok().body(CommonResponse.builder()
-//            .isSuccess(true)
-//            .message(MessageConstant.FIND_SUCCESS)
-//            .data(orderService.getOrderOfUserByStatus(status))
-//            .build());
-//  }
 
   @PostMapping(ApiEndpoint.UPDATE_STATUS)
   public ResponseEntity<CommonResponse<Object>> updateStatus(

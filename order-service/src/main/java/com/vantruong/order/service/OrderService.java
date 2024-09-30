@@ -10,6 +10,7 @@ import com.vantruong.order.client.ProductClient;
 import com.vantruong.order.constant.MessageConstant;
 import com.vantruong.order.dto.OrderDto;
 import com.vantruong.order.dto.OrderItemRequest;
+import com.vantruong.order.dto.OrderListDto;
 import com.vantruong.order.dto.OrderRequest;
 import com.vantruong.order.entity.Order;
 import com.vantruong.order.entity.OrderAddress;
@@ -24,6 +25,10 @@ import com.vantruong.order.util.OrderConverter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -146,27 +151,31 @@ public class OrderService {
     }
   }
 
-//  public List<OrderDto> getOrderOfUserByStatus(String status) {
-//    try {
-//      String email = authService.getUserId();;
-//      OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
-//      List<Order> orders = orderRepository.findOrderByEmailAndOrderStatusOrderByCreatedDateDesc(email, orderStatus);
-//      return orderConverter.convertToListOrderDto(orders);
-//    } catch (IllegalArgumentException e) {
-//      throw new IllegalArgumentException("Invalid order status: " + status);
-//    }
-//  }
-
-  public List<OrderDto> getOrderByUser() {
+  public OrderListDto getAllMyOrder(int pageNo, int pageSize, String orderStatus) {
     String userId = AuthenticationUtils.extractUserId();
-    List<Order> orders = orderRepository.findAllByEmailOrderByCreatedDateDesc(userId);
-    return orderConverter.convertToListOrderDto(orders);
+
+    Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("createdDate").descending());
+
+    Page<Order> orderPage;
+    if (orderStatus.equals("ALL")) {
+      orderPage = orderRepository.findByEmail(userId, pageable);
+    } else {
+      OrderStatus status = OrderStatus.findOrderStatus(orderStatus);
+      orderPage = orderRepository.findByEmailAndOrderStatus(userId, status, pageable);
+    }
+    List<OrderDto> orderDtoList = orderConverter.convertToListOrderDto(orderPage.getContent());
+
+    return new OrderListDto(
+            orderDtoList,
+            (int) orderPage.getTotalElements(),
+            orderPage.getTotalPages()
+    );
   }
 
   public OrderDto getOrderById(Long id) {
     Order order = orderRepository.findById(id).orElseThrow(() ->
             new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.ORDER_NOT_FOUND));
-    return orderConverter.convertToOrderDto(order, orderConverter.convertToListOrderDetailDto(order.getOrderItems()));
+    return orderConverter.convertToOrderDto(order);
   }
 
   @Transactional

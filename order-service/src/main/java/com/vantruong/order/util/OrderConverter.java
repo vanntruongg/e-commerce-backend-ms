@@ -7,12 +7,15 @@ import com.vantruong.common.event.PaymentStatus;
 import com.vantruong.common.util.DateTimeFormatter;
 import com.vantruong.order.dto.OrderDto;
 import com.vantruong.order.dto.OrderItemDto;
+import com.vantruong.order.dto.SizeQuantity;
 import com.vantruong.order.entity.Order;
 import com.vantruong.order.entity.OrderItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,7 +49,7 @@ public class OrderConverter {
     );
   }
 
-  public OrderDto convertToOrderDto(Order order, Set<com.vantruong.order.dto.OrderItemDto> orderItemDtos) {
+  public OrderDto convertToOrderDto(Order order) {
     return OrderDto.builder()
             .orderId(order.getOrderId())
             .email(order.getEmail())
@@ -60,25 +63,54 @@ public class OrderConverter {
             .paymentMethod(order.getPaymentMethod())
             .created(dateTimeFormatter.format(order.getCreatedDate()))
             .createdDate(order.getCreatedDate())
-            .orderItems(orderItemDtos)
+            .orderItems(convertToListOrderItemDto(order.getOrderItems()))
             .build();
   }
 
   public List<OrderDto> convertToListOrderDto(List<Order> orders) {
-    return orders.stream().map(order ->
-            convertToOrderDto(order, convertToListOrderDetailDto(order.getOrderItems()))
+    return orders.stream().map(this::convertToOrderDto).toList();
+  }
 
-    ).toList();
+  private Set<OrderItemDto> convertToListOrderItemDto(Set<OrderItem> orderItems) {
+    Map<Long, List<OrderItem>> groupedByProductId = orderItems.stream()
+            .collect(Collectors.groupingBy(OrderItem::getProductId));
+
+    return groupedByProductId.entrySet().stream().map(entry -> {
+      Long productId = entry.getKey();
+      List<OrderItem> items = entry.getValue();
+
+      String productName = items.get(0).getProductName();
+      Double productPrice = items.get(0).getProductPrice();
+      String productImage = items.get(0).getProductImage();
+
+      List<SizeQuantity> sizeQuantities = items.stream()
+              .map(item -> new SizeQuantity(item.getProductSize(), item.getQuantity()))
+              .toList();
+
+      return new OrderItemDto(
+              productId,
+              productName,
+              productPrice,
+              productImage,
+              sizeQuantities
+      );
+    }).collect(Collectors.toSet());
   }
 
   public OrderItemDto convertToOrderDetailDto(OrderItem orderDetail) {
+    List<SizeQuantity> sizeQuantityList = new ArrayList<>();
+    SizeQuantity sizeQuantity = SizeQuantity.builder()
+            .size(orderDetail.getProductSize())
+            .quantity(orderDetail.getQuantity())
+            .build();
+    sizeQuantityList.add(sizeQuantity);
+
     return OrderItemDto.builder()
             .productId(orderDetail.getProductId())
             .productName(orderDetail.getProductName())
-            .quantity(orderDetail.getQuantity())
             .productPrice(orderDetail.getProductPrice())
             .productImage(orderDetail.getProductImage())
-            .size(orderDetail.getProductSize())
+            .sizeQuantityList(sizeQuantityList)
             .build();
   }
 

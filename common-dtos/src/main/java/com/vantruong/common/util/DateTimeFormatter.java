@@ -13,7 +13,7 @@ import java.util.function.Function;
 public class DateTimeFormatter {
   private static final long SECONDS_PER_MINUTE = 60L;
   private static final long SECONDS_PER_HOUR = SECONDS_PER_MINUTE * 60;
-  private static final long SECONDS_PER_DAY = SECONDS_PER_HOUR * 60;
+  private static final long SECONDS_PER_DAY = SECONDS_PER_HOUR * 24;
 
   Map<Long, Function<LocalDateTime, String>> strategyMap = new LinkedHashMap<>();
 
@@ -42,7 +42,7 @@ public class DateTimeFormatter {
 
   private String formatInDate(LocalDateTime dateTime) {
     LocalDateTime localDateTime = dateTime.atZone(ZoneId.systemDefault()).toLocalDateTime();
-    java.time.format.DateTimeFormatter dateTimeFormatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    java.time.format.DateTimeFormatter dateTimeFormatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     return localDateTime.format(dateTimeFormatter);
   }

@@ -1,11 +1,14 @@
 package com.vantruong.inventory.service;
 
+import com.vantruong.common.dto.inventory.InventoryPost;
 import com.vantruong.common.dto.inventory.SizeQuantityDto;
 import com.vantruong.common.dto.request.ProductInventoryRequest;
 import com.vantruong.common.dto.request.ProductQuantityRequest;
 import com.vantruong.common.dto.response.ProductInventoryResponse;
 import com.vantruong.inventory.entity.Inventory;
+import com.vantruong.inventory.entity.SizeQuantity;
 import com.vantruong.inventory.repository.InventoryRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,13 +16,30 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class InternalInventoryService {
   private final InventoryRepository inventoryRepository;
   private final InventoryService inventoryService;
 
-  public InternalInventoryService(InventoryRepository inventoryRepository, InventoryService inventoryService) {
-    this.inventoryRepository = inventoryRepository;
-    this.inventoryService = inventoryService;
+  public Boolean createInventory(InventoryPost inventoryPost) {
+    try {
+      List<SizeQuantity> sizeQuantityList = inventoryPost.sizeQuantityDtoList().stream()
+              .map(sizeQuantityDto -> SizeQuantity.builder()
+                      .size(sizeQuantityDto.getSize())
+                      .quantity(sizeQuantityDto.getQuantity())
+                      .build()
+              )
+              .toList();
+
+      Inventory inventory = Inventory.builder()
+              .productId(inventoryPost.productId())
+              .sizes(sizeQuantityList)
+              .build();
+      inventoryRepository.save(inventory);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   /**
@@ -51,7 +71,7 @@ public class InternalInventoryService {
 
                       return inventory.getSizes().stream()
                               .map(sizeQuantity -> SizeQuantityDto.builder()
-                                      .size(sizeQuantity.getSize().name())
+                                      .size(sizeQuantity.getSize())
                                       .quantity(sizeQuantity.getQuantity())
                                       .build())
                               .toList();

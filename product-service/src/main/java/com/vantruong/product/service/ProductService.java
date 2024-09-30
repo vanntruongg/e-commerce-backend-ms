@@ -1,6 +1,9 @@
 package com.vantruong.product.service;
 
+import com.vantruong.common.dto.inventory.SizeQuantityDto;
+import com.vantruong.common.dto.response.ProductInventoryResponse;
 import com.vantruong.common.exception.Constant;
+import com.vantruong.common.exception.InventoryCreationException;
 import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.product.constant.MessageConstant;
 import com.vantruong.product.converter.ProductConverter;
@@ -10,14 +13,15 @@ import com.vantruong.product.dto.ProductPut;
 import com.vantruong.product.dto.ProductResponse;
 import com.vantruong.product.entity.Category;
 import com.vantruong.product.entity.Product;
-import com.vantruong.product.entity.ProductImage;
-import com.vantruong.product.repository.ProductImageRepository;
+import com.vantruong.product.exception.ProductCreationException;
 import com.vantruong.product.repository.ProductRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.*;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -27,10 +31,9 @@ import java.util.Map;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductService {
   ProductRepository productRepository;
-  ProductImageRepository productImageRepository;
   CategoryService categoryService;
   ProductConverter productConverter;
-
+  InventoryService inventoryService;
   static Integer PAGE_SIZE = 8;
 
   private Pageable createPaging(int pageNo, int pageSize, String sortOrder) {
@@ -50,7 +53,7 @@ public class ProductService {
     return PageRequest.of(pageNo, pageSize, sort);
   }
 
-  public ProductListResponse getAllProduct(Long categoryId, String sortOrder, int pageNo, int pageSize) {
+  public ProductListResponse getListProductByCustomer(Long categoryId, String sortOrder, int pageNo, int pageSize) {
     Pageable pageable = createPaging(pageNo, pageSize, sortOrder);
 //    List<com.vantruong.common.dto.response.ProductResponse> productResponses;
     Page<Product> productPage;
@@ -58,7 +61,7 @@ public class ProductService {
 //    nếu không truyền category
     if (categoryId != 0) {
       List<Long> categoryIds = categoryService.getAllSubCategoryIds(categoryId);
-      if(categoryIds.isEmpty()) {
+      if (categoryIds.isEmpty()) {
         productPage = productRepository.findAllByCategoryId(categoryId, pageable);
       } else {
         productPage = productRepository.findAllByCategoryIds(categoryIds, pageable);
@@ -66,11 +69,31 @@ public class ProductService {
     } else {
       productPage = productRepository.findAll(pageable);
     }
-    List<Product> productList = productPage.getContent();
-    List<ProductResponse> productListResponse = productList.stream()
+    List<ProductResponse> productListResponse = productPage.getContent().stream()
             .map(productConverter::convertToProductResponse)
             .toList();
 
+    return buildProductListResponse(productPage, productListResponse);
+  }
+
+  @PostAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+  public ProductListResponse getListProduct(int pageNo, int pageSize) {
+    Sort sort = Sort.by(Sort.Order.asc("id"));
+    Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+    Page<Product> productPage = productRepository.findAll(pageable);
+    ProductInventoryResponse productInventoryResponse = inventoryService.getInventoryByProductIds(productPage.getContent());
+    List<ProductResponse> productListResponse = productPage.getContent().stream()
+            .map(product -> {
+              List<SizeQuantityDto> sizeQuantityDtoList = productInventoryResponse.getProductInventoryResponse().get(product.getId());
+              return productConverter.convertToProductResponse(product, sizeQuantityDtoList);
+            })
+            .toList();
+
+    return buildProductListResponse(productPage, productListResponse);
+  }
+
+  private ProductListResponse buildProductListResponse(Page<Product> productPage, List<ProductResponse> productListResponse) {
     return new ProductListResponse(
             productListResponse,
             productPage.getNumber(),
@@ -102,28 +125,34 @@ public class ProductService {
   }
 
 
-  public ProductResponse createProduct(ProductPost productPost) {
-    Category category = categoryService.getCategoryById(productPost.id());
+  @Transactional
+  public Boolean createProduct(ProductPost productPost) {
+    try {
+      Category category = categoryService.getCategoryById(productPost.categoryId());
 
-    Product product = Product.builder()
-            .name(productPost.name())
-            .price(productPost.price())
-            .material(productPost.material())
-            .style(productPost.style())
-            .category(category)
-            .build();
-    productRepository.save(product);
+      Product product = Product.builder()
+              .name(productPost.name())
+              .price(productPost.price())
+              .material(productPost.material())
+              .style(productPost.style())
+              .imageUrl(productPost.imageUrl())
+              .description(productPost.description())
+              .category(category)
+              .build();
+      Product savedProduct = productRepository.save(product);
 
-    List<ProductImage> productImages = productPost.imageUrl().stream()
-            .map(imageUrl -> ProductImage.builder()
-                    .imageUrl(imageUrl)
-                    .product(product)
-                    .build())
-            .toList();
-    List<ProductImage> savedProductImages = productImageRepository.saveAll(productImages);
-    product.setImages(savedProductImages);
+      Boolean isInventoryCreationSuccessful = inventoryService.createInventory(savedProduct.getId(), productPost.stock());
+      if (!isInventoryCreationSuccessful) {
+        throw new InventoryCreationException(Constant.ErrorCode.INVENTORY_CREATION_FAILED, Constant.Message.INVENTORY_CREATION_FAILED);
+      }
+//    List<ProductImage> savedProductImages = productImageService.createProductImage(product, productPost.imageUrls());
+//    product.setImages(savedProductImages);
 
-    return productConverter.convertToProductResponse(product);
+//      return productConverter.convertToProductResponse(product);
+      return true;
+    } catch (Exception e) {
+      throw new ProductCreationException(Constant.ErrorCode.PRODUCT_CREATION_FAILED, Constant.Message.PRODUCT_CREATION_FAILED);
+    }
   }
 
   public List<ProductResponse> findProductByName(String name, int limit) {
@@ -138,15 +167,11 @@ public class ProductService {
     product.setPrice(productPut.price());
     product.setMaterial(productPut.material());
     product.setStyle(productPut.style());
+    product.setImageUrl(productPut.imageUrl());
+    product.setDescription(productPut.description());
     product.setCategory(category);
     productRepository.save(product);
     return true;
-  }
-
-  public List<ProductResponse> getAll() {
-    Sort sort = Sort.by(Sort.Order.asc("id"));
-    List<Product> products = productRepository.findAll(sort);
-    return productConverter.convertToListProductResponse(products);
   }
 
   public Long getProductCount() {

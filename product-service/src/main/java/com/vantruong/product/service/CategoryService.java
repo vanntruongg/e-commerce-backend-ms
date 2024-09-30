@@ -10,6 +10,7 @@ import com.vantruong.product.dto.CategoryDto;
 import com.vantruong.product.entity.Category;
 import com.vantruong.product.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class CategoryService {
   }
 
   public List<AllLevelCategoryDto> getALlCategory() {
-    List<Category> categories = categoryRepository.findTopLevelCategory();
+    List<Category> categories = categoryRepository.findTopLevelCategory(Sort.Order.asc("name"));
     List<AllLevelCategoryDto> result = new ArrayList<>();
     for (Category category : categories) {
       List<AllLevelCategoryDto> categoryResponses = getAllLevelChildrenByCategory(category.getId());

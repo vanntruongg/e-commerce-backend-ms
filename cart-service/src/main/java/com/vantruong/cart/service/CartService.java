@@ -68,8 +68,6 @@ public class CartService {
   }
 
   public CartResponse getCartById() {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    String email = authentication.getName();
     Cart cart = findByIdOrCreate();
     List<CartItemResponse> cartItemResponses = new ArrayList<>();
     if (Objects.nonNull(cart.getItems())) {

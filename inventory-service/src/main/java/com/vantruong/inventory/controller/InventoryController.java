@@ -2,7 +2,9 @@ package com.vantruong.inventory.controller;
 
 import com.vantruong.inventory.common.CommonResponse;
 import com.vantruong.inventory.constant.MessageConstant;
+import com.vantruong.inventory.dto.InventoryPut;
 import com.vantruong.inventory.service.InventoryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,13 +12,18 @@ import static com.vantruong.inventory.constant.ApiEndpoint.*;
 
 @RestController
 @RequestMapping(INVENTORY)
+@RequiredArgsConstructor
 public class InventoryController {
   private final InventoryService inventoryService;
 
-  public InventoryController(InventoryService inventoryService) {
-    this.inventoryService = inventoryService;
+  @PutMapping(UPDATE)
+  public ResponseEntity<CommonResponse<Object>> updateInventory(@RequestBody InventoryPut inventoryPut) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.UPDATE_SUCCESS)
+            .data(inventoryService.updateInventory(inventoryPut))
+            .build());
   }
-
 
   @GetMapping(GET + ID_PARAM)
   public ResponseEntity<CommonResponse<Object>> getByProductId(@PathVariable("id") Long productId) {

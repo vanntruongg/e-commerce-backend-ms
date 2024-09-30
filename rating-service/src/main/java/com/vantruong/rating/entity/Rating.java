@@ -2,7 +2,10 @@ package com.vantruong.rating.entity;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,9 +17,10 @@ public class Rating extends AbstractAuditEntity {
   @Id
   private String id;
   private String content;
-  private int ratingStar;
+  private Integer ratingStar;
+  @Indexed
   private Long productId;
-  private String productName;
   private String lastName;
   private String firstName;
+  private Set<String> upvoteUsers;
 }

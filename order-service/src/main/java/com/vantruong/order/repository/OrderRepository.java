@@ -1,6 +1,8 @@
 package com.vantruong.order.repository;
 
 import com.vantruong.order.entity.enumeration.OrderStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -21,7 +23,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
           "and o.orderStatus = :orderStatus " +
           "and oi.productId = :productId")
   boolean existsByEmailAndProductIdAndOrderStatus(String email, Long productId, OrderStatus orderStatus);
-  List<Order> findAllByEmailOrderByCreatedDateDesc(String email);
+
+  Page<Order> findByEmail(String email, Pageable pageable);
+  Page<Order> findByEmailAndOrderStatus(String email, OrderStatus orderStatus, Pageable pageable);
 
   @Query("select o.orderStatus, count(o) from Order o group by o.orderStatus")
   List<Object[]> findOrderCountByStatus();

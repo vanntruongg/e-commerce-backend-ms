@@ -9,7 +9,7 @@ import java.util.Set;
 public record UserDto(String email,
                       String firstName,
                       String lastName,
-                      LocalDate dob,
+                      LocalDate dateOfBirth,
                       String phone,
                       String imageUrl,
                       Set<Role> roles

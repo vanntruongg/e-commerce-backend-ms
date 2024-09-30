@@ -13,12 +13,13 @@ public class MessageConstant {
 
 //  actions
   public static final String FIND = "Tìm";
-  public static final String FIND_SUCCESS = String.format(CHAR_SEQUENCE_2, FIND, SUCCESS);
+  public static final String UPDATE = "Cập nhật";
 
-//  status
+  //  status
   public static final String NOT_FOUND = "Không tìm thấy!";
   public static final String PRODUCT_NOT_FOUND = "Không tìm thấy sản phẩm!";
 
 
-
+  public static final String FIND_SUCCESS = String.format(CHAR_SEQUENCE_2, FIND, SUCCESS);
+  public static final String UPDATE_SUCCESS = String.format(CHAR_SEQUENCE_2, UPDATE, SUCCESS);;
 }

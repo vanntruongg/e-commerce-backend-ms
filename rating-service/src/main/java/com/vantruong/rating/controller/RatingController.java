@@ -68,4 +68,26 @@ public class RatingController {
             .data(ratingService.getRatingBreakdown(productId))
             .build());
   }
+
+  @GetMapping(GET_MOST_UPVOTE_RATING)
+  public ResponseEntity<CommonResponse<Object>> getRatingWithMostUpvote(
+          @PathVariable("productId") Long productId
+  ) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.FIND_SUCCESS)
+            .data(ratingService.findRatingWithMostUpVotes(productId))
+            .build());
+  }
+
+  @PostMapping(UPVOTE_RATING)
+  public ResponseEntity<CommonResponse<Object>> upvoteRating(
+          @PathVariable("id") String ratingId
+  ) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.UPVOTE_RATING_SUCCESS)
+            .data(ratingService.handleUpvoteRating(ratingId))
+            .build());
+  }
 }

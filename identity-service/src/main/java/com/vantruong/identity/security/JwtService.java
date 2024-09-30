@@ -45,7 +45,7 @@ public class JwtService {
   }
 
   public String generateToken(UserDetailsImpl userDetails, boolean isAccessToken) {
-    long expireTimeAccessToken = Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli();
+    long expireTimeAccessToken = Instant.now().plus(24, ChronoUnit.HOURS).toEpochMilli();
     long expireTimeRefreshToken = Instant.now().plus(24, ChronoUnit.HOURS).toEpochMilli();
 
     JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);

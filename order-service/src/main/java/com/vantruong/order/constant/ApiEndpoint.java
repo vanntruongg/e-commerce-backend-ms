@@ -34,8 +34,10 @@ public class ApiEndpoint {
   public static final String STATISTIC = "/statistic";
   public static final String GET_TOTAL_ORDER = "/total-order";
   public static final String USER = "/user";
+  public static final String MY_ORDER = "/my-order";
   public static final String CREATE_ORDER = CREATE;
   public static final String GET_BY_USER = GET + USER;
+  public static final String GET_MY_ORDER = GET + MY_ORDER;
   public static final String GET_BY_STATUS = GET + STATUS;
   public static final String GET_BY_USER_AND_STATUS = GET + USER + STATUS;
   public static final String GET_BY_ID = GET + ID_PARAM;

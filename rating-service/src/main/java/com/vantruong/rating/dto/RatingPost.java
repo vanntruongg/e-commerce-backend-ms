@@ -6,7 +6,6 @@ import lombok.Builder;
 public record RatingPost(
         String content,
         int star,
-        Long productId,
-        String productName
+        Long productId
 ) {
 }

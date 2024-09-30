@@ -1,5 +1,6 @@
-package com.vantruong.product.repository.client;
+package com.vantruong.product.client;
 
+import com.vantruong.common.dto.inventory.InventoryPost;
 import com.vantruong.common.dto.inventory.SizeQuantityDto;
 import com.vantruong.common.dto.request.ProductInventoryRequest;
 import com.vantruong.common.dto.response.ProductInventoryResponse;
@@ -23,4 +24,7 @@ public interface InventoryClient {
 
   @GetMapping(GET_BY_PRODUCT_ID)
   CommonResponse<List<SizeQuantityDto>> getInventoryByProductId(@PathVariable("id") Long productId);
+
+  @PostMapping(CREATE_INVENTORY)
+  CommonResponse<Boolean> createInventory(@RequestBody InventoryPost inventoryPost);
 }

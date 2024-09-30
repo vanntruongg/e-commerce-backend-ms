@@ -188,7 +188,7 @@ public class UserService {
     return true;
   }
 
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
   public Long getUserCount() {
     return userRepository.count();
   }

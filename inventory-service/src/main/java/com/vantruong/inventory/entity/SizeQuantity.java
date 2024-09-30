@@ -1,7 +1,6 @@
 package com.vantruong.inventory.entity;
 
 
-import com.vantruong.inventory.enums.Size;
 import lombok.*;
 
 @Getter
@@ -10,6 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class SizeQuantity {
-  private Size size;
+  private String size;
   private Integer quantity;
 }

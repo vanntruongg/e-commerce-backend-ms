@@ -1,5 +1,7 @@
 package com.vantruong.product.dto;
 
+import com.vantruong.common.dto.inventory.SizeQuantityDto;
+
 import java.util.List;
 
 public record ProductPost(
@@ -8,7 +10,10 @@ public record ProductPost(
         double price,
         String material,
         String style,
-        List<String> imageUrl,
-        Long categoryId
+        String imageUrl,
+        String description,
+//        List<String> imageUrls,
+        Long categoryId,
+        List<SizeQuantityDto> stock
 ) {
 }
