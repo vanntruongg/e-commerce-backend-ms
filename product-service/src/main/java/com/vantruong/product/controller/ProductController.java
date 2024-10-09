@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import static com.vantruong.product.constant.ApiEndpoint.GET_ALL;
+import static com.vantruong.product.constant.ApiEndpoint.SEARCH_BY_NAME;
 
 
 @RestController
@@ -22,7 +23,7 @@ public class ProductController {
     this.productService = productService;
   }
 
-  @PostMapping(ApiEndpoint.CREATE_PRODUCT)
+  @PostMapping(ApiEndpoint.CREATE)
   public ResponseEntity<CommonResponse<Object>> createProduct(@RequestBody ProductPost productDto) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
@@ -55,6 +56,19 @@ public class ProductController {
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
             .data(productService.getListProduct(pageNo, pageSize))
+            .build());
+  }
+
+  @GetMapping(SEARCH_BY_NAME)
+  public ResponseEntity<CommonResponse<Object>> searchByName(
+          @PathVariable(name = "name") String productName,
+          @RequestParam(name = "pageNo", defaultValue = "0", required = false) int pageNo,
+          @RequestParam(name = "pageSize", defaultValue = "8", required = false) int pageSize
+  ) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.FIND_SUCCESS)
+            .data(productService.searchByName(productName, pageNo, pageSize))
             .build());
   }
 

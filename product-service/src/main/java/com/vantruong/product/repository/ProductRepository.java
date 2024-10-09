@@ -34,6 +34,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   Page<Product> findAllByCategoryIds(List<Long> categoryIds, Pageable page);
 
   List<Product> findProductByNameContainingIgnoreCase(String name, Limit limit);
+  Page<Product> findProductByNameContainingIgnoreCase(String name, Pageable pageable);
 
   @Query("select count(p) from Product p")
   Long getProductCount();

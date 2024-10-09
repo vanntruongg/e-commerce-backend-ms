@@ -19,7 +19,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.*;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,7 +76,7 @@ public class ProductService {
     return buildProductListResponse(productPage, productListResponse);
   }
 
-  @PostAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+  @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
   public ProductListResponse getListProduct(int pageNo, int pageSize) {
     Sort sort = Sort.by(Sort.Order.asc("id"));
     Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
@@ -102,6 +102,22 @@ public class ProductService {
             productPage.getTotalPages(),
             productPage.isLast()
     );
+  }
+
+  public ProductListResponse searchByName(String productName, int pageNo, int pageSize) {
+    Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+    Page<Product> productPage = productRepository.findProductByNameContainingIgnoreCase(productName, pageable);
+
+    ProductInventoryResponse productInventoryResponse = inventoryService.getInventoryByProductIds(productPage.getContent());
+    List<ProductResponse> productListResponse = productPage.getContent().stream()
+            .map(product -> {
+              List<SizeQuantityDto> sizeQuantityDtoList = productInventoryResponse.getProductInventoryResponse().get(product.getId());
+              return productConverter.convertToProductResponse(product, sizeQuantityDtoList);
+            })
+            .toList();
+
+    return buildProductListResponse(productPage, productListResponse);
   }
 
   public Product getProductById(Long id) {

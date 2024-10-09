@@ -6,7 +6,8 @@ import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.product.constant.MessageConstant;
 import com.vantruong.product.converter.CategoryConverter;
 import com.vantruong.product.dto.AllLevelCategoryDto;
-import com.vantruong.product.dto.CategoryDto;
+import com.vantruong.product.dto.CategoryPost;
+import com.vantruong.product.dto.CategoryPut;
 import com.vantruong.product.entity.Category;
 import com.vantruong.product.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +24,40 @@ public class CategoryService {
   private final CategoryRepository categoryRepository;
   private final CategoryConverter categoryConverter;
 
-  public CategoryResponse createCategory(CategoryDto categoryDto) {
+
+  private Category findById(Long categoryId) {
+    if(categoryId == null) return null;
+    return categoryRepository.findById(categoryId)
+            .orElse(null);
+  }
+
+  public CategoryResponse createCategory(CategoryPost categoryPost) {
+    Category parentCategory = this.findById(categoryPost.parentCategoryId());
     Category category = Category.builder()
-            .name(categoryDto.getName())
-            .image(categoryDto.getImage())
-            .parentCategory(categoryDto.getParentCategory())
+            .name(categoryPost.name())
+            .image(categoryPost.imageUrl())
+            .parentCategory(parentCategory)
             .build();
     categoryRepository.save(category);
     return categoryConverter.convertToCategoryResponse(category);
+  }
+
+  public Boolean updateCategory(CategoryPut categoryPut) {
+    Category category = this.findById(categoryPut.categoryId());
+    category.setName(categoryPut.name());
+    category.setImage(categoryPut.imageUrl());
+
+    if(categoryPut.isTopLevel()) {
+      category.setParentCategory(null);
+    } else {
+      Category parentCategory = this.findById(categoryPut.parentCategoryId());
+      if(parentCategory != null && !parentCategory.getId().equals(category.getId())) {
+        category.setParentCategory(parentCategory);
+      }
+    }
+
+    categoryRepository.save(category);
+    return true;
   }
 
   public List<AllLevelCategoryDto> getALlCategory() {
@@ -114,4 +141,6 @@ public class CategoryService {
       findSubCategoryIdsRecursively(category.getId(), categoryIds);
     }
   }
+
+
 }

@@ -3,13 +3,12 @@ package com.vantruong.product.controller;
 import com.vantruong.product.common.CommonResponse;
 import com.vantruong.product.constant.ApiEndpoint;
 import com.vantruong.product.constant.MessageConstant;
+import com.vantruong.product.dto.CategoryPost;
+import com.vantruong.product.dto.CategoryPut;
 import com.vantruong.product.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.vantruong.product.constant.ApiEndpoint.GET_ALL_PARENT_CATEGORY_BY_ID;
 
@@ -38,15 +37,24 @@ public class CategoryController {
             .build());
   }
 
-//  @PostMapping(ApiEndpoint.CATEGORY_CREATE)
-//  public ResponseEntity<CommonResponse<Object>> createCategory(@RequestBody CategoryDto categoryDto) {
-//    return ResponseEntity.ok().body(CommonResponse.builder()
-//            .isSuccess(true)
-//            .message(MessageConstant.CREATE_CATEGORY_SUCCESS)
-//            .data(categoryService.createCategory(categoryDto))
-//            .build());
-//  }
-//
+  @PostMapping(ApiEndpoint.CREATE)
+  public ResponseEntity<CommonResponse<Object>> createCategory(@RequestBody CategoryPost categoryPost) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.CREATE_CATEGORY_SUCCESS)
+            .data(categoryService.createCategory(categoryPost))
+            .build());
+  }
+
+  @PutMapping(ApiEndpoint.UPDATE)
+  public ResponseEntity<CommonResponse<Object>> updateCategory(@RequestBody CategoryPut categoryPut) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.UPDATE_CATEGORY_SUCCESS)
+            .data(categoryService.updateCategory(categoryPut))
+            .build());
+  }
+
 
 //  @GetMapping(ApiEndpoint.GET_TOP_LEVEL_CATEGORY)
 //  public ResponseEntity<CommonResponse<Object>> getTopLevelCategory() {
