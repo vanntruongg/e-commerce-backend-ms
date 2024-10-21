@@ -7,6 +7,7 @@ import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.identity.common.Utils;
 import com.vantruong.identity.constant.MessageConstant;
 import com.vantruong.identity.dto.UserDto;
+import com.vantruong.identity.dto.UserListDto;
 import com.vantruong.identity.dto.request.*;
 import com.vantruong.identity.entity.Role;
 import com.vantruong.identity.entity.Token;
@@ -23,6 +24,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -83,14 +87,14 @@ public class UserService {
   public Boolean requestForgotPassword(String email) {
     Token token = Utils.generateToken(TokenType.RESET_PASSWORD);
     User user = getUserByEmail(email);
-
+    token.setUser(user);
+    tokenService.createToken(token);
     SendMailVerifyUserRequest request = SendMailVerifyUserRequest.builder()
             .email(user.getEmail())
             .name(user.getFirstName())
             .token(token.getTokenValue())
             .build();
     mailClient.sendForgotPassword(request);
-    userRepository.save(user);
     return true;
   }
 
@@ -115,8 +119,37 @@ public class UserService {
   }
 
   @PreAuthorize("hasRole('ADMIN')")
-  public List<User> getAllUser() {
-    return userRepository.findAll();
+  public UserListDto getAllUser(int pageNo, int pageSize) {
+    Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+    Page<User> userPage = userRepository.findAll(pageable);
+
+    List<UserDto> userDtoList = userPage.getContent().stream()
+            .map(UserDto::fromEntity)
+            .toList();
+
+    return new UserListDto(
+            userDtoList,
+            (int) userPage.getTotalElements(),
+            userPage.getTotalPages(),
+            userPage.isLast()
+    );
+  }
+
+  public UserListDto searchByName(String name, int pageNo, int pageSize) {
+    Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+    Page<User> userPage = userRepository.findByFirstNameContainingIgnoreCase(name, pageable);
+    List<UserDto> userDtoList = userPage.getContent().stream()
+            .map(UserDto::fromEntity)
+            .toList();
+
+    return new UserListDto(
+            userDtoList,
+            (int) userPage.getTotalElements(),
+            userPage.getTotalPages(),
+            userPage.isLast()
+    );
   }
 
   @PostAuthorize("returnObject.email == authentication.name")
@@ -139,7 +172,6 @@ public class UserService {
 
     user.setFirstName(userPut.getFirstName());
     user.setLastName(userPut.getLastName());
-    user.setDateOfBirth(userPut.getDob());
     user.setPhone(userPut.getPhone());
     user.setImageUrl(userPut.getImageUrl());
 
