@@ -157,10 +157,11 @@ public class ProductService {
               .build();
       Product savedProduct = productRepository.save(product);
 
-      Boolean isInventoryCreationSuccessful = inventoryService.createInventory(savedProduct.getId(), productPost.stock());
-      if (!isInventoryCreationSuccessful) {
-        throw new InventoryCreationException(Constant.ErrorCode.INVENTORY_CREATION_FAILED, Constant.Message.INVENTORY_CREATION_FAILED);
-      }
+     Boolean createInventorySuccess = inventoryService.createInventory(savedProduct.getId(), productPost.stock());
+     if(!createInventorySuccess) {
+       throw new ProductCreationException(Constant.ErrorCode.PRODUCT_CREATION_FAILED, Constant.Message.PRODUCT_CREATION_FAILED);
+     }
+
 //    List<ProductImage> savedProductImages = productImageService.createProductImage(product, productPost.imageUrls());
 //    product.setImages(savedProductImages);
 

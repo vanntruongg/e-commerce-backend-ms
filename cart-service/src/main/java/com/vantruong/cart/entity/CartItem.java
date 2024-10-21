@@ -1,6 +1,5 @@
 package com.vantruong.cart.entity;
 
-import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.util.List;

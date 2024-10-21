@@ -21,6 +21,9 @@ public class UserApiEndpoint {
   public static final String VERIFY_EMAIL = "/verify-email";
   public static final String PROFILE = "/profile";
   public static final String DEFAULT = "/default";
+  public static final String SEARCH = "/search";
+  public static final String NAME = "/name";
+  public static final String NAME_PARAM = "/{name}";
   public static final String USER_GET_BY_EMAIL = GET + EMAIL_PARAM;
   public static final String UPDATE_USER = UPDATE;
   public static final String COUNT_USER = COUNT;
@@ -31,4 +34,5 @@ public class UserApiEndpoint {
   public static final String GET_ADDRESS = GET + ADDRESS;
   public static final String GET_ADDRESS_BY_ID = GET + ADDRESS + ID_PARAM;
   public static final String GET_DEFAULT_ADDRESS = GET + DEFAULT + ADDRESS;
+  public static final String SEARCH_BY_NAME = SEARCH + NAME + NAME_PARAM;
 }

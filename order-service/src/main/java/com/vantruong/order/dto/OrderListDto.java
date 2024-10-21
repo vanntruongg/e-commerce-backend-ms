@@ -5,6 +5,7 @@ import java.util.List;
 public record OrderListDto(
         List<OrderDto> orderList,
         int totalElements,
-        int totalPages
+        int totalPages,
+        boolean isLast
 ) {
 }

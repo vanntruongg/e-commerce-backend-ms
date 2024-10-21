@@ -5,8 +5,6 @@ import com.vantruong.common.dto.request.ProductQuantityRequest;
 import com.vantruong.common.exception.Constant;
 import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.common.exception.ProductQuantityNotAvailableException;
-import com.vantruong.order.client.InventoryClient;
-import com.vantruong.order.client.ProductClient;
 import com.vantruong.order.constant.MessageConstant;
 import com.vantruong.order.dto.OrderDto;
 import com.vantruong.order.dto.OrderItemRequest;
@@ -20,6 +18,7 @@ import com.vantruong.order.entity.enumeration.PaymentMethod;
 import com.vantruong.order.entity.enumeration.PaymentStatus;
 import com.vantruong.order.repository.OrderItemRepository;
 import com.vantruong.order.repository.OrderRepository;
+import com.vantruong.order.repository.specification.OrderSpecification;
 import com.vantruong.order.util.AuthenticationUtils;
 import com.vantruong.order.util.OrderConverter;
 import lombok.AccessLevel;
@@ -29,6 +28,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,13 +41,50 @@ import java.util.*;
 public class OrderService {
   OrderRepository orderRepository;
   OrderItemRepository orderItemRepository;
-  ProductClient productClient;
-  InventoryClient inventoryClient;
+  ProductService productService;
+  InventoryService inventoryService;
   OrderConverter orderConverter;
 
-  public List<OrderDto> getAllOrder() {
-    List<Order> orders = orderRepository.findAll();
-    return orderConverter.convertToListOrderDto(orders);
+
+  public OrderListDto getAllOrders(int pageNo, int pageSize, String orderStatus, String paymentMethod, String userId) {
+
+    Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("createdDate").descending());
+    OrderStatus status = orderStatus == null || orderStatus.isEmpty() ? null : OrderStatus.findOrderStatus(orderStatus);
+
+    Specification<Order> specification = Specification
+            .where(OrderSpecification.hasEmail(userId))
+            .and(OrderSpecification.hasOrderStatus(status))
+            .and(OrderSpecification.hasPaymentMethod(paymentMethod));
+
+    Page<Order> orderPage = orderRepository.findAll(specification, pageable);
+
+    List<OrderDto> orders = orderConverter.convertToListOrderDto(orderPage.getContent());
+    return new OrderListDto(
+            orders,
+            (int) orderPage.getTotalElements(),
+            orderPage.getTotalPages(),
+            orderPage.isLast()
+    );
+  }
+
+  public OrderListDto searchById(Long orderId) {
+    Order order = findById(orderId);
+    return new OrderListDto(
+            List.of(orderConverter.convertToOrderDto(order)),
+            1,
+            1,
+            true
+    );
+  }
+
+  @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+  public OrderListDto getAllOrderByAdmin(int pageNo, int pageSize, String orderStatus, String paymentMethod) {
+    return getAllOrders(pageNo, pageSize, orderStatus, paymentMethod, null);
+  }
+
+  public OrderListDto getAllMyOrder(int pageNo, int pageSize, String orderStatus) {
+    String userId = AuthenticationUtils.extractUserId();
+    return getAllOrders(pageNo, pageSize, orderStatus, null, userId);
   }
 
   @Transactional
@@ -115,7 +153,7 @@ public class OrderService {
     }
 
 
-    return productClient.calculateTotalOrderPrice(productQuantities).getData();
+    return productService.calculateTotalOrderPrice(productQuantities);
   }
 
   private boolean validateProductQuantities(List<OrderItemRequest> listProduct) {
@@ -128,8 +166,7 @@ public class OrderService {
                             .build()
             )
             .toList();
-    var response = inventoryClient.checkListProductQuantity(request);
-    return response.getData();
+    return inventoryService.checkListProductQuantity(request);
   }
 
   public void deleteOrder(Long orderId) {
@@ -151,27 +188,6 @@ public class OrderService {
     }
   }
 
-  public OrderListDto getAllMyOrder(int pageNo, int pageSize, String orderStatus) {
-    String userId = AuthenticationUtils.extractUserId();
-
-    Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("createdDate").descending());
-
-    Page<Order> orderPage;
-    if (orderStatus.equals("ALL")) {
-      orderPage = orderRepository.findByEmail(userId, pageable);
-    } else {
-      OrderStatus status = OrderStatus.findOrderStatus(orderStatus);
-      orderPage = orderRepository.findByEmailAndOrderStatus(userId, status, pageable);
-    }
-    List<OrderDto> orderDtoList = orderConverter.convertToListOrderDto(orderPage.getContent());
-
-    return new OrderListDto(
-            orderDtoList,
-            (int) orderPage.getTotalElements(),
-            orderPage.getTotalPages()
-    );
-  }
-
   public OrderDto getOrderById(Long id) {
     Order order = orderRepository.findById(id).orElseThrow(() ->
             new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.ORDER_NOT_FOUND));
@@ -191,4 +207,5 @@ public class OrderService {
             orderRepository.existsByEmailAndProductIdAndOrderStatus(email, productId, OrderStatus.COMPLETED)
     );
   }
+
 }

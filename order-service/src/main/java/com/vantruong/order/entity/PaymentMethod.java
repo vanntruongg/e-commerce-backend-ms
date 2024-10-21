@@ -21,8 +21,7 @@
 //  private String method;
 //
 //  @Column(name = "slug")
-//  @Enumerated(EnumType.STRING)
-//  private EPaymentMethod slug;
+//  private String slug;
 //
 //  @Column(name = "description")
 //  private String description;

@@ -12,10 +12,10 @@
         <module name="cart-service" />
         <module name="address-service" />
         <module name="inventory-service" />
-        <module name="common-dtos" />
         <module name="api-gateway" />
         <module name="product-service" />
         <module name="order-service" />
+        <module name="common-library" />
         <module name="eureka-server" />
         <module name="identity-service" />
         <module name="notification-service" />
@@ -44,7 +44,7 @@
       <module name="cart-service" options="-parameters" />
       <module name="chat-bot-service" options="-parameters" />
       <module name="client" options="-parameters" />
-      <module name="common-dtos" options="-parameters" />
+      <module name="common-library" options="-parameters" />
       <module name="email-service" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="identity-service" options="-parameters" />

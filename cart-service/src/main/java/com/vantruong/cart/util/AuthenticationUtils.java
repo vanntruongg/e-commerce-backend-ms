@@ -1,12 +1,9 @@
-package com.vantruong.cart.service;
+package com.vantruong.cart.util;
 
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
-@Service
-public class AuthService {
-
-  public String getUserId() {
+public class AuthenticationUtils {
+  public static String extractUserId() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     return authentication.getName();
   }

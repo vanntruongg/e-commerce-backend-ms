@@ -7,16 +7,22 @@ import com.vantruong.common.dto.response.ProductInventoryResponse;
 import com.vantruong.product.client.InventoryClient;
 import com.vantruong.product.common.CommonResponse;
 import com.vantruong.product.entity.Product;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class InventoryService {
+@Slf4j
+public class InventoryService extends AbstractCircuitBreakerFallbackHandler {
   private final InventoryClient inventoryClient;
 
+  @Retry(name = "restApi")
+  @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "getInventoryFallback")
   public ProductInventoryResponse getInventoryByProductIds(List<Product> productList) {
 
     List<Long> productIds = productList.stream()
@@ -31,9 +37,20 @@ public class InventoryService {
     return response.getData();
   }
 
+  protected ProductInventoryResponse getInventoryFallback(Throwable throwable) throws Throwable {
+    log.error("Fallback method called due to error: {}", throwable.getMessage());
+    return handleTypedFallback(throwable);
+  }
+
+  @Retry(name = "restApi")
+  @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "createInventoryFallback")
   public Boolean createInventory(Long productId, List<SizeQuantityDto> sizeQuantityDtoList) {
     InventoryPost inventoryPost = new InventoryPost(productId, sizeQuantityDtoList);
-    var response = inventoryClient.createInventory(inventoryPost);
-    return response.getData();
+    inventoryClient.createInventory(inventoryPost);
+    return true;
+  }
+
+  protected Boolean createInventoryFallback(Throwable throwable) throws Throwable {
+    return handleTypedFallback(throwable);
   }
 }

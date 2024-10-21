@@ -15,6 +15,7 @@ import com.vantruong.cart.exception.NotFoundException;
 import com.vantruong.cart.repository.CartRepository;
 import com.vantruong.cart.repository.client.InventoryClient;
 import com.vantruong.cart.repository.client.ProductClient;
+import com.vantruong.cart.util.AuthenticationUtils;
 import com.vantruong.common.dto.cart.CartItemCommon;
 import com.vantruong.common.dto.inventory.SizeQuantityDto;
 import com.vantruong.common.dto.request.DeleteCartItemsRequest;
@@ -40,18 +41,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartService {
   CartRepository cartRepository;
-  ProductClient productClient;
-  InventoryClient inventoryClient;
-  AuthService authService;
+  ProductService productService;
+  InventoryService inventoryService;
 
   public Cart findById() {
-    String email = authService.getUserId();
+    String email = AuthenticationUtils.extractUserId();
     return cartRepository.findById(email).orElseThrow(()
             -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.CART_NOT_FOUND));
   }
 
   private Cart findByIdOrCreate() {
-    String email = authService.getUserId();
+    String email = AuthenticationUtils.extractUserId();
     return cartRepository.findById(email).orElseGet(() -> {
       Cart cart = new Cart(email, new ArrayList<>());
       return cartRepository.save(cart);
@@ -60,7 +60,7 @@ public class CartService {
 
   private List<ProductResponse> getProductsByIds(List<CartItem> items) {
     List<Long> itemIds = items.stream().map(CartItem::getProductId).toList();
-    return productClient.getProductByIds(itemIds).getData();
+    return productService.getProductByIds(itemIds);
   }
 
   private Map<Long, ProductResponse> getProductMapById(List<ProductResponse> products) {
@@ -268,7 +268,7 @@ public class CartService {
             .productId(productId)
             .size(size)
             .build();
-    return inventoryClient.checkProductQuantityById(checkProductQuantityRequest).getData();
+    return inventoryService.checkProductQuantityById(checkProductQuantityRequest);
   }
 
   public void removeItemsFromCart(DeleteCartItemsRequest request) {

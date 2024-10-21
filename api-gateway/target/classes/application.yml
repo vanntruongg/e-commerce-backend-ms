@@ -6,8 +6,6 @@ app:
   api-prefix: /api/v1
 
 spring:
-#  main:
-#    web-application-type: reactive
   main:
     web-application-type: reactive
   application:
@@ -24,62 +22,65 @@ spring:
         locator:
           enabled: true
       routes:
+#        IDENTITY SERVICE
         - id: identity-service
           uri: http://localhost:9001
           predicates:
             - Path=${app.api-prefix}/identity/**
           filters:
             - StripPrefix=2
-        - id: book-service
+#        PRODUCT SERVICE
+        - id: product-service
           uri: http://localhost:9002
           predicates:
             - Path=${app.api-prefix}/product/**
           filters:
             - StripPrefix=2
+#        NOTIFICATION SERVICE
         - id: notification-service
           uri: http://localhost:9003
           predicates:
             - Path=${app.api-prefix}/notification/**
           filters:
             - StripPrefix=2
+#        CART SERVICE
         - id: cart-service
           uri: http://localhost:9004
           predicates:
             - Path=${app.api-prefix}/cart/**
           filters:
             - StripPrefix=2
+#        ORDER SERVICE
         - id: order-service
           uri: http://localhost:9005
           predicates:
             - Path=${app.api-prefix}/order/**
           filters:
             - StripPrefix=2
+#        ADDRESS SERVICE
         - id: address-service
           uri: http://localhost:9006
           predicates:
             - Path=${app.api-prefix}/address/**
           filters:
             - StripPrefix=2
-        - id: payment-service
-          uri: http://localhost:9007
-          predicates:
-            - Path=${app.api-prefix}/payments/**
-          filters:
-            - StripPrefix=2
+#        INVENTORY SERVICE
         - id: inventory-service
-          uri: http://localhost:9008
+          uri: http://localhost:9007
           predicates:
             - Path=${app.api-prefix}/inventory/**
           filters:
             - StripPrefix=2
+#       ORDER ORCHESTRATOR
         - id: order-orchestrator
-          uri: http://localhost:9009
+          uri: http://localhost:9008
           predicates:
             - Path=${app.api-prefix}/order-orchestrator/**
           filters:
             - StripPrefix=2
+#        RATING SERVICE
         - id: rating-service
-          uri: http://localhost:9010
+          uri: http://localhost:9009
           predicates:
             - Path=${app.api-prefix}/ratings/**
           filters:

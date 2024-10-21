@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.vantruong.order.constant.ApiEndpoint.REVENUE;
+
 @RestController
 @RequestMapping(ApiEndpoint.ORDER + ApiEndpoint.STATISTIC)
 public class StatisticController {
@@ -24,19 +26,31 @@ public class StatisticController {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(statisticService.getTotalOrderCountByStatus())
+            .data(statisticService.countOrder())
             .build());
   }
 
-  @GetMapping(ApiEndpoint.REVENUE)
-  public ResponseEntity<CommonResponse<Object>> getRevenue(
+//  @GetMapping(ApiEndpoint.REVENUE)
+//  public ResponseEntity<CommonResponse<Object>> getRevenue(
+//          @RequestParam("year") Integer year,
+//          @RequestParam(value = "month", required = false) Integer month
+//  ) {
+//    return ResponseEntity.ok().body(CommonResponse.builder()
+//            .isSuccess(true)
+//            .message(MessageConstant.FIND_SUCCESS)
+//            .data(statisticService.getRevenue(year, month))
+//            .build());
+//  }
+
+  @GetMapping(REVENUE)
+  public ResponseEntity<CommonResponse<Object>> getOrderRevenue(
           @RequestParam("year") Integer year,
           @RequestParam(value = "month", required = false) Integer month
   ) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(statisticService.getRevenue(year, month))
+            .data(statisticService.getOrderRevenue(year, month))
             .build());
   }
 
@@ -49,6 +63,24 @@ public class StatisticController {
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
             .data(statisticService.statisticOrder(year, month))
+            .build());
+  }
+
+  @GetMapping("/product/total-sold")
+  public ResponseEntity<CommonResponse<Object>> getTotalQuantitySoldPerProduct() {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.FIND_SUCCESS)
+            .data(statisticService.getTotalQuantitySoldPerProduct())
+            .build());
+  }
+
+  @GetMapping("/monthly-stats")
+  public ResponseEntity<CommonResponse<Object>> getTotalOrderPerMonth() {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.FIND_SUCCESS)
+            .data(statisticService.getTotalOrdersPerMonth())
             .build());
   }
 

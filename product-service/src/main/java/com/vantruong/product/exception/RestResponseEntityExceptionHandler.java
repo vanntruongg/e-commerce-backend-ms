@@ -1,5 +1,6 @@
 package com.vantruong.product.exception;
 
+import com.vantruong.common.exception.ExternalServiceException;
 import com.vantruong.common.exception.NotFoundException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,15 @@ public class RestResponseEntityExceptionHandler {
                     .isSuccess(false)
                     .message(exception.getMessage())
                     .errorDetails(exception.getCause() != null ? exception.getCause().getMessage() : StringUtils.EMPTY)
+            .build());
+  }
+
+  @ExceptionHandler(value = ExternalServiceException.class)
+  public ResponseEntity<CommonResponse<Object>> handleExternalServiceException(WebRequest request, Exception exception) {
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(CommonResponse.builder()
+            .isSuccess(false)
+            .message(exception.getMessage())
+            .errorDetails(exception.getCause() != null ? exception.getCause().getMessage() : StringUtils.EMPTY)
             .build());
   }
 }

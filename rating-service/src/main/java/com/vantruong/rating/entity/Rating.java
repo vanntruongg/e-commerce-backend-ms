@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -22,5 +23,6 @@ public class Rating extends AbstractAuditEntity {
   private Long productId;
   private String lastName;
   private String firstName;
-  private Set<String> upvoteUsers;
+  @Builder.Default
+  private Set<String> upvoteUsers = new HashSet<>();
 }

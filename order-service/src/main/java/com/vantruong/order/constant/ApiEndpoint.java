@@ -46,9 +46,11 @@ public class ApiEndpoint {
 
   public static final String PAYMENTS = "/payments";
   public static final String PAY = "/pay";
+  public static final String SEARCH = "/search";
 
   public static final String GET_BY_ORDER_ID = GET + ORDER + ID_PARAM;
   public static final String UPDATE_PAYMENT_STATUS = UPDATE + STATUS + ID_PARAM;
   public static final String VN_PAY_CALLBACK = "/vnpay-callback";
 
+  public static final String SEARCH_BY_ID = SEARCH  + ID_PARAM;
 }

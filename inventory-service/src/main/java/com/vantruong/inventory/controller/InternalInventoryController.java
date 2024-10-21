@@ -3,6 +3,8 @@ package com.vantruong.inventory.controller;
 import com.vantruong.common.dto.inventory.InventoryPost;
 import com.vantruong.common.dto.request.ProductInventoryRequest;
 import com.vantruong.common.dto.request.ProductQuantityRequest;
+import com.vantruong.common.exception.Constant;
+import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.inventory.common.CommonResponse;
 import com.vantruong.inventory.constant.MessageConstant;
 import com.vantruong.inventory.service.InternalInventoryService;
@@ -51,11 +53,12 @@ public class InternalInventoryController {
 
   @PostMapping(GET_ALL_BY_PRODUCT_IDS)
   public ResponseEntity<CommonResponse<Object>> getAllInventoryByProductIds(@RequestBody ProductInventoryRequest request) {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.SUCCESS)
-            .data(internalInventoryService.getAllInventoryByProductIds(request))
-            .build());
+    throw new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.NOT_FOUND);
+//    return ResponseEntity.ok().body(CommonResponse.builder()
+//            .isSuccess(true)
+//            .message(MessageConstant.SUCCESS)
+//            .data(internalInventoryService.getAllInventoryByProductIds(request))
+//            .build());
   }
 
   @GetMapping(GET_BY_PRODUCT_ID)

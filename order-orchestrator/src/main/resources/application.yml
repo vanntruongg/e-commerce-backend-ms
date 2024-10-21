@@ -1,6 +1,6 @@
 # ORDER-SERVICE
 server:
-  port: 9009
+  port: 9008
 
 spring:
   application:

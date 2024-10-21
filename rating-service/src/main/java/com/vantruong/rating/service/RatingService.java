@@ -25,7 +25,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -71,7 +74,6 @@ public class RatingService {
             .productId(ratingPost.productId())
             .lastName(userCommonDto.lastName())
             .firstName(userCommonDto.firstName())
-            .upvoteUsers(new HashSet<>())
             .build();
     Rating savedRating = ratingRepository.save(rating);
 

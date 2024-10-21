@@ -1,6 +1,6 @@
 # Inventory-service
 server:
-  port: 9008
+  port: 9007
 spring:
   application:
     name: inventory-service

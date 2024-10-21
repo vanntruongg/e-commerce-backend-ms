@@ -161,7 +161,5 @@ public class AuthService {
     SecurityContextHolder.getContext().setAuthentication(null);
 
     return true;
-
-
   }
 }

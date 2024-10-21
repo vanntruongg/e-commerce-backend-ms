@@ -9,8 +9,8 @@ import java.util.Set;
 public record UserDto(String email,
                       String firstName,
                       String lastName,
-                      LocalDate dateOfBirth,
                       String phone,
+                      String status,
                       String imageUrl,
                       Set<Role> roles
 ) {
@@ -18,8 +18,8 @@ public record UserDto(String email,
     return new UserDto(user.getEmail(),
             user.getFirstName(),
             user.getLastName(),
-            user.getDateOfBirth(),
             user.getPhone(),
+            user.getStatus().name(),
             user.getImageUrl(),
             user.getRoles());
   }

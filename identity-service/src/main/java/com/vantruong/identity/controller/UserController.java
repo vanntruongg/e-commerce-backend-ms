@@ -31,11 +31,27 @@ public class UserController {
             .build());
   }
   @GetMapping
-  public ResponseEntity<CommonResponse<Object>> getAllUser() {
+  public ResponseEntity<CommonResponse<Object>> getAllUser(
+          @RequestParam(name = "pageNo", defaultValue = "0", required = false) int pageNo,
+          @RequestParam(name = "pageSize", defaultValue = "5", required = false) int pageSize
+  ) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(userService.getAllUser())
+            .data(userService.getAllUser(pageNo, pageSize))
+            .build());
+  }
+
+  @GetMapping(UserApiEndpoint.SEARCH_BY_NAME)
+  public ResponseEntity<CommonResponse<Object>> searchByName(
+          @PathVariable(name = "name") String name,
+          @RequestParam(name = "pageNo", defaultValue = "0", required = false) int pageNo,
+          @RequestParam(name = "pageSize", defaultValue = "5", required = false) int pageSize
+  ) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.FIND_SUCCESS)
+            .data(userService.searchByName(name, pageNo, pageSize))
             .build());
   }
 

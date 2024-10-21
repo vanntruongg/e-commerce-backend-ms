@@ -22,8 +22,8 @@ public class InternalApiEndpoint {
   public static final String CART_SERVICE_URL = "http://localhost:9004" + INTERNAL + CART;
   public static final String ORDER_SERVICE_URL = "http://localhost:9005" + INTERNAL + ORDER;
   public static final String MAIL_SERVICE_URL = "http://localhost:9003" + NOTIFICATION + INTERNAL + MAIL;
-  public static final String PAYMENT_SERVICE_URL = "http://localhost:9007" + INTERNAL +  PAYMENTS;
-  public static final String INVENTORY_SERVICE_URL = "http://localhost:9008" + INTERNAL + INVENTORY;
+//  public static final String PAYMENT_SERVICE_URL = "http://localhost:9007" + INTERNAL +  PAYMENTS;
+  public static final String INVENTORY_SERVICE_URL = "http://localhost:9007" + INTERNAL + INVENTORY;
   //  params
 
   // actions

@@ -17,7 +17,9 @@ public class ProductResponse {
   private String material;
   private String style;
   private CategoryResponse category;
-  private List<ProductImageResponse> images;
+  private String imageUrl;
+
+  //  private List<ProductImageResponse> images;
   private List<SizeQuantityDto> sizeQuantity;
 //  private List<CategoryResponse> categories;
 }

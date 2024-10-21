@@ -26,9 +26,6 @@ public class User {
   @Column(name = "last_name", length = 20)
   String lastName;
 
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-  @Column(name = "date_of_birth")
-  private LocalDate dateOfBirth;
   @Column(name = "phone", length = 10)
   String phone;
 

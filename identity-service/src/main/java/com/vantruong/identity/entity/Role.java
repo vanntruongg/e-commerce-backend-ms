@@ -17,8 +17,10 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Role {
   @Id
+  @Column(name = "role_name")
   String name;
   @Max(value = 20)
+  @Column(name = "role_description")
   String description;
 
   @ManyToMany

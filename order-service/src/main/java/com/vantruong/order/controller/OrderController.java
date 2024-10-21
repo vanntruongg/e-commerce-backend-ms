@@ -19,13 +19,30 @@ public class OrderController {
   private final PaymentOrderService paymentOrderService;
 
   @GetMapping(ApiEndpoint.ORDERS)
-  public ResponseEntity<CommonResponse<Object>> getAllOrder() {
+  public ResponseEntity<CommonResponse<Object>> getAllOrder(
+          @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
+          @RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
+          @RequestParam(value = "orderStatus", defaultValue = "") String orderStatus,
+          @RequestParam(value = "paymentMethod", defaultValue = "") String paymentMethod
+  ) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
-            .data(orderService.getAllOrder())
+            .data(orderService.getAllOrderByAdmin(pageNo, pageSize, orderStatus, paymentMethod))
             .build());
   }
+
+  @GetMapping(ApiEndpoint.SEARCH_BY_ID)
+  public ResponseEntity<CommonResponse<Object>> searchById(
+          @PathVariable(name = "id") Long orderId
+  ) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.FIND_SUCCESS)
+            .data(orderService.searchById(orderId))
+            .build());
+  }
+
 
   @PostMapping(ApiEndpoint.CREATE_ORDER)
   public ResponseEntity<CommonResponse<Object>> createOrder(@RequestBody OrderRequest orderRequest) {
@@ -38,9 +55,9 @@ public class OrderController {
 
   @GetMapping(ApiEndpoint.GET_MY_ORDER)
   public ResponseEntity<CommonResponse<Object>> getAllMyOrder(
-          @RequestParam(value = "pageNo",defaultValue = "0") int pageNo,
-          @RequestParam(value = "pageSize",defaultValue = "5") int pageSize,
-          @RequestParam(value = "orderStatus",defaultValue = "ALL") String orderStatus
+          @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
+          @RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
+          @RequestParam(value = "orderStatus", defaultValue = "") String orderStatus
   ) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
