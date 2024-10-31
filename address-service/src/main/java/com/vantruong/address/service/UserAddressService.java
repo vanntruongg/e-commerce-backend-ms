@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,14 +36,13 @@ public class UserAddressService {
   }
 
   public UserAddressResponse getAddressDefault() {
-    UserAddress address = getDefaultAddressByEmail();
-    return addressConverter.convertToUserAddressResponse(address);
+    Optional<UserAddress> address = getDefaultAddressByEmail();
+    return address.map(addressConverter::convertToUserAddressResponse).orElse(null);
   }
 
-  private UserAddress getDefaultAddressByEmail() {
+  private Optional<UserAddress> getDefaultAddressByEmail() {
     String email = authService.getUserId();
-    return userAddressRepository.findByUserEmailAndIsDefault(email, true)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.NOT_FOUND));
+    return userAddressRepository.findByUserEmailAndIsDefault(email, true);
   }
 
   @Transactional
@@ -55,9 +55,11 @@ public class UserAddressService {
     // if there are existing address and the request is to set as default
     if (!userAddresses.isEmpty() && request.isDefault()) {
 //       find and set the current default address to false
-      UserAddress userAddressDefault = getDefaultAddressByEmail();
-      userAddressDefault.setIsDefault(false);
-      userAddressRepository.save(userAddressDefault);
+      Optional<UserAddress> userAddressDefault = getDefaultAddressByEmail();
+      if (userAddressDefault.isPresent()) {
+        userAddressDefault.get().setIsDefault(false);
+        userAddressRepository.save(userAddressDefault.get());
+      }
     }
 
     AddressData ward = addressService.findAddressById(request.wardId());
@@ -108,16 +110,18 @@ public class UserAddressService {
   public Boolean setDefaultAddress(Integer addressId) {
     UserAddress userAddress = findById(addressId);
 
-    UserAddress currentDefaultAddress = getDefaultAddressByEmail();
-
-    if (userAddress.equals(currentDefaultAddress)) return true;
-
-    currentDefaultAddress.setIsDefault(false);
-    userAddressRepository.save(currentDefaultAddress);
+    Optional<UserAddress> currentDefaultAddress = getDefaultAddressByEmail();
+    if (currentDefaultAddress.isPresent()) {
+      UserAddress address = currentDefaultAddress.get();
+      if (userAddress.equals(address)) return true;
+      address.setIsDefault(false);
+      userAddressRepository.save(address);
+    }
 
     userAddress.setIsDefault(true);
     userAddressRepository.save(userAddress);
     return true;
+
   }
 
   public Boolean deleteAddress(Integer addressId) {

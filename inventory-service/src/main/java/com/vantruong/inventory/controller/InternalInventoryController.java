@@ -53,12 +53,12 @@ public class InternalInventoryController {
 
   @PostMapping(GET_ALL_BY_PRODUCT_IDS)
   public ResponseEntity<CommonResponse<Object>> getAllInventoryByProductIds(@RequestBody ProductInventoryRequest request) {
-    throw new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.NOT_FOUND);
-//    return ResponseEntity.ok().body(CommonResponse.builder()
-//            .isSuccess(true)
-//            .message(MessageConstant.SUCCESS)
-//            .data(internalInventoryService.getAllInventoryByProductIds(request))
-//            .build());
+//    throw new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.NOT_FOUND);
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.SUCCESS)
+            .data(internalInventoryService.getAllInventoryByProductIds(request))
+            .build());
   }
 
   @GetMapping(GET_BY_PRODUCT_ID)
