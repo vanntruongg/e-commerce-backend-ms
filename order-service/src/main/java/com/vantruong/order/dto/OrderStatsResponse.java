@@ -1,7 +1,7 @@
 package com.vantruong.order.dto;
 
 public record OrderStatsResponse(
-        int month,
+        String month,
         int totalOrders
 ) {
 }

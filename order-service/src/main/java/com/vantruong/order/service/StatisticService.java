@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -92,22 +91,22 @@ public class StatisticService {
     return orderRevenueListDto;
   }
 
-  public Map<Integer, Double> getRevenue(Integer year, Integer month) {
-    Map<Integer, Double> revenue = new LinkedHashMap<>();
-
-    initializeRevenueMap(revenue, year, month, 0.0);
-
-    Set<Object[]> results = !Objects.isNull(month)
-            ? orderRepository.getTotalRevenueByMonthInYear(year, month)
-            : orderRepository.getTotalRevenueByYear(year);
-
-    if (!results.isEmpty()) {
-      for (Object[] result : results) {
-        revenue.put((Integer) result[0], (Double) result[1]);
-      }
-    }
-    return revenue;
-  }
+//  public Map<Integer, Double> getRevenue(Integer year, Integer month) {
+//    Map<Integer, Double> revenue = new LinkedHashMap<>();
+//
+//    initializeRevenueMap(revenue, year, month, 0.0);
+//
+//    Set<Object[]> results = !Objects.isNull(month)
+//            ? orderRepository.getTotalRevenueByMonthInYear(year, month)
+//            : orderRepository.getTotalRevenueByYear(year);
+//
+//    if (!results.isEmpty()) {
+//      for (Object[] result : results) {
+//        revenue.put((Integer) result[0], (Double) result[1]);
+//      }
+//    }
+//    return revenue;
+//  }
 
   public Map<Integer, Long> statisticOrder(Integer year, Integer month) {
     Map<Integer, Long> totalOrder = new LinkedHashMap<>();
@@ -137,27 +136,38 @@ public class StatisticService {
   public List<OrderStatsResponse> getTotalOrdersPerMonth() {
     LocalDate now = LocalDate.now();
     int currentYear = now.getYear();
+    int currentMonth = now.getMonthValue();
 
 // get current month and subtract 1 to the purpose of predicting the upcoming month
-    int currentMonth = now.getMonthValue() - 1;
 
-    Set<Object[]> results = orderRepository.getTotalOrderByYear(currentYear);
+    Set<Object[]> results = orderRepository.getTotalOrderByYear(currentYear, currentMonth);
 
     // map results to map with key is month and value is totalOrder
-    Map<Integer, Integer> ordersPerMonth = results.stream()
+    Map<String, Integer> ordersPerMonth = results.stream()
             .collect(Collectors.toMap(
-                    result -> (int) result[0],
+                    result -> (String) result[0],
                     result -> ((Number) result[1]).intValue()
             ));
 
-    return IntStream.rangeClosed(1, currentMonth)
-            .mapToObj(month ->
-                    new OrderStatsResponse(
-                            month,
-                            ordersPerMonth.getOrDefault(month, 0))
-            )
-            .toList();
+
+    List<OrderStatsResponse> orderStatsResponseList = new ArrayList<>();
+    for (Map.Entry<String, Integer> entry : ordersPerMonth.entrySet()) {
+      String key = entry.getKey();
+      Integer value = entry.getValue();
+
+      orderStatsResponseList.add(new OrderStatsResponse(key, value));
+    }
+    sortDate(orderStatsResponseList);
+    return orderStatsResponseList;
   }
+
+  private void sortDate(List<OrderStatsResponse> orderStatsResponseList) {
+    orderStatsResponseList.sort(Comparator.comparing(orderStatsResponse -> {
+      String[] parts = orderStatsResponse.month().split("-");
+      return LocalDate.of(Integer.parseInt(parts[1]), Integer.parseInt(parts[0]), 1);
+    }));
+  }
+
 
   public List<ProductSoldResponse> getTotalQuantitySoldPerProduct() {
     List<Object[]> results = orderItemRepository.getTotalQuantityPerProduct();

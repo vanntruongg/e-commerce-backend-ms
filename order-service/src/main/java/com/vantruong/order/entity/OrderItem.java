@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "order_item")
-public class OrderItem extends BaseEntity {
+public class OrderItem {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "od_id")
@@ -42,9 +42,4 @@ public class OrderItem extends BaseEntity {
   @JsonIgnore
   private Order order;
 
-  @Override
-  @JsonIgnore
-  public LocalDateTime getCreatedDate() {
-    return null;
-  }
 }
