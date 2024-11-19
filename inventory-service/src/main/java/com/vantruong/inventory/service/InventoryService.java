@@ -49,7 +49,7 @@ public class InventoryService {
   }
 
 
-  public Boolean updateQuantity(List<ProductQuantityRequest> requests, boolean compensate) {
+  public Boolean updateQuantityAndCompensate(List<ProductQuantityRequest> requests, boolean compensate) {
     for (ProductQuantityRequest request : requests) {
       Inventory inventory = findInventoryByProductId(request.getProductId());
 

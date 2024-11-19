@@ -6,7 +6,7 @@ spring:
   application:
     name: order-orchestrator
   kafka:
-    bootstrap-servers: localhost:9094
+    bootstrap-servers: ${KAFKA_HOST:localhost}:9094
     consumer:
       group-id: order-orchestrator-group
       auto-offset-reset: earliest

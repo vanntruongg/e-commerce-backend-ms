@@ -30,20 +30,20 @@ public class OrderSagaOrchestrator {
   }
 
 
-  @KafkaListener(topics = KafkaTopics.ORDER_CREATED_TOPIC)
-  public void onOrderUpdated(OrderEvent orderEvent) {
-    if (orderEvent.getOrderEventStatus() == OrderEventStatus.NEW) {
-      kafkaProducer.send(KafkaTopics.INVENTORY_TOPIC, orderEvent);
-    } else if (orderEvent.getOrderEventStatus() == OrderEventStatus.ROLLBACK) {
-      CompletableFuture<String> resultFuture = sagaResults.remove(orderEvent.getOrderId().toString());
-      if (resultFuture != null) {
-        compensateOrder(orderEvent);
-        resultFuture.completeExceptionally(new RuntimeException("Order processing failed"));
-      }
-    }
-  }
+//  @KafkaListener(topics = KafkaTopics.ORDER_CREATED_TOPIC)
+//  public void onOrderUpdated(OrderEvent orderEvent) {
+//    if (orderEvent.getOrderEventStatus() == OrderEventStatus.NEW) {
+//      kafkaProducer.send(KafkaTopics.INVENTORY_TOPIC, orderEvent);
+//    } else if (orderEvent.getOrderEventStatus() == OrderEventStatus.ROLLBACK) {
+//      CompletableFuture<String> resultFuture = sagaResults.remove(orderEvent.getOrderId().toString());
+//      if (resultFuture != null) {
+//        compensateOrder(orderEvent);
+//        resultFuture.completeExceptionally(new RuntimeException("Order processing failed"));
+//      }
+//    }
+//  }
 
-  @KafkaListener(topics = KafkaTopics.INVENTORY_RESPONSE)
+  @KafkaListener(topics = {KafkaTopics.INVENTORY_RESPONSE, KafkaTopics.PAYMENT_SUCCESS })
   public void onInventoryUpdated(OrderEvent orderEvent) {
     CompletableFuture<String> resultFuture = sagaResults.get(orderEvent.getOrderId().toString());
     if (orderEvent.getOrderEventStatus() == OrderEventStatus.NEW) {
@@ -59,7 +59,6 @@ public class OrderSagaOrchestrator {
         sagaResults.remove(orderEvent.getOrderId().toString());
       }
     }
-
   }
 
   private void completeOrder(OrderEvent orderEvent) {

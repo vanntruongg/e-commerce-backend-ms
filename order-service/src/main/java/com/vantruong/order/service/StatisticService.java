@@ -1,8 +1,10 @@
 package com.vantruong.order.service;
 
 import com.vantruong.common.dto.product.ProductSoldResponse;
+import com.vantruong.order.dto.HasMonth;
 import com.vantruong.order.dto.OrderRevenueDto;
 import com.vantruong.order.dto.OrderStatsResponse;
+import com.vantruong.order.dto.RevenueStatsResponse;
 import com.vantruong.order.repository.OrderItemRepository;
 import com.vantruong.order.repository.OrderRepository;
 import lombok.AccessLevel;
@@ -10,8 +12,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,35 +25,6 @@ public class StatisticService {
   OrderRepository orderRepository;
   static int MONTH_IN_YEAR = 12;
   private final OrderItemRepository orderItemRepository;
-
-//  public Map<String, Long> getTotalOrderCountByStatus() {
-//    List<Object[]> results = orderRepository.findOrderCountByStatus();
-//    Map<String, Long> orderCountByStatus = new HashMap<>();
-//    for (Object[] result : results) {
-//      orderCountByStatus.put(result[0].toString(), (Long) result[1]);
-//    }
-//    return orderCountByStatus;
-//  }
-
-//  public Map<Integer, Integer> getCountOrderByMonth() {
-//    List<Object[]> results = orderRepository.countOrderByMonth();
-//    Map<Integer, Integer> orderCountByMonth = new HashMap<>();
-//
-//    // initial the order for each month to 0
-//    for (int i = 1; i <= MONTH_IN_YEAR; i++) {
-//      orderCountByMonth.put(i, 0);
-//    }
-//
-//    // iterate through the results update the order count by month
-//    for (Object[] result : results) {
-//      int month = (int) result[0];
-//      int count = ((Number) result[1]).intValue();
-//
-//      // update the order count for the corresponding month in the map
-//      orderCountByMonth.put(month, count);
-//    }
-//    return orderCountByMonth;
-//  }
 
   private int getMonthsOrDays(Integer year, Integer month) {
     return Objects.isNull(month) ? MONTH_IN_YEAR : LocalDate.of(year, month, 1).lengthOfMonth();
@@ -73,7 +48,7 @@ public class StatisticService {
 
     Set<Object[]> results = !Objects.isNull(month)
             ? orderRepository.getTotalRevenueByMonthInYear(year, month)
-            : orderRepository.getTotalRevenueByYear(year);
+            : orderRepository.getTotalOrderAndTotalRevenueByYear(year);
 
 
     if (!results.isEmpty()) {
@@ -90,23 +65,6 @@ public class StatisticService {
 
     return orderRevenueListDto;
   }
-
-//  public Map<Integer, Double> getRevenue(Integer year, Integer month) {
-//    Map<Integer, Double> revenue = new LinkedHashMap<>();
-//
-//    initializeRevenueMap(revenue, year, month, 0.0);
-//
-//    Set<Object[]> results = !Objects.isNull(month)
-//            ? orderRepository.getTotalRevenueByMonthInYear(year, month)
-//            : orderRepository.getTotalRevenueByYear(year);
-//
-//    if (!results.isEmpty()) {
-//      for (Object[] result : results) {
-//        revenue.put((Integer) result[0], (Double) result[1]);
-//      }
-//    }
-//    return revenue;
-//  }
 
   public Map<Integer, Long> statisticOrder(Integer year, Integer month) {
     Map<Integer, Long> totalOrder = new LinkedHashMap<>();
@@ -133,42 +91,6 @@ public class StatisticService {
     }
   }
 
-  public List<OrderStatsResponse> getTotalOrdersPerMonth() {
-    LocalDate now = LocalDate.now();
-    int currentYear = now.getYear();
-    int currentMonth = now.getMonthValue();
-
-// get current month and subtract 1 to the purpose of predicting the upcoming month
-
-    Set<Object[]> results = orderRepository.getTotalOrderByYear(currentYear, currentMonth);
-
-    // map results to map with key is month and value is totalOrder
-    Map<String, Integer> ordersPerMonth = results.stream()
-            .collect(Collectors.toMap(
-                    result -> (String) result[0],
-                    result -> ((Number) result[1]).intValue()
-            ));
-
-
-    List<OrderStatsResponse> orderStatsResponseList = new ArrayList<>();
-    for (Map.Entry<String, Integer> entry : ordersPerMonth.entrySet()) {
-      String key = entry.getKey();
-      Integer value = entry.getValue();
-
-      orderStatsResponseList.add(new OrderStatsResponse(key, value));
-    }
-    sortDate(orderStatsResponseList);
-    return orderStatsResponseList;
-  }
-
-  private void sortDate(List<OrderStatsResponse> orderStatsResponseList) {
-    orderStatsResponseList.sort(Comparator.comparing(orderStatsResponse -> {
-      String[] parts = orderStatsResponse.month().split("-");
-      return LocalDate.of(Integer.parseInt(parts[1]), Integer.parseInt(parts[0]), 1);
-    }));
-  }
-
-
   public List<ProductSoldResponse> getTotalQuantitySoldPerProduct() {
     List<Object[]> results = orderItemRepository.getTotalQuantityPerProduct();
 
@@ -181,5 +103,75 @@ public class StatisticService {
             )
             .toList();
   }
+
+
+  public List<RevenueStatsResponse> getTotalRevenuePerMonth() {
+    LocalDate now = LocalDate.now();
+    int currentYear = now.getYear();
+    int currentMonth = now.getMonthValue();
+    return orderRepository.getToTalRevenuePerMonth(currentYear, currentMonth);
+
+//    return createStatsResponse(results, RevenueStatsResponse::new);
+  }
+
+  public List<OrderStatsResponse> getTotalOrdersPerMonth() {
+    LocalDate now = LocalDate.now();
+    int currentYear = now.getYear();
+    int currentMonth = now.getMonthValue();
+    return orderRepository.getTotalOrderByYear(currentYear, currentMonth);
+  }
+
+//  private <T> List<T> createStatsResponse(Collection<Object[]> results, BiFunction<String, Number, T> responseConstructor) {
+//    Map<String, Number> statsMap = results.stream()
+//            .collect(Collectors.toMap(
+//                    result -> (String) result[0],
+//                    result -> (Number) result[1]
+//            ));
+//
+//    List<T> responseList = new ArrayList<>();
+//    statsMap.forEach((key, value) -> responseList.add(responseConstructor.apply(key, value)));
+//    sortStatsByDate(responseList);
+//
+//    return responseList;
+//  }
+//
+//  private <T> void sortStatsByDate(List<T> statsResponseList) {
+//    statsResponseList.sort(Comparator.comparing(response -> {
+//      String month = ((HasMonth) response).getMonth();
+//      String[] parts = month.split("-");
+//      return LocalDate.of(Integer.parseInt(parts[1]), Integer.parseInt(parts[0]), 1);
+//    }));
+//  }
+
+  public byte[] exportCsvOrder() {
+    List<OrderStatsResponse> orderStatsResponseList = getTotalOrdersPerMonth();
+    String columnName = "Orders";
+    return createCsvFile(orderStatsResponseList, columnName);
+  }
+
+  public byte[] exportCsvRevenue() {
+    List<RevenueStatsResponse> orderStatsResponseList = getTotalRevenuePerMonth();
+    String columnName = "Revenue";
+    return createCsvFile(orderStatsResponseList, columnName);
+  }
+
+
+  public <T extends HasMonth> byte[] createCsvFile(List<T> statsResponseList, String columnName) {
+    StringBuilder csvBuilder = new StringBuilder();
+
+    // Thêm dòng tiêu đề
+    csvBuilder.append("Month," + columnName + "\n");
+
+    // Duyệt qua dữ liệu và thêm từng dòng vào CSV
+    for (T statsResponse : statsResponseList) {
+      csvBuilder.append(statsResponse.getMonth())
+              .append(",")
+              .append(statsResponse.getValue())
+              .append("\n");
+    }
+    // Chuyển nội dung CSV sang mảng byte để trả về
+    return csvBuilder.toString().getBytes(StandardCharsets.UTF_8);
+  }
+
 
 }

@@ -4,6 +4,8 @@ import com.vantruong.order.common.CommonResponse;
 import com.vantruong.order.constant.ApiEndpoint;
 import com.vantruong.order.constant.MessageConstant;
 import com.vantruong.order.service.StatisticService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,7 +77,7 @@ public class StatisticController {
             .build());
   }
 
-  @GetMapping("/monthly-stats")
+  @GetMapping("/monthly-order-stats")
   public ResponseEntity<CommonResponse<Object>> getTotalOrderPerMonth() {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
@@ -84,4 +86,36 @@ public class StatisticController {
             .build());
   }
 
+  @GetMapping("/monthly-revenue-stats")
+  public ResponseEntity<CommonResponse<Object>> getTotalRevenuePerMonth() {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.FIND_SUCCESS)
+            .data(statisticService.getTotalRevenuePerMonth())
+            .build());
+  }
+
+  @GetMapping("/export-csv-order-stats")
+  public ResponseEntity<byte[]> exportCsvOrder() {
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=monthly-stats.csv")
+            .contentType(MediaType.parseMediaType("text/csv"))
+            .body(statisticService.exportCsvOrder());
+
+//    byte[] csvData = statisticService.exportCsv();
+//
+//    HttpHeaders headers = new HttpHeaders();
+//    headers.setContentType(MediaType.TEXT_PLAIN);
+//    headers.setContentDispositionFormData("attachment", "orders.csv");
+//
+//    return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
+  }
+
+  @GetMapping("/export-csv-revenue-stats")
+  public ResponseEntity<byte[]> exportCsvRevenue() {
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=monthly-stats.csv")
+            .contentType(MediaType.parseMediaType("text/csv"))
+            .body(statisticService.exportCsvRevenue());
+  }
 }

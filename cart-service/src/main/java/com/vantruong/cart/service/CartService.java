@@ -13,8 +13,6 @@ import com.vantruong.cart.exception.ErrorCode;
 import com.vantruong.cart.exception.InsufficientProductQuantityException;
 import com.vantruong.cart.exception.NotFoundException;
 import com.vantruong.cart.repository.CartRepository;
-import com.vantruong.cart.repository.client.InventoryClient;
-import com.vantruong.cart.repository.client.ProductClient;
 import com.vantruong.cart.util.AuthenticationUtils;
 import com.vantruong.common.dto.cart.CartItemCommon;
 import com.vantruong.common.dto.inventory.SizeQuantityDto;
@@ -25,7 +23,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

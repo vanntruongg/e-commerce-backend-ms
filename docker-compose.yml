@@ -15,3 +15,174 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+#  postgres_identity:
+#    image: postgres:latest
+#    container_name: postgres_identity
+#    ports:
+#      - "5432:5432"
+#    environment:
+#      POSTGRES_DB: NEST-Store-IdentityDB
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: vtadmin
+#    volumes:
+#      - ./postgres/data:/var/lib/postgresql/data
+#    networks:
+#      - mynetwork
+#  postgres_product:
+#    image: postgres:latest
+#    container_name: postgres_product
+#    ports:
+#      - "5433:5432"
+#    environment:
+#      POSTGRES_DB: NEST-Store-ProductDB
+#      POSTGRES_USER: vantruong
+#      POSTGRES_PASSWORD: vantruong
+#    volumes:
+#      - ./postgres/data:/var/lib/postgresql/data
+#    networks:
+#      - mynetwork
+
+  eureka-server:
+    image: eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - mynetwork
+  api-gateway:
+    image: api-gateway
+    container_name: api-gateway
+    ports:
+      - "9000:9000"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL=http://eureka-server:8761/eureka/
+      - IDENTITY_SERVICE_URL=http://identity-service:9001
+      - PRODUCT_SERVICE_URL=http://product-service:9002
+      - NOTIFICATION_SERVICE_URL=http://notification-service:9003
+      - CART_SERVICE_URL=http://cart-service:9004
+      - ORDER_SERVICE_URL=http://order-service:9005
+      - ADDRESS_SERVICE_URL=http://address-service:9006
+      - INVENTORY_SERVICE_URL=http://inventory-service:9007
+      - ORDER_ORCHESTRATOR_SERVICE_URL=http://order-orchestrator-service:9008
+      - RATING_SERVICE_URL=http://rating-service:9009
+      - AI_SERVICE_URL=http://ai-service:9010
+    networks:
+      - mynetwork
+
+  address-service:
+    image: address-service
+    container_name: address-service
+    ports:
+      - "9006:9006"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL=http://eureka-server:8761/eureka/
+      - DATABASE_URL=jdbc:postgresql://host.docker.internal:5432/address_data
+      - DB_USER_NAME=vantruong
+      - DB_USER_PASSWORD=vantruong
+    networks:
+      - mynetwork
+  cart-service:
+    image: cart-service
+    container_name: cart-service
+    ports:
+      - "9004:9004"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL=http://eureka-server:8761/eureka/
+      - KAFKA_HOST=kafka:9094
+    networks:
+      - mynetwork
+  identity-service:
+    image: identity-service
+    container_name: identity-service
+    ports:
+      - "9001:9001"
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL=http://eureka-server:8761/eureka/
+      - DATABASE_URL=jdbc:postgresql://host.docker.internal:5432/NEST-Store-IdentityDB
+      - DB_USER_NAME=vantruong
+      - DB_USER_PASSWORD=vantruong
+    depends_on:
+      - eureka-server
+#      - postgres_identity
+    networks:
+      - mynetwork
+  inventory-service:
+    image: inventory-service
+    container_name: inventory-service
+    ports:
+      - "9007:9007"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL=http://eureka-server:8761/eureka/
+    networks:
+      - mynetwork
+  notification-service:
+    image: notification-service
+    container_name: notification-service
+    ports:
+      - "9003:9003"
+    environment:
+      - KAFKA_HOST=kafka:9094
+    networks:
+      - mynetwork
+  order-orchestrator-service:
+    image:  order-orchestrator-service
+    container_name:  order-orchestrator-service
+    ports:
+      - "9008:9008"
+    networks:
+      - mynetwork
+    environment:
+      - KAFKA_HOST=kafka:9094
+  order-service:
+    image: order-service
+    container_name: order-service
+    ports:
+      - "9005:9005"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL=http://eureka-server:8761/eureka/
+      - DATABASE_URL=jdbc:postgresql://host.docker.internal:5432/NEST-Store-OrderDB
+      - DB_USER_NAME=vantruong
+      - DB_USER_PASSWORD=vantruong
+      - KAFKA_HOST=kafka:9094
+    networks:
+      - mynetwork
+  product-service:
+    image: product-service
+    container_name: product-service
+    ports:
+      - "9002:9002"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL=http://eureka-server:8761/eureka/
+      - DATABASE_URL=jdbc:postgresql://host.docker.internal:5432/NEST-Store-ProductDB
+      - DB_USER_NAME=vantruong
+      - DB_USER_PASSWORD=vantruong
+      - KAFKA_HOST=kafka:9094
+    networks:
+      - mynetwork
+  rating-service:
+    image: rating-service
+    container_name: rating-service
+    ports:
+      - "9009:9009"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL=http://eureka-server:8761/eureka/
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

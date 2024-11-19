@@ -1,0 +1,12 @@
+com\vantruong\gateway\ApiGatewayApplication.class
+com\vantruong\gateway\config\WebClientConfig.class
+com\vantruong\gateway\common\CommonResponse$CommonResponseBuilder.class
+com\vantruong\gateway\service\IdentityService.class
+com\vantruong\gateway\dto\response\IntrospectResponse.class
+com\vantruong\gateway\dto\request\IntrospectRequest.class
+com\vantruong\gateway\dto\request\IntrospectRequest$IntrospectRequestBuilder.class
+com\vantruong\gateway\filter\AuthenticationFilter.class
+com\vantruong\gateway\filter\RouteValidator.class
+com\vantruong\gateway\dto\response\IntrospectResponse$IntrospectResponseBuilder.class
+com\vantruong\gateway\common\CommonResponse.class
+com\vantruong\gateway\client\IdentityClient.class

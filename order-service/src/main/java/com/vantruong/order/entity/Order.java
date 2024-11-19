@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import com.vantruong.order.entity.enumeration.OrderStatus;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
@@ -43,4 +44,7 @@ public class Order extends BaseEntity {
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
   private Set<OrderItem> orderItems;
+
+  @Column(name = "payment_start_time")
+  private LocalDateTime paymentStartTime;
 }

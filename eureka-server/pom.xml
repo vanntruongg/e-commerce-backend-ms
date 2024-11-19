@@ -11,7 +11,7 @@
 	<groupId>vantruong</groupId>
 	<artifactId>eureka-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>nest-store-eureka-server</name>
+	<name>eureka-server</name>
 	<description>Information Systems Thesis</description>
 	<properties>
 		<java.version>17</java.version>

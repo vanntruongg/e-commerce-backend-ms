@@ -1,6 +1,8 @@
 package com.vantruong.order.service;
 
 import com.vantruong.common.constant.KafkaTopics;
+import com.vantruong.common.event.CancelOrderEvent;
+import com.vantruong.common.event.CancelOrderItem;
 import com.vantruong.common.event.OrderEvent;
 import com.vantruong.common.event.OrderEventStatus;
 import com.vantruong.order.dto.OrderCreateResponse;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,13 +38,11 @@ public class PaymentOrderService {
     String urlPayment = null;
     PaymentMethod paymentMethod = orderRequest.getPaymentMethod();
 
-    if (paymentMethod.equals(PaymentMethod.COD)) {
-      OrderEvent orderEvent = orderConverter.orderToKafka(order);
-      kafkaProducer.sendOrder(orderEvent);
-    } else if (paymentMethod.equals(PaymentMethod.VN_PAY)) {
+    if (paymentMethod.equals(PaymentMethod.VN_PAY)) {
       urlPayment = getPaymentUrl(order.getOrderId(), order.getTotalPrice());
     }
-
+    OrderEvent orderEvent = orderConverter.orderToKafka(order);
+    kafkaProducer.sendCreatedOrder(orderEvent);
     return OrderCreateResponse.builder()
             .paymentMethod(paymentMethod)
             .urlPayment(urlPayment)
@@ -61,11 +63,13 @@ public class PaymentOrderService {
     OrderEvent orderEvent = orderConverter.orderToKafka(order);
     if (paymentResponse) {
       orderEvent.setOrderEventStatus(OrderEventStatus.NEW);
+      kafkaProducer.sendPaymentSuccess(orderEvent);
     } else {
       compensateOrder(orderEvent);
       orderEvent.setOrderEventStatus(OrderEventStatus.ROLLBACK);
+      CancelOrderEvent cancelOrderEvent = createCancelOrderEvent(order);
+      kafkaProducer.sendCancelOrder(cancelOrderEvent);
     }
-    kafkaProducer.sendOrder(orderEvent);
   }
 
   @KafkaListener(topics = KafkaTopics.ORDER_TOPIC)
@@ -73,4 +77,17 @@ public class PaymentOrderService {
     orderService.deleteOrder(orderEvent.getOrderId());
   }
 
+
+  private CancelOrderEvent createCancelOrderEvent(Order order) {
+    Set<CancelOrderItem> cancelOrderItems = order.getOrderItems().stream()
+            .map(item -> new CancelOrderItem(
+                    item.getProductId(),
+                    item.getQuantity(),
+                    item.getProductSize()
+            ))
+            .collect(Collectors.toSet());
+    return CancelOrderEvent.builder()
+            .orderItems(cancelOrderItems)
+            .build();
+  }
 }

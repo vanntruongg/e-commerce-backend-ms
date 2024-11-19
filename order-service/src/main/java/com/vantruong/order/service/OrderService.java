@@ -33,6 +33,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -77,6 +78,12 @@ public class OrderService {
     );
   }
 
+  public void updatePaymentStatus(Long orderId, PaymentStatus paymentStatus) {
+    Order order = findById(orderId);
+    order.setPaymentStatus(paymentStatus);
+    orderRepository.save(order);
+  }
+
   @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
   public OrderListDto getAllOrderByAdmin(int pageNo, int pageSize, String orderStatus, String paymentMethod) {
     return getAllOrders(pageNo, pageSize, orderStatus, paymentMethod, null);
@@ -100,16 +107,22 @@ public class OrderService {
 
     Double totalPrice = calculateTotalOrderPrice(orderRequest.getOrderItemRequests());
     OrderAddress orderAddress = mapToOrderAddress(orderRequest);
-    PaymentStatus paymentStatus = orderRequest.getPaymentMethod().equals(PaymentMethod.COD) ? PaymentStatus.PENDING : PaymentStatus.COMPLETED;
     String userId = AuthenticationUtils.extractUserId();
+    LocalDateTime paymentStartTime = null;
+
+    if (orderRequest.getPaymentMethod() == PaymentMethod.VN_PAY) {
+      paymentStartTime = LocalDateTime.now();
+    }
+
     Order order = Order.builder()
             .email(userId)
             .totalPrice(totalPrice)
             .notes(orderRequest.getNotes())
             .orderStatus(OrderStatus.PENDING)
-            .paymentStatus(paymentStatus)
+            .paymentStatus(PaymentStatus.PENDING)
             .paymentMethod(orderRequest.getPaymentMethod())
             .orderAddress(orderAddress)
+            .paymentStartTime(paymentStartTime)
             .build();
     orderRepository.save(order);
 
@@ -207,5 +220,10 @@ public class OrderService {
             orderRepository.existsByEmailAndProductIdAndOrderStatus(email, productId, OrderStatus.COMPLETED)
     );
   }
+
+  public List<Order> findOrdersByStatusAndTime(PaymentStatus status, LocalDateTime time) {
+    return orderRepository.findByPaymentStatusAndPaymentStartTimeBefore(status, time);
+  }
+
 
 }

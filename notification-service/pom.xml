@@ -6,7 +6,7 @@
 		<groupId>com.vantruong</groupId>
 		<artifactId>parent-pom</artifactId>
 		<version>1.0.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath>../parent-pom/pom.xml</relativePath> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>vantruong</groupId>
 	<artifactId>notification-service</artifactId>
@@ -35,6 +35,7 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
     </dependencies>
 
 	<build>

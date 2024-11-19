@@ -24,68 +24,77 @@ spring:
       routes:
 #        IDENTITY SERVICE
         - id: identity-service
-          uri: http://localhost:9001
+          uri: ${IDENTITY_SERVICE_URL:http://localhost:9001}
           predicates:
             - Path=${app.api-prefix}/identity/**
           filters:
             - StripPrefix=2
 #        PRODUCT SERVICE
         - id: product-service
-          uri: http://localhost:9002
+          uri: ${PRODUCT_SERVICE_URL:http://localhost:9002}
           predicates:
             - Path=${app.api-prefix}/product/**
           filters:
             - StripPrefix=2
 #        NOTIFICATION SERVICE
         - id: notification-service
-          uri: http://localhost:9003
+          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:9003}
           predicates:
             - Path=${app.api-prefix}/notification/**
           filters:
             - StripPrefix=2
 #        CART SERVICE
         - id: cart-service
-          uri: http://localhost:9004
+          uri: ${CART_SERVICE_URL:http://localhost:9004}
           predicates:
             - Path=${app.api-prefix}/cart/**
           filters:
             - StripPrefix=2
 #        ORDER SERVICE
         - id: order-service
-          uri: http://localhost:9005
+          uri: ${ORDER_SERVICE_URL:http://localhost:9005}
           predicates:
             - Path=${app.api-prefix}/order/**
           filters:
             - StripPrefix=2
 #        ADDRESS SERVICE
         - id: address-service
-          uri: http://localhost:9006
+          uri: ${ADDRESS_SERVICE_URL:http://localhost:9006}
           predicates:
             - Path=${app.api-prefix}/address/**
           filters:
             - StripPrefix=2
 #        INVENTORY SERVICE
         - id: inventory-service
-          uri: http://localhost:9007
+          uri: ${INVENTORY_SERVICE_URL:http://localhost:9007}
           predicates:
             - Path=${app.api-prefix}/inventory/**
           filters:
             - StripPrefix=2
 #       ORDER ORCHESTRATOR
         - id: order-orchestrator
-          uri: http://localhost:9008
+          uri: ${ORDER_ORCHESTRATOR_SERVICE_URL:http://localhost:9008}
           predicates:
             - Path=${app.api-prefix}/order-orchestrator/**
           filters:
             - StripPrefix=2
 #        RATING SERVICE
         - id: rating-service
-          uri: http://localhost:9009
+          uri: ${RATING_SERVICE_URL:http://localhost:9009}
           predicates:
             - Path=${app.api-prefix}/ratings/**
+          filters:
+            - StripPrefix=2
+#         AI SERVICE
+        - id: ai-service
+          uri: ${AI_SERVICE_URL:http://localhost:9010}
+          predicates:
+            - Path=${app.api-prefix}/ai/**
           filters:
             - StripPrefix=2
 eureka:
   client:
     service-url:
-      default-zone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true

@@ -6,12 +6,12 @@
 		<groupId>com.vantruong</groupId>
 		<artifactId>parent-pom</artifactId>
 		<version>1.0.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath>../parent-pom/pom.xml</relativePath> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>vantruong</groupId>
 	<artifactId>api-gateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>nest-store-api-gateway</name>
+	<name>api-gateway</name>
 	<description>Information Systems Thesis</description>
 
 	<properties>

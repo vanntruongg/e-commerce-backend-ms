@@ -3,8 +3,6 @@ package com.vantruong.inventory.controller;
 import com.vantruong.common.dto.inventory.InventoryPost;
 import com.vantruong.common.dto.request.ProductInventoryRequest;
 import com.vantruong.common.dto.request.ProductQuantityRequest;
-import com.vantruong.common.exception.Constant;
-import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.inventory.common.CommonResponse;
 import com.vantruong.inventory.constant.MessageConstant;
 import com.vantruong.inventory.service.InternalInventoryService;

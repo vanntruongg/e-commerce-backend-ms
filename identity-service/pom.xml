@@ -6,7 +6,7 @@
         <groupId>com.vantruong</groupId>
         <artifactId>parent-pom</artifactId>
         <version>1.0.0</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath>../parent-pom/pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
     <groupId>vantruong</groupId>
     <artifactId>identity-service</artifactId>
@@ -97,8 +97,6 @@
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
         </dependency>
-
-
 
     </dependencies>
     <dependencyManagement>

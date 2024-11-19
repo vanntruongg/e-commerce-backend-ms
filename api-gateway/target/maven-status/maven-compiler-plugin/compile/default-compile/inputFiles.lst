@@ -1,0 +1,9 @@
+D:\HeThongThongTin_2095A2_TranVanTruong\LuanVanTotNghiep\source_code\nest-store-backend\api-gateway\src\main\java\com\vantruong\gateway\ApiGatewayApplication.java
+D:\HeThongThongTin_2095A2_TranVanTruong\LuanVanTotNghiep\source_code\nest-store-backend\api-gateway\src\main\java\com\vantruong\gateway\client\IdentityClient.java
+D:\HeThongThongTin_2095A2_TranVanTruong\LuanVanTotNghiep\source_code\nest-store-backend\api-gateway\src\main\java\com\vantruong\gateway\common\CommonResponse.java
+D:\HeThongThongTin_2095A2_TranVanTruong\LuanVanTotNghiep\source_code\nest-store-backend\api-gateway\src\main\java\com\vantruong\gateway\config\WebClientConfig.java
+D:\HeThongThongTin_2095A2_TranVanTruong\LuanVanTotNghiep\source_code\nest-store-backend\api-gateway\src\main\java\com\vantruong\gateway\dto\request\IntrospectRequest.java
+D:\HeThongThongTin_2095A2_TranVanTruong\LuanVanTotNghiep\source_code\nest-store-backend\api-gateway\src\main\java\com\vantruong\gateway\dto\response\IntrospectResponse.java
+D:\HeThongThongTin_2095A2_TranVanTruong\LuanVanTotNghiep\source_code\nest-store-backend\api-gateway\src\main\java\com\vantruong\gateway\filter\AuthenticationFilter.java
+D:\HeThongThongTin_2095A2_TranVanTruong\LuanVanTotNghiep\source_code\nest-store-backend\api-gateway\src\main\java\com\vantruong\gateway\filter\RouteValidator.java
+D:\HeThongThongTin_2095A2_TranVanTruong\LuanVanTotNghiep\source_code\nest-store-backend\api-gateway\src\main\java\com\vantruong\gateway\service\IdentityService.java
