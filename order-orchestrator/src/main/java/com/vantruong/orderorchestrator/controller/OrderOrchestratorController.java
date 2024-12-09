@@ -17,8 +17,10 @@ import static com.vantruong.orderorchestrator.constant.ApiEndpoint.VN_PAY_PAYMEN
 public class OrderOrchestratorController {
   private final OrderSagaOrchestrator orderSagaOrchestrator;
 
-  private static final String URL_ORDER_SUCCESS = "http://localhost:3000/thank-you";
-  private static final String URL_ORDER_FAILED = "http://localhost:3000/checkout";
+//  private static final String URL_ORDER_SUCCESS = "http://localhost:3000/thank-you";
+//  private static final String URL_ORDER_FAILED = "http://localhost:3000/checkout";
+  private static final String URL_ORDER_SUCCESS = "https://neststore-vtt.vercel.app/thank-you";
+  private static final String URL_ORDER_FAILED = "https://neststore-vtt.vercel.app/checkout";
 
   @GetMapping(VN_PAY_PAYMENT_CALLBACK)
   public CompletableFuture<RedirectView> createOrder(@RequestParam Map<String, String> params) {
