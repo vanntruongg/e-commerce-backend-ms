@@ -14,7 +14,6 @@ public class UserPut {
   private String email;
   private String firstName;
   private String lastName;
-  private LocalDate dob;
   private String phone;
   private String address;
   private String imageUrl;

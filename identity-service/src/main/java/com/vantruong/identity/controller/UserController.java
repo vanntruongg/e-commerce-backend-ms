@@ -92,6 +92,15 @@ public class UserController {
             .build());
   }
 
+  @PostMapping(UserApiEndpoint.ACTIVE_ACCOUNT)
+  public ResponseEntity<CommonResponse<Object>> activeAccount(@PathVariable("email") String email) {
+    return ResponseEntity.ok().body(CommonResponse.builder()
+            .isSuccess(true)
+            .message(MessageConstant.UPDATE_USER_SUCCESS)
+            .data(userService.activeAccount(email))
+            .build());
+  }
+
   @PostMapping(UserApiEndpoint.USER_CHANGE_PASSWORD)
   public ResponseEntity<CommonResponse<Object>> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
     return ResponseEntity.ok().body(CommonResponse.builder()

@@ -52,7 +52,6 @@ public class UserService {
   TokenService tokenService;
   RoleService roleService;
 
-  @Transactional
   public Boolean register(RegisterRequest userDto) {
     try {
       if (userRepository.existsById(userDto.getEmail())) {
@@ -229,5 +228,12 @@ public class UserService {
   public Object getUser() {
     String email = securityContextHelper.getUserId();
     return getUserByEmail(email);
+  }
+
+  public boolean activeAccount(String email) {
+    User user = findByEmail(email);
+    user.setStatus(AccountStatus.ACTIVE);
+    userRepository.save(user);
+    return true;
   }
 }

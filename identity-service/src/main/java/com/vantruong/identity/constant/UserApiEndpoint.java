@@ -29,6 +29,7 @@ public class UserApiEndpoint {
   public static final String COUNT_USER = COUNT;
   public static final String USER_CHANGE_PASSWORD = CHANGE_PASSWORD;
   public static final String DELETE_USER = DELETE + EMAIL_PARAM;
+  public static final String ACTIVE_ACCOUNT = ACTIVE + EMAIL_PARAM;
   public static final String UPDATE_PHONE = UPDATE + PHONE + PHONE_PARAM;
   public static final String UPDATE_ADDRESS = UPDATE + ADDRESS + ADDRESS_PARAM;
   public static final String GET_ADDRESS = GET + ADDRESS;
