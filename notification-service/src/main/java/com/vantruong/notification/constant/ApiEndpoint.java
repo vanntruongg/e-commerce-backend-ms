@@ -13,7 +13,7 @@ public class ApiEndpoint {
   public static final String CONFIRM = "/confirm";
   public static final String ORDER = "/order";
 
-  public static final String MAIL_REQUEST_MAPPING = INTERNAL + MAIL;
+  public static final String MAIL_REQUEST_MAPPING =  INTERNAL + MAIL;
   public static final String CONFIRM_ORDER = CONFIRM + ORDER;
 
 }
