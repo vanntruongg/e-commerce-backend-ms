@@ -1,29 +1,37 @@
-# E-Commerce Microservices with Spring Framework
-This is implements an e-commerce website using microservices architecture with Spring Framework.
+# E-Commerce Website 
+This project aims to learn about microservices architecture and implement it using Java
 
-## Introduction
-This project is aimed at developing a fashion e-commerce website using microservices architecture, serving as an exploration into advanced architectural patterns and technologies.
-### Main Goals
-- Learning Microservice: This primary goal of this project is to gain hands-on experience with microservices architecture, understanding its principles, advantages, and challenges.
-- Enhancing Knowledge: Through this project, I seek to deepen my understanding of various technologies and frameworks commonly used in microservices development, such as Spring Framework.
+## Learning Objectives
+- **Understand the principle of microservices architecture**:
+    Gain a deep understanding of how microservices work 
+    and the benefits of breaking down a system into independent, loosely-coupled services.
+- **Implementing inter-service communication using both synchronous and asynchronous patterns**:
+    Learn how service can communicate with each other efficiently using RESTful APIs, OpenFeign,
+    and message broker like Kafka.
+- **Managing data consistency and reliability across distributed system**:
+    Explore strategies for maintaining data integrity and consistency across multiple services and database,
+    ensuring system reliability even in distributed environments.
 
-### Features
 
-### Technologies used
-- Spring Boot
-- Spring Cloud
-- Spring Security & JWT
-- OpenFeign
-- PostgreSQL(Relationship DB), MongoDB(Document DB), Redis(In-memory DB)
 
-## Architecture
+## Technologies and frameworks
+- **Programming Language**: Java 17
+- **Framework**: Spring Boot 3.3
+- **Inter-Service Communication**: OpenFeign
+- **Message Broker**: Kafka
+- **Database**: PostgreSQL, MongoDB, Redis
 
-### Microservices
-1. **Identity Service**: Handles user authentication, registration, and profile management.
-2. **Address Service**: Handles user authentication, registration, and profile management.
-3. **Product Service**: Manages products, categories.
-4. **Cart Service**: Manages shopping cart for users.
-5. **Order Service**: Process and manages orders, including checkout and payment integration.
-6. **Payment Service**: Process and manages orders, including checkout and payment integration.
+## How to run
+1. Clone the repository
+```bash
+git clone https://github.com/vanntruongg/e-commerce-backend-ms.git
+cd e-commerce-backend-ms
+```
+2. Build the project
+```bash
+mvn clean install 
+```
+3. Start each service locally using your IDE or terminal
+
 
 
