@@ -31,12 +31,15 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
   ObjectMapper objectMapper;
   RouteValidator routeValidator;
 
+
+  @Override
+  public int getOrder() {
+    return -1;
+  }
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
     if (routeValidator.isPublicEndpoint(exchange.getRequest()))
       return chain.filter(exchange);
-
-//  get token from authentication header
     List<String> authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION);
     if (CollectionUtils.isEmpty(authHeader)) {
       return unAuthenticated(exchange.getResponse());
@@ -50,17 +53,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     ).onErrorResume(throwable -> unAuthenticated(exchange.getResponse()));
   }
 
-  @Override
-  public int getOrder() {
-    return -1;
-  }
-
   private Mono<Void> unAuthenticated(ServerHttpResponse response) {
     CommonResponse<?> commonResponse = CommonResponse.builder()
             .isSuccess(false)
             .message("Unauthenticated")
             .build();
-
     String body;
     try {
       body = objectMapper.writeValueAsString(commonResponse);

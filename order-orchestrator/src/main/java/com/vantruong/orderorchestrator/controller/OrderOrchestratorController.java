@@ -19,8 +19,8 @@ public class OrderOrchestratorController {
 
 //  private static final String URL_ORDER_SUCCESS = "http://localhost:3000/thank-you";
 //  private static final String URL_ORDER_FAILED = "http://localhost:3000/checkout";
-  private static final String URL_ORDER_SUCCESS = "https://neststore-vtt.vercel.app/thank-you";
-  private static final String URL_ORDER_FAILED = "https://neststore-vtt.vercel.app/checkout";
+  private static final String URL_ORDER_SUCCESS = "https://neststore.vercel.app/thank-you";
+  private static final String URL_ORDER_FAILED = "https://neststore.vercel.app/checkout";
 
   @GetMapping(VN_PAY_PAYMENT_CALLBACK)
   public CompletableFuture<RedirectView> createOrder(@RequestParam Map<String, String> params) {

@@ -1,0 +1,21 @@
+server:
+  port: 9999
+spring:
+  application:
+    name: config-server
+
+ports:
+  identity: 9001
+  user: 9002
+  product: 9003
+  inventory: 9004
+  cart: 9005
+  order: 9006
+  payment: 9007
+  rating: 9008
+  notification: 9009
+  ai: 9010
+  orchestration: 9011
+
+
+

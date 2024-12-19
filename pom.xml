@@ -23,13 +23,13 @@
 	<modules>
 		<module>eureka-server</module>
 		<module>api-gateway</module>
-		<module>inventory-service</module>
-		<module>product-service</module>
-		<module>identity-service</module>
-		<module>order-service</module>
-		<module>cart-service</module>
-		<module>notification-service</module>
-		<module>address-service</module>
+		<module>inventory</module>
+		<module>product</module>
+		<module>identity</module>
+		<module>order</module>
+		<module>cart</module>
+		<module>notification</module>
+		<module>user</module>
 		<module>parent-pom</module>
 <!--		<module>common-library</module>-->
 	</modules>

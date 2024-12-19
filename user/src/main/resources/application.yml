@@ -1,0 +1,26 @@
+# USER-SERVICE
+server:
+  port: 9002
+
+spring:
+  application:
+    name: address-data-service
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/NEST-Store-UserDB}
+    username: ${DB_USER_NAME:vantruong}
+    password: ${DB_USER_PASSWORD:vantruong}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+    hibernate:
+      ddl-auto: update
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL:http://localhost:8761/eureka}
+
+jwt:
+  secret: cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
