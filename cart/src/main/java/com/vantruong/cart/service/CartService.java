@@ -14,11 +14,7 @@ import com.vantruong.cart.exception.InsufficientProductQuantityException;
 import com.vantruong.cart.exception.NotFoundException;
 import com.vantruong.cart.repository.CartRepository;
 import com.vantruong.cart.util.AuthenticationUtils;
-import com.vantruong.common.dto.cart.CartItemCommon;
-import com.vantruong.common.dto.inventory.SizeQuantityDto;
-import com.vantruong.common.dto.request.DeleteCartItemsRequest;
-import com.vantruong.common.dto.request.ProductQuantityRequest;
-import com.vantruong.common.dto.response.ProductResponse;
+import com.vantruong.cart.viewmodel.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -55,34 +51,30 @@ public class CartService {
     });
   }
 
-  private List<ProductResponse> getProductsByIds(List<CartItem> items) {
+  private List<ProductVm> getProductsByIds(List<CartItem> items) {
     List<Long> itemIds = items.stream().map(CartItem::getProductId).toList();
     return productService.getProductByIds(itemIds);
   }
 
-  private Map<Long, ProductResponse> getProductMapById(List<ProductResponse> products) {
-    return products.stream().collect(Collectors.toMap(ProductResponse::getId, p -> p));
+  private Map<Long, ProductVm> getProductMapById(List<ProductVm> products) {
+    return products.stream().collect(Collectors.toMap(ProductVm::id, p -> p));
   }
 
   public CartResponse getCartById() {
     Cart cart = findByIdOrCreate();
     List<CartItemResponse> cartItemResponses = new ArrayList<>();
     if (Objects.nonNull(cart.getItems())) {
-      List<ProductResponse> products = getProductsByIds(cart.getItems());
+      List<ProductVm> products = getProductsByIds(cart.getItems());
 
-      Map<Long, ProductResponse> productMap = getProductMapById(products);
+      Map<Long, ProductVm> productMap = getProductMapById(products);
 
       cartItemResponses = cart.getItems().stream().map(item -> {
-        ProductResponse product = productMap.get(item.getProductId());
+        ProductVm product = productMap.get(item.getProductId());
         List<SizeQuantity> sizeQuantities = item.getSizeQuantities();
-        List<SizeQuantityDto> sizeQuantityDtos = new ArrayList<>();
+        List<SizeQuantityVm> sizeQuantityDtos = new ArrayList<>();
         if (sizeQuantities != null) {
           sizeQuantityDtos = sizeQuantities.stream()
-                  .map(sizeQuantity -> SizeQuantityDto.builder()
-                          .size(sizeQuantity.getSize())
-                          .quantity(sizeQuantity.getQuantity())
-                          .build()
-                  )
+                  .map(sizeQuantity -> new SizeQuantityVm(sizeQuantity.getSize(), sizeQuantity.getQuantity()))
                   .toList();
         }
         return CartItemResponse.builder()
@@ -261,22 +253,19 @@ public class CartService {
   }
 
   private Integer getQuantityInStock(Long productId, String size) {
-    ProductQuantityRequest checkProductQuantityRequest = ProductQuantityRequest.builder()
-            .productId(productId)
-            .size(size)
-            .build();
+    ProductQuantityCheckVm checkProductQuantityRequest = new ProductQuantityCheckVm(productId, size);
     return inventoryService.checkProductQuantityById(checkProductQuantityRequest);
   }
 
-  public void removeItemsFromCart(DeleteCartItemsRequest request) {
-    Cart cart = cartRepository.findById(request.getEmail()).orElseThrow(()
+  public void removeItemsFromCart(CartItemDeleteVm cartItemDeleteVm) {
+    Cart cart = cartRepository.findById(cartItemDeleteVm.email()).orElseThrow(()
             -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.CART_NOT_FOUND));
-    for (CartItemCommon item : request.getItems()) {
-      CartItem cartItem = findCartItemByProductId(cart, item.getProductId());
+    for (CartItemVm item : cartItemDeleteVm.cartItemVms()) {
+      CartItem cartItem = findCartItemByProductId(cart, item.productId());
       if (cartItem != null) {
         List<SizeQuantity> sizeQuantities = cartItem.getSizeQuantities();
         if (sizeQuantities != null) {
-          sizeQuantities.removeIf(it -> it.getSize().equals(item.getSize()));
+          sizeQuantities.removeIf(it -> it.getSize().equals(item.size()));
           if (sizeQuantities.isEmpty()) {
             cart.getItems().remove(cartItem);
           }
@@ -286,7 +275,7 @@ public class CartService {
     cartRepository.save(cart);
   }
 
-  public List<SizeQuantityDto> getByEmailAndProductId(Long productId) {
+  public List<SizeQuantityVm> getByEmailAndProductId(Long productId) {
     Cart cart = findById();
     CartItem cartItem = findCartItemByProductId(cart, productId);
 
@@ -294,12 +283,8 @@ public class CartService {
       List<SizeQuantity> sizeQuantities = cartItem.getSizeQuantities();
       if (sizeQuantities == null) return null;
       return sizeQuantities.stream()
-              .map(sizeQuantity ->
-                      SizeQuantityDto.builder()
-                              .size(sizeQuantity.getSize())
-                              .quantity(sizeQuantity.getQuantity())
-                              .build()
-              ).toList();
+              .map(sizeQuantity -> new SizeQuantityVm(sizeQuantity.getSize(), sizeQuantity.getQuantity()))
+              .toList();
     }
     return null;
   }

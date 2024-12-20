@@ -1,7 +1,7 @@
 package com.vantruong.cart.service;
 
 import com.vantruong.cart.repository.client.ProductClient;
-import com.vantruong.common.dto.response.ProductResponse;
+import com.vantruong.cart.viewmodel.ProductVm;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class ProductService extends AbstractCircuitBreakerFallbackHandler {
 
   @Retry(name = "restApi")
   @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "getProductByIdsFallback")
-  public List<ProductResponse> getProductByIds(List<Long> itemIds) {
+  public List<ProductVm> getProductByIds(List<Long> itemIds) {
     return productClient.getProductByIds(itemIds).getData();
   }
 
