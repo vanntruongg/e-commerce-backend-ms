@@ -2,6 +2,7 @@ package com.vantruong.user.dto.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class CreateUserRequest {

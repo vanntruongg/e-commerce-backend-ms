@@ -8,7 +8,6 @@ public class ApiEndpoint {
 
   //  params
   public static final String ID_PARAM = "/{id}";
-
   // actions
   public static final String GET = "/get";
   public static final String UPDATE = "/update";

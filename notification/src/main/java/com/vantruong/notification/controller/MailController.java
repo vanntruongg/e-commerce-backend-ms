@@ -1,16 +1,19 @@
 package com.vantruong.notification.controller;
 
 import com.vantruong.notification.constant.ApiEndpoint;
-import com.vantruong.notification.viewmodel.SendMailVerifyUserRequest;
 import com.vantruong.notification.service.MailService;
+import com.vantruong.notification.viewmodel.SendMailVerifyUserRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.vantruong.notification.constant.ApiEndpoint.MAIL;
+import static com.vantruong.notification.constant.ApiEndpoint.NOTIFICATION;
+
 
 @RestController
-@RequestMapping(ApiEndpoint.MAIL_REQUEST_MAPPING)
+@RequestMapping(NOTIFICATION + MAIL)
 public class MailController {
   private final MailService mailService;
 
@@ -27,9 +30,4 @@ public class MailController {
   public void sendResetPassword(@RequestBody SendMailVerifyUserRequest request) {
     mailService.sendResetPassword(request);
   }
-
-//  @PostMapping(ApiEndpoint.CONFIRM_ORDER)
-//  public void confirmOrder(@RequestBody OrderVm orderDto) {
-//    mailService.confirmOrder(orderDto);
-//  }
 }

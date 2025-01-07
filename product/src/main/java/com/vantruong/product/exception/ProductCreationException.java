@@ -1,7 +1,5 @@
 package com.vantruong.product.exception;
 
-import com.vantruong.common.exception.ErrorDetail;
-
 public class ProductCreationException extends RuntimeException {
   private final transient ErrorDetail errorDetail;
 

@@ -1,26 +1,23 @@
 package com.vantruong.order.service;
 
-import com.vantruong.common.dto.order.OrderExistsByProductAndUser;
-import com.vantruong.common.dto.request.ProductQuantityRequest;
-import com.vantruong.common.exception.Constant;
-import com.vantruong.common.exception.NotFoundException;
-import com.vantruong.common.exception.ProductQuantityNotAvailableException;
 import com.vantruong.order.constant.MessageConstant;
 import com.vantruong.order.dto.OrderDto;
-import com.vantruong.order.dto.OrderItemRequest;
 import com.vantruong.order.dto.OrderListDto;
-import com.vantruong.order.dto.OrderRequest;
 import com.vantruong.order.entity.Order;
 import com.vantruong.order.entity.OrderAddress;
 import com.vantruong.order.entity.OrderItem;
 import com.vantruong.order.entity.enumeration.OrderStatus;
 import com.vantruong.order.entity.enumeration.PaymentMethod;
 import com.vantruong.order.entity.enumeration.PaymentStatus;
+import com.vantruong.order.exception.ErrorCode;
+import com.vantruong.order.exception.NotFoundException;
+import com.vantruong.order.exception.ProductQuantityNotAvailableException;
 import com.vantruong.order.repository.OrderItemRepository;
 import com.vantruong.order.repository.OrderRepository;
 import com.vantruong.order.repository.specification.OrderSpecification;
 import com.vantruong.order.util.AuthenticationUtils;
 import com.vantruong.order.util.OrderConverter;
+import com.vantruong.order.viewmodel.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,7 +31,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,12 +78,6 @@ public class OrderService {
     );
   }
 
-  public void updatePaymentStatus(Long orderId, PaymentStatus paymentStatus) {
-    Order order = findById(orderId);
-    order.setPaymentStatus(paymentStatus);
-    orderRepository.save(order);
-  }
-
   @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
   public OrderListDto getAllOrderByAdmin(int pageNo, int pageSize, String orderStatus, String paymentMethod) {
     return getAllOrders(pageNo, pageSize, orderStatus, paymentMethod, null);
@@ -95,17 +89,17 @@ public class OrderService {
   }
 
   @Transactional
-  public Order createNewOrder(OrderRequest orderRequest) {
-    boolean isQuantityValid = validateProductQuantities(orderRequest.getOrderItemRequests());
+  public Order createNewOrder(OrderPostVm orderRequest) {
+    boolean isQuantityValid = validateProductQuantities(orderRequest.getOrderItemVms());
 
     if (!isQuantityValid) {
       throw new ProductQuantityNotAvailableException(
-              Constant.ErrorCode.INSUFFICIENT_PRODUCT_QUANTITY,
+              ErrorCode.INSUFFICIENT_PRODUCT_QUANTITY,
               MessageConstant.PRODUCT_QUANTITY_NOT_AVAILABLE
       );
     }
 
-    Double totalPrice = calculateTotalOrderPrice(orderRequest.getOrderItemRequests());
+    Double totalPrice = calculateTotalOrderPrice(orderRequest.getOrderItemVms());
     OrderAddress orderAddress = mapToOrderAddress(orderRequest);
     String userId = AuthenticationUtils.extractUserId();
     LocalDateTime paymentStartTime = null;
@@ -126,29 +120,29 @@ public class OrderService {
             .build();
     orderRepository.save(order);
 
-    Set<OrderItem> orderItems = createOrderItems(orderRequest.getOrderItemRequests(), order);
+    Set<OrderItem> orderItems = createOrderItems(orderRequest.getOrderItemVms(), order);
     // setOrderItems so that able to return order with orderItems
     order.setOrderItems(orderItems);
 
     return order;
   }
 
-  private Set<OrderItem> createOrderItems(List<OrderItemRequest> requests, Order order) {
-    List<OrderItem> orderItems = requests.stream()
+  private Set<OrderItem> createOrderItems(List<OrderItemVm> orderItemVms, Order order) {
+    List<OrderItem> orderItems = orderItemVms.stream()
             .map(item -> OrderItem.builder()
-                    .productId(item.getProductId())
-                    .quantity(item.getQuantity())
-                    .productSize(item.getSize())
-                    .productName(item.getProductName())
-                    .productPrice(item.getProductPrice())
-                    .productImage(item.getProductImage())
+                    .productId(item.productId())
+                    .quantity(item.quantity())
+                    .productSize(item.size())
+                    .productName(item.productName())
+                    .productPrice(item.productPrice())
+                    .productImage(item.productImage())
                     .order(order)
                     .build())
             .toList();
     return new HashSet<>(orderItemRepository.saveAll(orderItems));
   }
 
-  private OrderAddress mapToOrderAddress(OrderRequest orderRequest) {
+  private OrderAddress mapToOrderAddress(OrderPostVm orderRequest) {
     return OrderAddress.builder()
             .contactName(orderRequest.getName())
             .phone(orderRequest.getPhone())
@@ -156,27 +150,21 @@ public class OrderService {
             .build();
   }
 
-  private Double calculateTotalOrderPrice(List<OrderItemRequest> requests) {
-    Map<Long, Integer> productQuantities = new HashMap<>();
+  private Double calculateTotalOrderPrice(List<OrderItemVm> orderItemVms) {
+    List<ProductQuantityVm> productQuantityVms = orderItemVms.stream()
+            .map(orderItemVm -> new ProductQuantityVm(orderItemVm.productId(), orderItemVm.quantity()))
+            .collect(Collectors.toList());
 
-    for (OrderItemRequest request : requests) {
-      Long productId = request.getProductId();
-      Integer quantity = request.getQuantity();
-      productQuantities.merge(productId, quantity, Integer::sum);
-    }
-
-
-    return productService.calculateTotalOrderPrice(productQuantities);
+    return productService.calculateTotalOrderPrice(new CalculateTotalOrderPricePostVm(productQuantityVms)).totalPrice();
   }
 
-  private boolean validateProductQuantities(List<OrderItemRequest> listProduct) {
-    List<ProductQuantityRequest> request = listProduct.stream()
-            .map(orderDetailDto ->
-                    ProductQuantityRequest.builder()
-                            .productId(orderDetailDto.getProductId())
-                            .size(orderDetailDto.getSize())
-                            .quantity(orderDetailDto.getQuantity())
-                            .build()
+  private boolean validateProductQuantities(List<OrderItemVm> orderItemVms) {
+    List<ProductQuantityCheckVm> request = orderItemVms.stream()
+            .map(orderItem ->
+                    new ProductQuantityCheckVm(
+                            orderItem.productId(),
+                            orderItem.size(),
+                            orderItem.quantity())
             )
             .toList();
     return inventoryService.checkListProductQuantity(request);
@@ -188,7 +176,7 @@ public class OrderService {
 
   public Order findById(Long id) {
     return orderRepository.findById(id).orElseThrow(() ->
-            new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.ORDER_NOT_FOUND));
+            new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.ORDER_NOT_FOUND));
   }
 
   public List<OrderDto> getOrderByStatus(String status) {
@@ -203,7 +191,7 @@ public class OrderService {
 
   public OrderDto getOrderById(Long id) {
     Order order = orderRepository.findById(id).orElseThrow(() ->
-            new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.ORDER_NOT_FOUND));
+            new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.ORDER_NOT_FOUND));
     return orderConverter.convertToOrderDto(order);
   }
 
@@ -215,10 +203,9 @@ public class OrderService {
     return true;
   }
 
-  public OrderExistsByProductAndUser checkOrderExistsByProductAndUserWithStatus(String email, Long productId) {
-    return new OrderExistsByProductAndUser(
-            orderRepository.existsByEmailAndProductIdAndOrderStatus(email, productId, OrderStatus.COMPLETED)
-    );
+  public OrderCheckResultVm isOrderCompleted(String email, Long productId) {
+    boolean result = orderRepository.isOrderCompleted(email, productId);
+    return new OrderCheckResultVm(result);
   }
 
   public List<Order> findOrdersByStatusAndTime(PaymentStatus status, LocalDateTime time) {

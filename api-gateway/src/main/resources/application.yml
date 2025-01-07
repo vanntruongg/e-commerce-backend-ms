@@ -39,7 +39,7 @@ spring:
         - id: user-service
           uri: ${ADDRESS_SERVICE_URL:http://localhost:9002}
           predicates:
-            - Path=${app.api-prefix}/address/**
+            - Path=${app.api-prefix}/user/**
           filters:
             - StripPrefix=2
 #        PRODUCT

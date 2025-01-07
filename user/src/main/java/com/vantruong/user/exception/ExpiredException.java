@@ -1,7 +1,5 @@
 package com.vantruong.user.exception;
 
-import com.vantruong.common.exception.ErrorDetail;
-
 public class ExpiredException extends RuntimeException {
   private final transient ErrorDetail errorDetail;
 

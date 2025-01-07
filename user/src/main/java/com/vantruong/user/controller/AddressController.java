@@ -3,6 +3,7 @@ package com.vantruong.user.controller;
 import com.vantruong.user.common.CommonResponse;
 import com.vantruong.user.constant.MessageConstant;
 import com.vantruong.user.service.AddressService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,12 +11,9 @@ import static com.vantruong.user.constant.ApiEndpoint.*;
 
 @RestController
 @RequestMapping(ADDRESS)
+@RequiredArgsConstructor
 public class AddressController {
   private final AddressService addressService;
-
-  public AddressController(AddressService addressService) {
-    this.addressService = addressService;
-  }
 
   @GetMapping(GET_DATA)
   public ResponseEntity<CommonResponse<Object>> getAddress(

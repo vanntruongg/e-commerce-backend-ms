@@ -4,11 +4,12 @@ import com.vantruong.user.constant.MessageConstant;
 import com.vantruong.user.dto.UserAddressRequest;
 import com.vantruong.user.dto.UserAddressResponse;
 import com.vantruong.user.entity.AddressData;
+import com.vantruong.user.entity.User;
 import com.vantruong.user.entity.UserAddress;
+import com.vantruong.user.exception.ErrorCode;
+import com.vantruong.user.exception.NotFoundException;
 import com.vantruong.user.repository.UserAddressRepository;
 import com.vantruong.user.util.AddressConverter;
-import com.vantruong.common.exception.Constant;
-import com.vantruong.common.exception.NotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,10 +27,12 @@ public class UserAddressService {
   AddressService addressService;
   AddressConverter addressConverter;
   AuthService authService;
+  UserService userService;
 
   public List<UserAddressResponse> getAllAddressByUserId() {
     String email = authService.getUserId();
-    List<UserAddress> userAddresses = userAddressRepository.findAllByUserEmailOrderByIsDefaultDesc(email);
+    User user = userService.findByEmail(email);
+    List<UserAddress> userAddresses = userAddressRepository.findAllByUserEmailOrderByIsDefaultDesc(user);
     return userAddresses.stream()
             .map(addressConverter::convertToUserAddressResponse)
             .toList();
@@ -42,14 +45,18 @@ public class UserAddressService {
 
   private Optional<UserAddress> getDefaultAddressByEmail() {
     String email = authService.getUserId();
-    return userAddressRepository.findByUserEmailAndIsDefault(email, true);
+    User user = userService.findByEmail(email);
+
+    return userAddressRepository.findByUserEmailAndIsDefault(user, true);
   }
 
   @Transactional
   public UserAddressResponse createUserAddress(UserAddressRequest request) {
     String email = authService.getUserId();
+    User user = userService.findByEmail(email);
+
 //    check and set default address if it's first address
-    List<UserAddress> userAddresses = userAddressRepository.findAllByUserEmail(email);
+    List<UserAddress> userAddresses = userAddressRepository.findAllByUserEmail(user);
     Boolean isDefault = userAddresses.isEmpty() || request.isDefault();
 
     // if there are existing address and the request is to set as default
@@ -73,7 +80,7 @@ public class UserAddressService {
             .district(district)
             .province(province)
             .isDefault(isDefault)
-            .userEmail(email)
+            .userEmail(user)
             .build();
     userAddressRepository.save(userAddress);
     return addressConverter.convertToUserAddressResponse(userAddress);
@@ -81,7 +88,7 @@ public class UserAddressService {
 
   public UserAddress findById(Integer id) {
     return userAddressRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.NOT_FOUND));
   }
 
   @Transactional
@@ -126,11 +133,13 @@ public class UserAddressService {
 
   public Boolean deleteAddress(Integer addressId) {
     String email = authService.getUserId();
-    List<UserAddress> addresses = userAddressRepository.findAllByUserEmail(email);
+    User user = userService.findByEmail(email);
+
+    List<UserAddress> addresses = userAddressRepository.findAllByUserEmail(user);
     UserAddress userAddress = addresses.stream()
             .filter(address -> address.getId().equals(addressId))
             .findFirst()
-            .orElseThrow(() -> new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.NOT_FOUND));
 
 //    check if there are more than one address
     if (addresses.size() > 1 && userAddress.getIsDefault()) return false;

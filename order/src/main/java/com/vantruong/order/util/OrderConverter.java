@@ -1,10 +1,5 @@
 package com.vantruong.order.util;
 
-import com.vantruong.common.dto.order.OrderItemCommonDto;
-import com.vantruong.common.event.OrderEvent;
-import com.vantruong.common.event.OrderEventStatus;
-import com.vantruong.common.event.PaymentStatus;
-import com.vantruong.common.util.DateTimeFormatter;
 import com.vantruong.order.dto.OrderDto;
 import com.vantruong.order.dto.OrderItemDto;
 import com.vantruong.order.dto.SizeQuantity;
@@ -24,30 +19,30 @@ import java.util.stream.Collectors;
 public class OrderConverter {
   private final DateTimeFormatter dateTimeFormatter;
 
-  public OrderEvent orderToKafka(Order order) {
-    Set<OrderItemCommonDto> orderItemVms = order.getOrderItems().stream()
-            .map(orderItem -> new OrderItemCommonDto(orderItem.getOrderItemId(),
-                    orderItem.getProductId(),
-                    orderItem.getQuantity(),
-                    orderItem.getProductName(),
-                    orderItem.getProductPrice(),
-                    orderItem.getProductImage(),
-                    orderItem.getProductSize()))
-            .collect(Collectors.toSet());
-
-    return new OrderEvent(order.getOrderId(),
-            order.getEmail(),
-            order.getNotes(),
-            order.getTotalPrice(),
-            order.getOrderStatus().name(),
-            OrderEventStatus.NEW,
-            PaymentStatus.PAYMENT_SUCCESS,
-            order.getOrderAddress().getContactName(),
-            order.getOrderAddress().getPhone(),
-            order.getOrderAddress().getAddress(),
-            orderItemVms
-    );
-  }
+//  public OrderEvent orderToKafka(Order order) {
+//    Set<OrderItemCommonDto> orderItemVms = order.getOrderItems().stream()
+//            .map(orderItem -> new OrderItemCommonDto(orderItem.getOrderItemId(),
+//                    orderItem.getProductId(),
+//                    orderItem.getQuantity(),
+//                    orderItem.getProductName(),
+//                    orderItem.getProductPrice(),
+//                    orderItem.getProductImage(),
+//                    orderItem.getProductSize()))
+//            .collect(Collectors.toSet());
+//
+//    return new OrderEvent(order.getOrderId(),
+//            order.getEmail(),
+//            order.getNotes(),
+//            order.getTotalPrice(),
+//            order.getOrderStatus().name(),
+//            OrderEventStatus.NEW,
+//            PaymentStatus.PAYMENT_SUCCESS,
+//            order.getOrderAddress().getContactName(),
+//            order.getOrderAddress().getPhone(),
+//            order.getOrderAddress().getAddress(),
+//            orderItemVms
+//    );
+//  }
 
   public OrderDto convertToOrderDto(Order order) {
     return OrderDto.builder()

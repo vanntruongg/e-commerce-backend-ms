@@ -1,8 +1,5 @@
 package com.vantruong.identity.exception.handler;
 
-import com.vantruong.common.exception.Constant;
-import com.vantruong.common.exception.DuplicateException;
-import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.identity.common.CommonResponse;
 import com.vantruong.identity.exception.*;
 import org.apache.commons.lang3.StringUtils;
@@ -76,7 +73,7 @@ public class RestResponseEntityExceptionHandler {
 
   @ExceptionHandler(value = FormException.class)
   public ResponseEntity<CommonResponse<Object>> handleFormException(Exception ex, WebRequest request) {
-    return ResponseEntity.status(Constant.ErrorCode.FORM_ERROR).body(CommonResponse.builder()
+    return ResponseEntity.status(ErrorCode.FORM_ERROR).body(CommonResponse.builder()
             .isSuccess(false)
             .message(ex.getMessage())
             .errorDetails(ex.getCause() != null ? ex.getCause().getMessage() : StringUtils.EMPTY)

@@ -11,7 +11,8 @@ public class MessageConstant {
   public static final String SUCCESS = "successfully!";
   public static final String FAIL = "fail!";
 
-  public static final String FIND_SUCCESS = SUCCESS;
+  public static final String FIND = "Find";
+  public static final String FIND_SUCCESS = String.format(CHAR_SEQUENCE_2, FIND, SUCCESS);;
   public static final String ADDRESS = "address";
   public static final String UPDATE = "Update";
   public static final String DELETE = "Delete";
@@ -26,13 +27,9 @@ public class MessageConstant {
 
 
   //  actions
-  public static final String FIND = "Tìm";
-  public static final String CREATE = "Thêm";
-  public static final String FAILED = "lỗi!";
+  public static final String CREATE = "Create";
+  public static final String FAILED = "Failed!";
   public static final String LOGIN = "Login";
-  public static final String ACCOUNT_UNAVAILABLE = "Tài khoản không khả dụng.";
-  public static final String REQUEST_RESET_PASSWORD_SUCCESS = "Yêu cầu thay đổi mật khẩu thành công.";
-  public static final String RESET_PASSWORD_SUCCESS = "Thay đổi mật khẩu thành công";
   private static final String LOGOUT = "Đăng xuất";
   public static final String REGISTER = "Đăng ký";
   public static final String REFRESH_TOKEN = "Refresh token";
@@ -44,9 +41,7 @@ public class MessageConstant {
   public static final String USER = "Người dùng";
   public static final String CHANGE_PASSWORD = "Thay đổi mật khẩu";
 
-  public static final String LOGIN_SUCCESS = String.format(CHAR_SEQUENCE_2, LOGIN, SUCCESS);
   public static final String REGISTER_SUCCESS = String.format(CHAR_SEQUENCE_2, REGISTER, SUCCESS);
-  public static final String REFRESH_TOKEN_FAIL = String.format(CHAR_SEQUENCE_2, REFRESH_TOKEN, FAILED);
   public static final String USER_NOT_FOUND = String.format(CHAR_SEQUENCE_2, USER, NOT_FOUND);
   public static final String UPDATE_USER_SUCCESS = String.format(CHAR_SEQUENCE_3, UPDATE, USER, SUCCESS);
   public static final String CHANGE_PASSWORD_SUCCESS = String.format(CHAR_SEQUENCE_2, CHANGE_PASSWORD, SUCCESS);
@@ -61,4 +56,6 @@ public class MessageConstant {
   public static final String VERIFY_SUCCESS = String.format(CHAR_SEQUENCE_2, VERIFY, SUCCESS);
   public static final String REQUEST_VERIFY_SUCCESS = "Yêu cầu xác minh tài khoản thành công.";
   public static final String CREATE_SUCCESS = CREATE + SUCCESS;
+  public static final String ACCESS_DENIED = "You are not allowed to perform this action.";
+
 }

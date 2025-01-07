@@ -25,9 +25,9 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
   @Query("SELECT CASE WHEN COUNT(o) > 0 THEN true ELSE false END " +
           "from Order o inner join OrderItem oi on o.orderId = oi.order.orderId " +
           "where o.email = :email " +
-          "and o.orderStatus = :orderStatus " +
-          "and oi.productId = :productId")
-  boolean existsByEmailAndProductIdAndOrderStatus(String email, Long productId, OrderStatus orderStatus);
+          "and oi.productId = :productId " +
+          "and o.orderStatus = 'COMPLETED' ")
+  boolean isOrderCompleted(String email, Long productId);
 
 //  Page<Order> findByEmail(String email, Pageable pageable);
 //

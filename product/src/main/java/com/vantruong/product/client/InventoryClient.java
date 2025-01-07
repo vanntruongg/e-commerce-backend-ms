@@ -1,10 +1,10 @@
 package com.vantruong.product.client;
 
-import com.vantruong.common.dto.inventory.InventoryPost;
-import com.vantruong.common.dto.inventory.SizeQuantityDto;
-import com.vantruong.common.dto.request.ProductInventoryRequest;
-import com.vantruong.common.dto.response.ProductInventoryResponse;
 import com.vantruong.product.common.CommonResponse;
+import com.vantruong.product.viewmodel.InventoryPostVm;
+import com.vantruong.product.viewmodel.ProductInventoryVm;
+import com.vantruong.product.viewmodel.ProductListInventoryCheckVm;
+import com.vantruong.product.viewmodel.SizeQuantityVm;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,18 +13,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-import static com.vantruong.common.constant.InternalApiEndpoint.*;
+import static com.vantruong.product.constant.InternalApiEndpoint.*;
 
 
-@FeignClient(name = "inventory-service", url = INVENTORY_SERVICE_URL)
+@FeignClient(name = "inventory-service", url = INVENTORY_SERVICE_URL + INTERNAL)
 public interface InventoryClient {
 
   @PostMapping(GET_ALL_BY_PRODUCT_IDS)
-  CommonResponse<ProductInventoryResponse> getAllInventoryByProductIds(@RequestBody ProductInventoryRequest request);
+  CommonResponse<ProductInventoryVm> getAllInventoryByProductIds(@RequestBody ProductListInventoryCheckVm request);
 
   @GetMapping(GET_BY_PRODUCT_ID)
-  CommonResponse<List<SizeQuantityDto>> getInventoryByProductId(@PathVariable("id") Long productId);
+  CommonResponse<List<SizeQuantityVm>> getInventoryByProductId(@PathVariable("id") Long productId);
 
   @PostMapping(CREATE_INVENTORY)
-  CommonResponse<Boolean> createInventory(@RequestBody InventoryPost inventoryPost);
+  CommonResponse<Boolean> createInventory(@RequestBody InventoryPostVm inventoryPost);
 }

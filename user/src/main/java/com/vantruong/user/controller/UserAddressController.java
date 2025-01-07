@@ -12,7 +12,7 @@ import static com.vantruong.user.constant.ApiEndpoint.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(ADDRESS + USER)
+@RequestMapping(USER + ADDRESS)
 public class UserAddressController {
   private final UserAddressService userAddressService;
 

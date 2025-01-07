@@ -1,14 +1,16 @@
 package com.vantruong.notification.repository;
 
-import com.vantruong.common.constant.InternalApiEndpoint;
-import com.vantruong.common.dto.user.UserAddress;
 import com.vantruong.notification.common.CommonResponse;
+import com.vantruong.notification.viewmodel.UserAddressVm;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "address-data-service", url = InternalApiEndpoint.ADDRESS_SERVICE_URL)
+import static com.vantruong.notification.constant.InternalApiEndpoint.*;
+
+
+@FeignClient(name = "user-service", url = USER_SERVICE_URL + INTERNAL)
 public interface UserAddressClient {
-  @GetMapping(InternalApiEndpoint.ORDER + InternalApiEndpoint.GET + InternalApiEndpoint.ID_PARAM)
-  CommonResponse<UserAddress> getUserAddressById(@PathVariable("id") Integer addressId);
+  @GetMapping(ADDRESS + ID_PARAM)
+  CommonResponse<UserAddressVm> getUserAddressById(@PathVariable("id") Integer addressId);
 }

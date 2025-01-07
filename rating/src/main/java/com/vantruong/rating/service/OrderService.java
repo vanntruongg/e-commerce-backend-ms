@@ -1,8 +1,8 @@
 package com.vantruong.rating.service;
 
-import com.vantruong.common.dto.order.OrderExistsByProductAndUser;
 import com.vantruong.rating.client.OrderClient;
 import com.vantruong.rating.common.CommonResponse;
+import com.vantruong.rating.viewmodel.OrderCheckResultVm;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +15,12 @@ public class OrderService extends AbstractCircuitBreakerFallbackHandler {
 
   @Retry(name = "orderServiceApi")
   @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "checkOrderExistsByProductAndUserWithStatusFallback")
-  public OrderExistsByProductAndUser checkOrderExistsByProductAndUserWithStatus(String email, Long productId) {
-    CommonResponse<OrderExistsByProductAndUser> response = orderClient.checkOrderExistsByProductAndUserWithStatus(email, productId);
+  public OrderCheckResultVm checkOrderExistsByProductAndUserWithStatus(String email, Long productId) {
+    CommonResponse<OrderCheckResultVm> response = orderClient.checkOrderExistsByProductAndUserWithStatus(email, productId);
     return response.getData();
   }
 
-  protected OrderExistsByProductAndUser checkOrderExistsByProductAndUserWithStatusFallback(Throwable throwable) throws Throwable {
+  protected OrderCheckResultVm checkOrderExistsByProductAndUserWithStatusFallback(Throwable throwable) throws Throwable {
     return handleTypedFallback(throwable);
   }
 }

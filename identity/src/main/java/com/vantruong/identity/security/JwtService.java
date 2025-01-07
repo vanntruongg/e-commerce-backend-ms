@@ -8,6 +8,7 @@ import com.nimbusds.jwt.SignedJWT;
 import com.vantruong.identity.entity.User;
 import com.vantruong.identity.exception.AuthenticationException;
 import com.vantruong.identity.repository.InvalidatedTokenRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class JwtService {
 
   private final InvalidatedTokenRepository invalidatedTokenRepository;
@@ -29,18 +31,19 @@ public class JwtService {
   @Value("${jwt.secret}")
   private String secret;
 
-  public JwtService(InvalidatedTokenRepository invalidatedTokenRepository) {
-    this.invalidatedTokenRepository = invalidatedTokenRepository;
-  }
 
   private String buildRole(User user) {
     StringJoiner stringJoiner = new StringJoiner(" ");
-    if (!CollectionUtils.isEmpty(user.getRoles()))
+    if (!CollectionUtils.isEmpty(user.getRoles())) {
       user.getRoles().forEach(role -> {
         stringJoiner.add(role.getName());
-        if (!CollectionUtils.isEmpty(role.getPermissions()))
-          role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
+        if (!CollectionUtils.isEmpty(role.getPermissions())) {
+          role.getPermissions().forEach(permission -> {
+            stringJoiner.add(permission.getName());
+          });
+        }
       });
+    }
     return stringJoiner.toString();
   }
 

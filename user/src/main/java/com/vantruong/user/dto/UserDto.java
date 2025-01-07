@@ -1,6 +1,5 @@
 package com.vantruong.user.dto;
 
-import com.vantruong.user.entity.Role;
 import com.vantruong.user.entity.User;
 
 import java.util.Set;

@@ -1,6 +1,5 @@
 package com.vantruong.identity.exception;
 
-import com.vantruong.common.exception.ErrorDetail;
 import lombok.Getter;
 
 @Getter

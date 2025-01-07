@@ -7,7 +7,6 @@ import com.vantruong.product.dto.ProductPost;
 import com.vantruong.product.dto.ProductPut;
 import com.vantruong.product.service.ProductService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import static com.vantruong.product.constant.ApiEndpoint.GET_ALL;

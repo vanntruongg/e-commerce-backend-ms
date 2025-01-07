@@ -4,7 +4,7 @@ server:
 
 spring:
   application:
-    name: address-data-service
+    name: user-service
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/NEST-Store-UserDB}
     username: ${DB_USER_NAME:vantruong}

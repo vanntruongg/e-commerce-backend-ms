@@ -27,15 +27,9 @@ public class SecurityConfig {
   private String secret;
 
   private static final String[] PUBLIC_API_ENDPOINT = {
-          "/identity/users/register",
-          "/identity/auth/login",
-          "/identity/auth/logout",
-          "/identity/auth/verify-email",
-          "/identity/auth/refresh-token",
-          "/identity/auth/request/verify",
-          "/identity/users/forgot-password",
-          "/identity/users/reset-password",
-          "/identity/get/current-user",
+          "/identity/login",
+          "/identity/logout",
+          "/identity/refresh-token",
           "/internal/**"
   };
 
@@ -44,8 +38,8 @@ public class SecurityConfig {
     httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
     httpSecurity.authorizeHttpRequests(request -> request
-            .requestMatchers(PUBLIC_API_ENDPOINT).permitAll()
-            .anyRequest().authenticated()
+//            .requestMatchers(PUBLIC_API_ENDPOINT).permitAll()
+            .anyRequest().permitAll()
     );
 
     httpSecurity.oauth2ResourceServer(oauth2 ->

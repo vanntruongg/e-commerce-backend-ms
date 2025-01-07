@@ -1,12 +1,12 @@
 package com.vantruong.order.service;
 
-import com.vantruong.common.dto.product.ProductSoldResponse;
 import com.vantruong.order.dto.HasMonth;
 import com.vantruong.order.dto.OrderRevenueDto;
 import com.vantruong.order.dto.OrderStatsResponse;
 import com.vantruong.order.dto.RevenueStatsResponse;
 import com.vantruong.order.repository.OrderItemRepository;
 import com.vantruong.order.repository.OrderRepository;
+import com.vantruong.order.viewmodel.ProductSoldVm;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -91,17 +89,8 @@ public class StatisticService {
     }
   }
 
-  public List<ProductSoldResponse> getTotalQuantitySoldPerProduct() {
-    List<Object[]> results = orderItemRepository.getTotalQuantityPerProduct();
-
-    return results.stream()
-            .map(result ->
-                    new ProductSoldResponse(
-                            (Long) result[0],
-                            ((Number) result[1]).intValue()
-                    )
-            )
-            .toList();
+  public List<ProductSoldVm> getTotalQuantitySoldPerProduct() {
+    return orderItemRepository.getTotalQuantityPerProduct();
   }
 
 
@@ -120,28 +109,6 @@ public class StatisticService {
     int currentMonth = now.getMonthValue();
     return orderRepository.getTotalOrderByYear(currentYear, currentMonth);
   }
-
-//  private <T> List<T> createStatsResponse(Collection<Object[]> results, BiFunction<String, Number, T> responseConstructor) {
-//    Map<String, Number> statsMap = results.stream()
-//            .collect(Collectors.toMap(
-//                    result -> (String) result[0],
-//                    result -> (Number) result[1]
-//            ));
-//
-//    List<T> responseList = new ArrayList<>();
-//    statsMap.forEach((key, value) -> responseList.add(responseConstructor.apply(key, value)));
-//    sortStatsByDate(responseList);
-//
-//    return responseList;
-//  }
-//
-//  private <T> void sortStatsByDate(List<T> statsResponseList) {
-//    statsResponseList.sort(Comparator.comparing(response -> {
-//      String month = ((HasMonth) response).getMonth();
-//      String[] parts = month.split("-");
-//      return LocalDate.of(Integer.parseInt(parts[1]), Integer.parseInt(parts[0]), 1);
-//    }));
-//  }
 
   public byte[] exportCsvOrder() {
     List<OrderStatsResponse> orderStatsResponseList = getTotalOrdersPerMonth();

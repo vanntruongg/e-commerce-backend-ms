@@ -1,23 +1,12 @@
 package com.vantruong.user.service;
 
-import com.vantruong.common.dto.user.UserCommonDto;
-import com.vantruong.common.exception.Constant;
-import com.vantruong.common.exception.DuplicateException;
-import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.user.client.MailClient;
-import com.vantruong.user.common.Utils;
 import com.vantruong.user.constant.MessageConstant;
 import com.vantruong.user.dto.UserDto;
 import com.vantruong.user.dto.UserListDto;
 import com.vantruong.user.dto.request.*;
-import com.vantruong.user.entity.Role;
-import com.vantruong.user.entity.Token;
 import com.vantruong.user.entity.User;
-import com.vantruong.user.enums.AccountStatus;
-import com.vantruong.user.enums.ERole;
-import com.vantruong.user.enums.TokenType;
-import com.vantruong.user.exception.ExpiredException;
-import com.vantruong.user.exception.FormException;
+import com.vantruong.user.exception.*;
 import com.vantruong.user.helper.SecurityContextHelper;
 import com.vantruong.user.repository.UserRepository;
 import lombok.AccessLevel;
@@ -30,12 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -47,7 +33,6 @@ import java.util.Set;
 public class UserService {
   UserRepository userRepository;
   SecurityContextHelper securityContextHelper;
-  PasswordEncoder passwordEncoder;
   MailClient mailClient;
   TokenService tokenService;
   RoleService roleService;
@@ -55,62 +40,30 @@ public class UserService {
   public Boolean createNewUser(CreateUserRequest userDto) {
     try {
       if (userRepository.existsById(userDto.getEmail())) {
-        throw new FormException(Constant.ErrorCode.NOT_NULL, MessageConstant.EMAIL_EXISTED, new Throwable("email"));
+        throw new FormException(ErrorCode.NOT_NULL, MessageConstant.EMAIL_EXISTED, new Throwable("email"));
       }
 
-      Token tokenVerifyUser = Utils.generateToken(TokenType.VERIFICATION);
-      Role role = roleService.findById(ERole.USER.getRole());
+//      Token tokenVerifyUser = Utils.generateToken(TokenType.VERIFICATION);
+//      Role role = roleService.findById(ERole.USER.getRole());
       User newUser = User.builder()
               .email(userDto.getEmail())
               .firstName(userDto.getFirstName())
               .lastName(userDto.getLastName())
-              .password(passwordEncoder.encode(userDto.getPassword()))
-              .roles(Set.of(role))
               .build();
 
       userRepository.save(newUser);
-
-      SendMailVerifyUserRequest request = SendMailVerifyUserRequest.builder()
-              .email(newUser.getEmail())
-              .name(newUser.getFirstName())
-              .token(tokenVerifyUser.getTokenValue())
-              .build();
-      mailClient.sendVerificationEmail(request);
+//
+//      SendMailVerifyUserRequest request = SendMailVerifyUserRequest.builder()
+//              .email(newUser.getEmail())
+//              .name(newUser.getFirstName())
+//              .token(tokenVerifyUser.getTokenValue())
+//              .build();
+//      mailClient.sendVerificationEmail(request);
       return true;
     } catch (DuplicateException ex) {
       log.error("Error during user registration: {}", ex.getMessage(), ex);
       throw ex;
     }
-  }
-
-  public Boolean requestForgotPassword(String email) {
-    Token token = Utils.generateToken(TokenType.RESET_PASSWORD);
-    User user = getUserByEmail(email);
-    token.setUser(user);
-    tokenService.createToken(token);
-    SendMailVerifyUserRequest request = SendMailVerifyUserRequest.builder()
-            .email(user.getEmail())
-            .name(user.getFirstName())
-            .token(token.getTokenValue())
-            .build();
-    mailClient.sendForgotPassword(request);
-    return true;
-  }
-
-  public Boolean resetPassword(ResetPasswordRequest request) {
-    Token token = tokenService.findByTokenValue(request.getToken());
-    User user = token.getUser();
-    if (TokenType.RESET_PASSWORD.getTokenType().equals(token.getTokenType())) {
-      if (LocalDateTime.now().isBefore(token.getExpiredDate())) {
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-      } else {
-        throw new ExpiredException(Constant.ErrorCode.EXPIRED, MessageConstant.EXPIRED_TOKEN);
-      }
-    } else {
-      throw new NotFoundException(Constant.ErrorCode.DENIED, MessageConstant.INVALID_TOKEN);
-    }
-    userRepository.save(user);
-    return true;
   }
 
   @PreAuthorize("hasRole('ADMIN')")
@@ -151,17 +104,17 @@ public class UserService {
   public User getUserByEmail(String email) {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     authentication.getAuthorities().forEach(authority -> log.info(authority.getAuthority()));
-    return userRepository.findById(email).orElseThrow(() -> new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.USER_NOT_FOUND));
+    return userRepository.findById(email).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.USER_NOT_FOUND));
   }
 
   public User findByEmail(String email) {
     return userRepository.findById(email)
-            .orElseThrow(() -> new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.USER_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.USER_NOT_FOUND));
   }
 
   @Transactional
   public UserDto updateUser(UserPut userPut) {
-    Set<Role> accountRoles = securityContextHelper.getRoles();
+    Set<String> accountRoles = securityContextHelper.getRoles();
 
     User user = getUserByEmail(userPut.getEmail());
 
@@ -171,40 +124,13 @@ public class UserService {
     user.setImageUrl(userPut.getImageUrl());
 
     // if list role not empty and account update is admin
-    Role adminRole = roleService.findById(ERole.ADMIN.getRole());
-    if (userPut.getRoles() != null && accountRoles.contains(adminRole)) {
-      List<Role> roles = roleService.findAllById(userPut.getRoles());
-      user.setRoles(new HashSet<>(roles));
-    }
+//    Role adminRole = roleService.findById(ERole.ADMIN.getRole());
+//    if (userPut.getRoles() != null && accountRoles.contains(adminRole.getName())) {
+//      List<Role> roles = roleService.findAllById(userPut.getRoles());
+//      user.setRoles(new HashSet<>(roles));
+//    }
     User savedUser = userRepository.save(user);
     return UserDto.fromEntity(savedUser);
-  }
-
-  @Transactional
-  public Boolean changePassword(ChangePasswordRequest changePasswordRequest) {
-    String email = securityContextHelper.getUserId();
-    User user = getUserByEmail(email);
-
-    if (passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
-      user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
-      userRepository.save(user);
-      return true;
-    } else {
-      throw new FormException(Constant.ErrorCode.DENIED, MessageConstant.OLD_PASSWORD_NOT_MATCHES, new Throwable("oldPassword"));
-    }
-  }
-
-  public Boolean deleteUser(String email) {
-    User user = getUserByEmail(email);
-    user.setStatus(AccountStatus.DELETED);
-    userRepository.save(user);
-    return true;
-  }
-
-  public UserCommonDto getProfile() {
-    String email = securityContextHelper.getUserId();
-    User user = getUserByEmail(email);
-    return new UserCommonDto(user.getEmail(), user.getFirstName(), user.getLastName());
   }
 
   public Boolean addPhoneNumber(String phone) {
@@ -226,42 +152,4 @@ public class UserService {
     return getUserByEmail(email);
   }
 
-  public boolean activeAccount(String email) {
-    User user = findByEmail(email);
-    user.setStatus(AccountStatus.ACTIVE);
-    userRepository.save(user);
-    return true;
-  }
-
-  public Boolean processVerifyEmail(String tokenValue) {
-    Token token = tokenService.findByTokenValue(tokenValue);
-    User user = token.getUser();
-
-    if (TokenType.VERIFICATION.getTokenType().equals(token.getTokenType())) {
-      if (LocalDateTime.now().isBefore(token.getExpiredDate())) {
-        user.setStatus(AccountStatus.ACTIVE);
-      } else {
-        throw new ExpiredException(Constant.ErrorCode.EXPIRED, MessageConstant.EXPIRED_TOKEN);
-      }
-    } else {
-      throw new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.INVALID_TOKEN);
-    }
-    userRepository.save(user);
-    return true;
-  }
-
-  public Boolean requestVerifyAccount(String email) {
-    Token token = Utils.generateToken(TokenType.VERIFICATION);
-    User user = findByEmail(email);
-    token.setUser(user);
-
-    SendMailVerifyUserRequest request = SendMailVerifyUserRequest.builder()
-            .email(user.getEmail())
-            .name(user.getFirstName())
-            .token(token.getTokenValue())
-            .build();
-    mailClient.sendVerificationEmail(request);
-    tokenService.createToken(token);
-    return true;
-  }
 }

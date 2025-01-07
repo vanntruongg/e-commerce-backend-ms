@@ -1,6 +1,6 @@
 package com.vantruong.rating.service;
 
-import com.vantruong.common.exception.ExternalServiceException;
+import com.vantruong.rating.exception.ExternalServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 

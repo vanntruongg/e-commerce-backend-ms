@@ -27,7 +27,7 @@ public class SecurityConfig {
     httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
     httpSecurity.authorizeHttpRequests(request -> request
-            .anyRequest().authenticated()
+            .anyRequest().permitAll()
     );
 
     httpSecurity.oauth2ResourceServer(oauth2 ->

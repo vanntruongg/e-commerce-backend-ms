@@ -10,23 +10,26 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.vantruong.common.constant.InternalApiEndpoint.CHECK_ORDER_BY_USER_PRODUCT_STATUS;
-import static com.vantruong.common.constant.InternalApiEndpoint.INTERNAL;
 import static com.vantruong.order.constant.ApiEndpoint.ORDER;
+import static com.vantruong.order.constant.InternalApiEndpoint.CHECK_ORDER_BY_USER_PRODUCT_STATUS;
+import static com.vantruong.order.constant.InternalApiEndpoint.INTERNAL;
 
 
 @RestController
-@RequestMapping(INTERNAL + ORDER)
+@RequestMapping(ORDER + INTERNAL)
 @RequiredArgsConstructor
 public class InternalOrderController {
   private final OrderService orderService;
 
   @GetMapping(CHECK_ORDER_BY_USER_PRODUCT_STATUS)
-  public ResponseEntity<CommonResponse<Object>> checkOrderExistsByProductAndUserWithStatus(@PathVariable("email") String email, @PathVariable("id") Long productId) {
+  public ResponseEntity<CommonResponse<Object>> checkOrderExistsByProductAndUserWithStatus(
+          @PathVariable("email") String email,
+          @PathVariable("id") Long productId
+  ) {
      return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.SUCCESS)
-            .data(orderService.checkOrderExistsByProductAndUserWithStatus(email, productId))
+            .data(orderService.isOrderCompleted(email, productId))
             .build());
   }
 }

@@ -1,21 +1,21 @@
 package com.vantruong.rating.service;
 
-import com.vantruong.common.dto.user.UserCommonDto;
-import com.vantruong.common.exception.AccessDeniedException;
-import com.vantruong.common.exception.Constant;
-import com.vantruong.common.exception.NotFoundException;
-import com.vantruong.common.exception.ResourceExistedException;
 import com.vantruong.rating.constant.MessageConstant;
 import com.vantruong.rating.dto.RatingDto;
 import com.vantruong.rating.dto.RatingListDto;
 import com.vantruong.rating.dto.RatingPost;
 import com.vantruong.rating.dto.RatingStarPercentage;
 import com.vantruong.rating.entity.Rating;
+import com.vantruong.rating.exception.AccessDeniedException;
+import com.vantruong.rating.exception.ErrorCode;
+import com.vantruong.rating.exception.NotFoundException;
+import com.vantruong.rating.exception.ResourceExistedException;
 import com.vantruong.rating.repository.RatingByStar;
 import com.vantruong.rating.repository.RatingRepository;
 import com.vantruong.rating.repository.RatingRepositoryCustom;
 import com.vantruong.rating.repository.TotalStarsAndTotalRatingsResponse;
 import com.vantruong.rating.util.AuthenticationUtils;
+import com.vantruong.rating.viewmodel.UserVm;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -59,21 +59,21 @@ public class RatingService {
             userId,
             ratingPost.productId()
     ).isPresent()) {
-      throw new AccessDeniedException(Constant.ErrorCode.DENIED, Constant.Message.ACCESS_DENIED);
+      throw new AccessDeniedException(ErrorCode.DENIED, MessageConstant.ACCESS_DENIED);
     }
 
     if (ratingRepository.existsByCreatedByAndProductId(userId, ratingPost.productId())) {
-      throw new ResourceExistedException(Constant.ErrorCode.RESOURCE_ALREADY_EXISTED, Constant.Message.RATING_ALREADY_EXISTED);
+      throw new ResourceExistedException(ErrorCode.RESOURCE_ALREADY_EXISTED, MessageConstant.RATING_ALREADY_EXISTED);
     }
 
-    UserCommonDto userCommonDto = userService.getUser();
+    UserVm user = userService.getUser();
 
     Rating rating = Rating.builder()
             .content(ratingPost.content())
             .ratingStar(ratingPost.star())
             .productId(ratingPost.productId())
-            .lastName(userCommonDto.lastName())
-            .firstName(userCommonDto.firstName())
+            .lastName(user.lastName())
+            .firstName(user.firstName())
             .build();
     Rating savedRating = ratingRepository.save(rating);
 
@@ -82,7 +82,7 @@ public class RatingService {
 
   public Boolean deleteRating(String ratingId) {
     Rating rating = ratingRepository.findById(ratingId)
-            .orElseThrow(() -> new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.RATING_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.RATING_NOT_FOUND));
 
     ratingRepository.delete(rating);
     return true;
@@ -161,7 +161,7 @@ public class RatingService {
 
   private Rating getRatingById(String id) {
     return ratingRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.RATING_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.RATING_NOT_FOUND));
   }
 
 }

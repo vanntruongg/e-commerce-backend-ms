@@ -1,9 +1,6 @@
 package com.vantruong.order.listener;
 
 
-import com.vantruong.common.constant.KafkaTopics;
-import com.vantruong.common.event.OrderEvent;
-import com.vantruong.order.entity.enumeration.PaymentStatus;
 import com.vantruong.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -14,9 +11,11 @@ import org.springframework.stereotype.Component;
 public class OrderEventListener {
   private final OrderService orderService;
 
+  public static final String PAYMENT_SUCCESS = "payment-success";
 
-  @KafkaListener(topics = KafkaTopics.PAYMENT_SUCCESS)
-  public void handlePaymentSuccess(OrderEvent orderEvent) {
-    orderService.updatePaymentStatus(orderEvent.getOrderId(), PaymentStatus.COMPLETED);
+
+  @KafkaListener(topics = PAYMENT_SUCCESS)
+  public void handlePaymentSuccess() {
+//    orderService.updatePaymentStatus(orderEvent.getOrderId(), PaymentStatus.COMPLETED);
   }
 }

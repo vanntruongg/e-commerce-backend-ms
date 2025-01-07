@@ -10,14 +10,15 @@ public class RouteValidator {
 
   public List<String> openApiEndpoints = List.of(
 //          Identity endpoints
-          "/api/v1/identity/users/register",
-          "/api/v1/identity/auth/login",
-          "/api/v1/identity/auth/logout",
-          "/api/v1/identity/auth/refresh-token",
-          "/api/v1/identity/auth/verify-email",
-          "/api/v1/identity/auth/request/verify",
-          "/api/v1/identity/users/forgot-password",
-          "/api/v1/identity/users/reset-password",
+          "/api/v1/identity/login",
+          "/api/v1/identity/logout",
+          "/api/v1/identity/refresh-token",
+
+          "/api/v1/user/register",
+          "/api/v1/user/verify-email",
+          "/api/v1/user/request/verify",
+          "/api/v1/user/forgot-password",
+          "/api/v1/user/reset-password",
 //          product endpoints
           "/api/v1/product",
           "/api/v1/product/category",

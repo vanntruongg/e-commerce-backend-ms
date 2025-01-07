@@ -1,8 +1,7 @@
 package com.vantruong.product.dto;
 
-import com.vantruong.common.dto.inventory.SizeQuantityDto;
-import com.vantruong.common.dto.response.CategoryResponse;
-import com.vantruong.common.dto.response.ProductImageResponse;
+import com.vantruong.product.viewmodel.CategoryVm;
+import com.vantruong.product.viewmodel.SizeQuantityVm;
 
 import java.util.List;
 
@@ -11,11 +10,11 @@ public record ProductResponse(Long id,
                               Double price,
                               String material,
                               String style,
-                              CategoryResponse category,
+                              CategoryVm category,
                               String imageUrl,
                               String description,
 //                              List<ProductImageResponse> images,
-                              List<SizeQuantityDto> sizeQuantity
+                              List<SizeQuantityVm> sizeQuantity
 ) {
 }
 

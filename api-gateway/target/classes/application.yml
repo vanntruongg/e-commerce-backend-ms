@@ -11,6 +11,12 @@ spring:
   application:
     name: api-gateway
   cloud:
+    config:
+      uri: http://localhost:9999
+      fail-fast: true
+      retry:
+        max-attempts: 5
+      profile: default
     gateway:
       globalcors:
         cors-configurations:
@@ -22,67 +28,67 @@ spring:
         locator:
           enabled: true
       routes:
-#        IDENTITY SERVICE
+#        IDENTITY
         - id: identity-service
           uri: ${IDENTITY_SERVICE_URL:http://localhost:9001}
           predicates:
             - Path=${app.api-prefix}/identity/**
           filters:
             - StripPrefix=2
-#        PRODUCT SERVICE
+#        USER
+        - id: user-service
+          uri: ${ADDRESS_SERVICE_URL:http://localhost:9002}
+          predicates:
+            - Path=${app.api-prefix}/user/**
+          filters:
+            - StripPrefix=2
+#        PRODUCT
         - id: product-service
-          uri: ${PRODUCT_SERVICE_URL:http://localhost:9002}
+          uri: ${PRODUCT_SERVICE_URL:http://localhost:9003}
           predicates:
             - Path=${app.api-prefix}/product/**
           filters:
             - StripPrefix=2
-#        NOTIFICATION SERVICE
-        - id: notification-service
-          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:9003}
-          predicates:
-            - Path=${app.api-prefix}/notification/**
-          filters:
-            - StripPrefix=2
-#        CART SERVICE
-        - id: cart-service
-          uri: ${CART_SERVICE_URL:http://localhost:9004}
-          predicates:
-            - Path=${app.api-prefix}/cart/**
-          filters:
-            - StripPrefix=2
-#        ORDER SERVICE
-        - id: order-service
-          uri: ${ORDER_SERVICE_URL:http://localhost:9005}
-          predicates:
-            - Path=${app.api-prefix}/order/**
-          filters:
-            - StripPrefix=2
-#        ADDRESS SERVICE
-        - id: address-service
-          uri: ${ADDRESS_SERVICE_URL:http://localhost:9006}
-          predicates:
-            - Path=${app.api-prefix}/address/**
-          filters:
-            - StripPrefix=2
-#        INVENTORY SERVICE
+#        INVENTORY
         - id: inventory-service
-          uri: ${INVENTORY_SERVICE_URL:http://localhost:9007}
+          uri: ${INVENTORY_SERVICE_URL:http://localhost:9004}
           predicates:
             - Path=${app.api-prefix}/inventory/**
           filters:
             - StripPrefix=2
-#       ORDER ORCHESTRATOR
-        - id: order-orchestrator
-          uri: ${ORDER_ORCHESTRATOR_SERVICE_URL:http://localhost:9008}
+#        CART
+        - id: cart-service
+          uri: ${CART_SERVICE_URL:http://localhost:9005}
           predicates:
-            - Path=${app.api-prefix}/order-orchestrator/**
+            - Path=${app.api-prefix}/cart/**
           filters:
             - StripPrefix=2
-#        RATING SERVICE
+#        ORDER
+        - id: order-service
+          uri: ${ORDER_SERVICE_URL:http://localhost:9006}
+          predicates:
+            - Path=${app.api-prefix}/order/**
+          filters:
+            - StripPrefix=2
+#        PAYMENT
+        - id: order-service
+          uri: ${ORDER_SERVICE_URL:http://localhost:9007}
+          predicates:
+            - Path=${app.api-prefix}/order/**
+          filters:
+            - StripPrefix=2
+#        RATING
         - id: rating-service
-          uri: ${RATING_SERVICE_URL:http://localhost:9009}
+          uri: ${RATING_SERVICE_URL:http://localhost:9008}
           predicates:
             - Path=${app.api-prefix}/ratings/**
+          filters:
+            - StripPrefix=2
+#        NOTIFICATION SERVICE
+        - id: notification-service
+          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:9009}
+          predicates:
+            - Path=${app.api-prefix}/notification/**
           filters:
             - StripPrefix=2
 #         AI SERVICE
@@ -90,6 +96,13 @@ spring:
           uri: ${AI_SERVICE_URL:http://localhost:9010}
           predicates:
             - Path=${app.api-prefix}/ai/**
+          filters:
+            - StripPrefix=2
+#       ORDER ORCHESTRATOR
+        - id: order-orchestrator
+          uri: ${ORDER_ORCHESTRATOR_SERVICE_URL:http://localhost:9011}
+          predicates:
+            - Path=${app.api-prefix}/order-orchestrator/**
           filters:
             - StripPrefix=2
 eureka:

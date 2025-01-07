@@ -253,7 +253,7 @@ public class CartService {
   }
 
   private Integer getQuantityInStock(Long productId, String size) {
-    ProductQuantityCheckVm checkProductQuantityRequest = new ProductQuantityCheckVm(productId, size);
+    ProductCheckVm checkProductQuantityRequest = new ProductCheckVm(productId, size);
     return inventoryService.checkProductQuantityById(checkProductQuantityRequest);
   }
 

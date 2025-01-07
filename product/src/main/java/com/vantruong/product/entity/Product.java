@@ -35,8 +35,6 @@ public class Product extends BaseEntity {
 
   @Column(name = "p_image")
   private String imageUrl;
-//  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-//  private List<ProductImage> images;
 
   @ManyToOne
   @JoinColumn(name = "cat_id", referencedColumnName = "cat_id")

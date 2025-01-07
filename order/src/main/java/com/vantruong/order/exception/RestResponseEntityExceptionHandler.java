@@ -1,8 +1,5 @@
 package com.vantruong.order.exception;
 
-import com.vantruong.common.exception.Constant;
-import com.vantruong.common.exception.NotFoundException;
-import com.vantruong.common.exception.ProductQuantityNotAvailableException;
 import com.vantruong.order.common.CommonResponse;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -25,7 +22,7 @@ public class RestResponseEntityExceptionHandler {
 
   @ExceptionHandler(value = ProductQuantityNotAvailableException.class)
   public ResponseEntity<CommonResponse<Object>> handleInsufficientProductQuantityException(WebRequest request, Exception exception) {
-    return ResponseEntity.status(Constant.ErrorCode.UNPROCESSABLE_ENTITY).body(CommonResponse.builder()
+    return ResponseEntity.status(ErrorCode.UNPROCESSABLE_ENTITY).body(CommonResponse.builder()
             .isSuccess(false)
             .message(exception.getMessage())
             .errorDetails(exception.getCause() != null ? exception.getCause().getMessage() : StringUtils.EMPTY)

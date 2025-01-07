@@ -1,7 +1,8 @@
 package com.vantruong.rating.util;
 
-import com.vantruong.common.exception.AccessDeniedException;
-import com.vantruong.common.exception.Constant;
+import com.vantruong.rating.constant.MessageConstant;
+import com.vantruong.rating.exception.AccessDeniedException;
+import com.vantruong.rating.exception.ErrorCode;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,7 +16,7 @@ public class AuthenticationUtils {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     if (auth instanceof AnonymousAuthenticationToken) {
-      throw new AccessDeniedException(Constant.ErrorCode.DENIED, Constant.Message.ACCESS_DENIED);
+      throw new AccessDeniedException(ErrorCode.DENIED, MessageConstant.ACCESS_DENIED);
     }
 
     JwtAuthenticationToken contextHolder = (JwtAuthenticationToken) auth;

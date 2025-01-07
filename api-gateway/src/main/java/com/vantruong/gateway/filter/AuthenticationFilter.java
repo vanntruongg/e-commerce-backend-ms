@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,6 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
   IdentityService identityService;
   ObjectMapper objectMapper;
   RouteValidator routeValidator;
-
 
   @Override
   public int getOrder() {

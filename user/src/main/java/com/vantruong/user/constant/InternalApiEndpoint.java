@@ -9,7 +9,7 @@ public class InternalApiEndpoint {
   public static final String NOTIFICATION = "/notification";
   public static final String INTERNAL = "/internal";
   public static final String MAIL = "/mail";
-  public static final String MAIL_SERVICE_URL = "http://localhost:9003" + NOTIFICATION + INTERNAL + MAIL;
+  public static final String NOTIFICATION_SERVICE_URL = "http://localhost:9009/notification";
   public static final String ADDRESS_DATA = "/address-data";
   public static final String GET = "/get";
   public static final String ADDRESS_SERVICE_URL = "http://localhost:9006" + ADDRESS_DATA;

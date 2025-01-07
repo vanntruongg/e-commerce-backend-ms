@@ -23,4 +23,7 @@ public class MessageConstant {
 
   public static final String CREATE_RATING_SUCCESS = "Đánh giá sản phẩm thành công";
   public static final String UPVOTE_RATING_SUCCESS = "Đã thích đánh giá";
+
+  public static final String ACCESS_DENIED = "You are not allowed to perform this action.";
+  public static final String RATING_ALREADY_EXISTED = "Bạn đã đánh giá sản phẩm này";
 }

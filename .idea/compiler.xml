@@ -9,11 +9,10 @@
         <outputRelativeToContentRoot value="true" />
         <module name="order-orchestrator" />
         <module name="notification" />
-        <module name="config-server" />
         <module name="product" />
         <module name="identity" />
         <module name="api-gateway" />
-        <module name="common-library" />
+        <module name="rating" />
         <module name="inventory" />
         <module name="eureka-server" />
         <module name="user" />
@@ -25,14 +24,16 @@
       <module name="book-service" target="17" />
       <module name="chat-bot-service" target="17" />
       <module name="client" target="17" />
+      <module name="common-library" target="17" />
+      <module name="config-server" target="17" />
       <module name="email-service" target="17" />
       <module name="nest-store-microservices (1)" target="1.5" />
       <module name="nest-store-microservices (2)" target="1.5" />
       <module name="notification-service (2)" target="17" />
+      <module name="parent-pom" target="1.5" />
       <module name="payment-service" target="17" />
       <module name="product-service (1)" target="17" />
       <module name="product-service (2)" target="17" />
-      <module name="rating" target="17" />
       <module name="server" target="17" />
     </bytecodeTargetLevel>
   </component>

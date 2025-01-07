@@ -1,7 +1,7 @@
 package com.vantruong.cart.service;
 
-import com.vantruong.cart.repository.client.InventoryClient;
-import com.vantruong.cart.viewmodel.ProductQuantityCheckVm;
+import com.vantruong.cart.client.InventoryClient;
+import com.vantruong.cart.viewmodel.ProductCheckVm;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class InventoryService extends AbstractCircuitBreakerFallbackHandler {
 
   @Retry(name = "restApi")
   @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "checkProductQuantityByIdFallback")
-  public Integer checkProductQuantityById(ProductQuantityCheckVm request) {
+  public Integer checkProductQuantityById(ProductCheckVm request) {
     return inventoryClient.checkProductQuantityById(request).getData();
   }
 

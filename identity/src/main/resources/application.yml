@@ -3,20 +3,12 @@ server:
   port: 9001
 
 spring:
+  name: identity-service
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/NEST-Store-IdentityDB}
     username: ${DB_USER_NAME:vantruong}
     password: ${DB_USER_PASSWORD:vantruong}
     driver-class-name: org.postgresql.Driver
-  jpa:
-    properties:
-      hibernate:
-        show_sql: true
-    hibernate:
-      ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-  application:
-    name: identity-service
   kafka:
     bootstrap-servers: localhost:9094
     consumer:

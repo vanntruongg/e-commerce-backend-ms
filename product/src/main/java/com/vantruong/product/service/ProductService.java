@@ -1,10 +1,5 @@
 package com.vantruong.product.service;
 
-import com.vantruong.common.dto.inventory.SizeQuantityDto;
-import com.vantruong.common.dto.response.ProductInventoryResponse;
-import com.vantruong.common.exception.Constant;
-import com.vantruong.common.exception.InventoryCreationException;
-import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.product.constant.MessageConstant;
 import com.vantruong.product.converter.ProductConverter;
 import com.vantruong.product.dto.ProductListResponse;
@@ -13,8 +8,12 @@ import com.vantruong.product.dto.ProductPut;
 import com.vantruong.product.dto.ProductResponse;
 import com.vantruong.product.entity.Category;
 import com.vantruong.product.entity.Product;
+import com.vantruong.product.exception.ErrorCode;
+import com.vantruong.product.exception.NotFoundException;
 import com.vantruong.product.exception.ProductCreationException;
 import com.vantruong.product.repository.ProductRepository;
+import com.vantruong.product.viewmodel.ProductInventoryVm;
+import com.vantruong.product.viewmodel.SizeQuantityVm;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -82,10 +81,10 @@ public class ProductService {
     Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
     Page<Product> productPage = productRepository.findAll(pageable);
-    ProductInventoryResponse productInventoryResponse = inventoryService.getInventoryByProductIds(productPage.getContent());
+    ProductInventoryVm productInventoryVm = inventoryService.getInventoryByProductIds(productPage.getContent());
     List<ProductResponse> productListResponse = productPage.getContent().stream()
             .map(product -> {
-              List<SizeQuantityDto> sizeQuantityDtoList = productInventoryResponse.getProductInventoryResponse().get(product.getId());
+              List<SizeQuantityVm> sizeQuantityDtoList = productInventoryVm.productInventoryVm().get(product.getId());
               return productConverter.convertToProductResponse(product, sizeQuantityDtoList);
             })
             .toList();
@@ -109,10 +108,10 @@ public class ProductService {
 
     Page<Product> productPage = productRepository.findProductByNameContainingIgnoreCase(productName, pageable);
 
-    ProductInventoryResponse productInventoryResponse = inventoryService.getInventoryByProductIds(productPage.getContent());
+    ProductInventoryVm productInventoryResponse = inventoryService.getInventoryByProductIds(productPage.getContent());
     List<ProductResponse> productListResponse = productPage.getContent().stream()
             .map(product -> {
-              List<SizeQuantityDto> sizeQuantityDtoList = productInventoryResponse.getProductInventoryResponse().get(product.getId());
+              List<SizeQuantityVm> sizeQuantityDtoList = productInventoryResponse.productInventoryVm().get(product.getId());
               return productConverter.convertToProductResponse(product, sizeQuantityDtoList);
             })
             .toList();
@@ -122,7 +121,7 @@ public class ProductService {
 
   public Product getProductById(Long id) {
     return productRepository.findById(id).orElseThrow(() ->
-            new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.PRODUCT_NOT_FOUND));
+            new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.PRODUCT_NOT_FOUND));
   }
 
   public Double calculateTotalOrderPrice(Map<Long, Integer> productQuantities) {
@@ -159,7 +158,7 @@ public class ProductService {
 
      Boolean createInventorySuccess = inventoryService.createInventory(savedProduct.getId(), productPost.stock());
      if(!createInventorySuccess) {
-       throw new ProductCreationException(Constant.ErrorCode.PRODUCT_CREATION_FAILED, Constant.Message.PRODUCT_CREATION_FAILED);
+       throw new ProductCreationException(ErrorCode.PRODUCT_CREATION_FAILED, MessageConstant.PRODUCT_CREATION_FAILED);
      }
 
 //    List<ProductImage> savedProductImages = productImageService.createProductImage(product, productPost.imageUrls());
@@ -168,7 +167,7 @@ public class ProductService {
 //      return productConverter.convertToProductResponse(product);
       return true;
     } catch (Exception e) {
-      throw new ProductCreationException(Constant.ErrorCode.PRODUCT_CREATION_FAILED, Constant.Message.PRODUCT_CREATION_FAILED);
+      throw new ProductCreationException(ErrorCode.PRODUCT_CREATION_FAILED,MessageConstant.PRODUCT_CREATION_FAILED);
     }
   }
 

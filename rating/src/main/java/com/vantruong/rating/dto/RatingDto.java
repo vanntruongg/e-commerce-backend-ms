@@ -1,7 +1,7 @@
 package com.vantruong.rating.dto;
 
-import com.vantruong.common.util.DateTimeFormatter;
 import com.vantruong.rating.entity.Rating;
+import com.vantruong.rating.util.DateTimeFormatter;
 import lombok.Builder;
 
 import java.util.Set;

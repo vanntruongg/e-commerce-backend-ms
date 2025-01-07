@@ -1,10 +1,8 @@
 package com.vantruong.user.service;
 
-import com.vantruong.common.exception.Constant;
-import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.user.constant.MessageConstant;
-import com.vantruong.user.entity.Token;
-import com.vantruong.user.repository.TokenRepository;
+import com.vantruong.user.exception.ErrorCode;
+import com.vantruong.user.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +16,7 @@ public class TokenService {
 
   public Token findByTokenValue(String tokenValue) {
     return tokenRepository.findTokenByTokenValue(tokenValue).orElseThrow(()
-            -> new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.INVALID_TOKEN));
+            -> new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.INVALID_TOKEN));
   }
 
   @Transactional

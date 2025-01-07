@@ -1,7 +1,5 @@
 package com.vantruong.identity.exception;
 
-import com.vantruong.common.exception.ErrorDetail;
-
 public class AccountUnAvailableException extends RuntimeException {
   private final transient ErrorDetail errorDetail;
   public AccountUnAvailableException(int errorCode, String message) {

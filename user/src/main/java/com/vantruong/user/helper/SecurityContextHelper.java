@@ -1,10 +1,12 @@
 package com.vantruong.user.helper;
 
-import com.vantruong.user.entity.Role;
+import com.vantruong.user.constant.MessageConstant;
+import com.vantruong.user.exception.AccessDeniedException;
+import com.vantruong.user.exception.ErrorCode;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -12,37 +14,27 @@ import java.util.Set;
 
 @Component(value = "securityContextHelper")
 public class SecurityContextHelper {
-  private final UserDetailsServiceImpl userDetailsService;
-
-  public SecurityContextHelper(UserDetailsServiceImpl userDetailsService) {
-    this.userDetailsService = userDetailsService;
-  }
-
-  public UserDetailsImpl getUserDetails() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
-      Jwt jwt = (Jwt) authentication.getCredentials();
-      String email = jwt.getClaimAsString("email");
-      return userDetailsService.loadUserByUsername(email);
-    }
-    return null;
-  }
 
   public String getUserId() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null) {
-      Jwt jwt = (Jwt) authentication.getCredentials();
-      return jwt.getClaimAsString("email");
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+    if (auth instanceof AnonymousAuthenticationToken) {
+      throw new AccessDeniedException(ErrorCode.DENIED, MessageConstant.ACCESS_DENIED);
     }
-    throw new AuthenticationException();
+
+    JwtAuthenticationToken contextHolder = (JwtAuthenticationToken) auth;
+    return contextHolder.getToken().getClaim("email");
   }
 
-  public Set<Role> getRoles() {
-    UserDetailsImpl userDetails = getUserDetails();
-    if (userDetails != null) {
-      return userDetails.getRole();
+  public Set<String> getRoles() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+    if (auth instanceof AnonymousAuthenticationToken) {
+      throw new AccessDeniedException(ErrorCode.DENIED, MessageConstant.ACCESS_DENIED);
     }
-    throw new AuthenticationException();
+
+    JwtAuthenticationToken contextHolder = (JwtAuthenticationToken) auth;
+    return contextHolder.getToken().getClaim("roles");
   }
 
 }

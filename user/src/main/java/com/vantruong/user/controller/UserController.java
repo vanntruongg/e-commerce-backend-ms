@@ -10,17 +10,15 @@ import com.vantruong.user.dto.request.UserPut;
 import com.vantruong.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.vantruong.user.constant.AuthApiEndpoint.IDENTITY;
-import static com.vantruong.user.constant.MessageConstant.REGISTER;
+import static com.vantruong.user.constant.ApiEndpoint.REGISTER;
 import static com.vantruong.user.constant.UserApiEndpoint.*;
 
 
 @RestController
-@RequestMapping(IDENTITY + UserApiEndpoint.USERS)
+@RequestMapping( UserApiEndpoint.USER)
 @RequiredArgsConstructor
 public class UserController {
   private final UserService userService;
@@ -95,57 +93,12 @@ public class UserController {
             .build());
   }
 
-  @PostMapping(UserApiEndpoint.ACTIVE_ACCOUNT)
-  public ResponseEntity<CommonResponse<Object>> activeAccount(@PathVariable("email") String email) {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.UPDATE_USER_SUCCESS)
-            .data(userService.activeAccount(email))
-            .build());
-  }
-
-  @PostMapping(UserApiEndpoint.USER_CHANGE_PASSWORD)
-  public ResponseEntity<CommonResponse<Object>> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.CHANGE_PASSWORD_SUCCESS)
-            .data(userService.changePassword(changePasswordRequest))
-            .build());
-  }
-
-  @DeleteMapping(DELETE_USER)
-  public ResponseEntity<CommonResponse<Object>> deleteUser(@PathVariable("email") String email) {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.DELETE_USER_SUCCESS)
-            .data(userService.deleteUser(email))
-            .build());
-  }
-
   @GetMapping(COUNT_USER)
   public ResponseEntity<CommonResponse<Object>> getUserCount() {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.FIND_SUCCESS)
             .data(userService.getUserCount())
-            .build());
-  }
-
-  @PostMapping(FORGOT_PASSWORD)
-  public ResponseEntity<CommonResponse<Object>> requestForgotPassword(@RequestParam("email") String email) {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.REQUEST_RESET_PASSWORD_SUCCESS)
-            .data(userService.requestForgotPassword(email))
-            .build());
-  }
-
-  @PostMapping(RESET_PASSWORD)
-  public ResponseEntity<CommonResponse<Object>> resetPassword(@RequestBody ResetPasswordRequest request) {
-    return ResponseEntity.ok().body(CommonResponse.builder()
-            .isSuccess(true)
-            .message(MessageConstant.RESET_PASSWORD_SUCCESS)
-            .data(userService.resetPassword(request))
             .build());
   }
 }

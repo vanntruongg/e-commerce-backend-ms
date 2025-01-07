@@ -6,7 +6,6 @@ public record ProductPut(
         double price,
         String material,
         String style,
-//        List<String> imageUrls,
         String imageUrl,
         String description,
         Long categoryId

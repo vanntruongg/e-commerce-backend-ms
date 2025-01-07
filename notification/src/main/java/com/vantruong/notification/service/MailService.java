@@ -1,9 +1,9 @@
 package com.vantruong.notification.service;
 
-import com.vantruong.common.dto.order.OrderCommonDto;
 import com.vantruong.notification.client.UserClient;
 import com.vantruong.notification.constant.CommonConstant;
 import com.vantruong.notification.constant.EmailConstant;
+import com.vantruong.notification.viewmodel.OrderVm;
 import com.vantruong.notification.viewmodel.SendMailVerifyUserRequest;
 import com.vantruong.notification.job.SendMailJob;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,17 +83,17 @@ public class MailService {
     jobSendMail(systemEmail, request.email(), subject, htmlBody, javaMailSender);
   }
 
-  public void confirmOrder(OrderCommonDto orderDto) {
+  public void confirmOrder(OrderVm orderVm) {
     Context context = new Context();
 
     Map<String, Object> templateModel = new HashMap<>();
-    templateModel.put("order", orderDto);
+    templateModel.put("order", orderVm);
     context.setVariables(templateModel);
 
     String subject = "Xác nhận đơn đặt hàng";
     String htmlBody = templateEngine.process(EmailConstant.CONFIRM_ORDER, context);
 
-    jobSendMail(systemEmail, orderDto.email(), subject, htmlBody, javaMailSender);
+    jobSendMail(systemEmail, orderVm.email(), subject, htmlBody, javaMailSender);
   }
 
 }

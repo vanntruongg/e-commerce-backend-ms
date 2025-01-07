@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommonResponse<T> {
   @Builder.Default
-  int code = 9005;
+  int code = 9006;
   boolean isSuccess;
   String message;
   T data;

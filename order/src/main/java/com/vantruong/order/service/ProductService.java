@@ -1,6 +1,8 @@
 package com.vantruong.order.service;
 
 import com.vantruong.order.client.ProductClient;
+import com.vantruong.order.viewmodel.CalculateTotalOrderPricePostVm;
+import com.vantruong.order.viewmodel.CalculateTotalOrderPriceVm;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +17,8 @@ public class ProductService extends AbstractCircuitBreakerFallbackHandler {
 
   @Retry(name = "restApi")
   @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "calculateTotalOrderPriceFallback")
-  public Double calculateTotalOrderPrice(Map<Long, Integer> productQuantities) {
-    return productClient.calculateTotalOrderPrice(productQuantities).getData();
+  public CalculateTotalOrderPriceVm calculateTotalOrderPrice(CalculateTotalOrderPricePostVm totalOrderPricePostVm) {
+    return productClient.calculateTotalOrderPrice(totalOrderPricePostVm).getData();
   }
 
   protected Double calculateTotalOrderPriceFallback(Throwable throwable) throws Throwable {

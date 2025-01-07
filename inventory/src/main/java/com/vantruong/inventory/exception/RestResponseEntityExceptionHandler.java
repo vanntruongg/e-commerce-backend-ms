@@ -1,6 +1,5 @@
 package com.vantruong.inventory.exception;
 
-import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.inventory.common.CommonResponse;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;

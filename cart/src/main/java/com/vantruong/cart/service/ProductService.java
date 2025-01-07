@@ -1,6 +1,6 @@
 package com.vantruong.cart.service;
 
-import com.vantruong.cart.repository.client.ProductClient;
+import com.vantruong.cart.client.ProductClient;
 import com.vantruong.cart.viewmodel.ProductVm;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;

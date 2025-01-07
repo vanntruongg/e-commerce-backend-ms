@@ -3,7 +3,7 @@ package com.vantruong.order.controller;
 import com.vantruong.order.common.CommonResponse;
 import com.vantruong.order.constant.ApiEndpoint;
 import com.vantruong.order.constant.MessageConstant;
-import com.vantruong.order.dto.OrderRequest;
+import com.vantruong.order.viewmodel.OrderPostVm;
 import com.vantruong.order.entity.enumeration.OrderStatus;
 import com.vantruong.order.service.OrderService;
 import com.vantruong.order.service.PaymentOrderService;
@@ -45,7 +45,7 @@ public class OrderController {
 
 
   @PostMapping(ApiEndpoint.CREATE_ORDER)
-  public ResponseEntity<CommonResponse<Object>> createOrder(@RequestBody OrderRequest orderRequest) {
+  public ResponseEntity<CommonResponse<Object>> createOrder(@RequestBody OrderPostVm orderRequest) {
     return ResponseEntity.ok().body(CommonResponse.builder()
             .isSuccess(true)
             .message(MessageConstant.ORDER_SUCCESS)

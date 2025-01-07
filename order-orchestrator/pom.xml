@@ -3,17 +3,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.vantruong</groupId>
-		<artifactId>parent-pom</artifactId>
-		<version>1.0.0</version>
-		<relativePath>../parent-pom/pom.xml</relativePath> <!-- lookup parent from repository -->
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.4.1</version>
+		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>vantruong</groupId>
 	<artifactId>order-orchestrator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>nest-store-order-service</name>
-	<description>Information Systems Thesis</description>
-
+	<name>order-orchestration</name>
+	<description>Order Orchestration for NEST Store</description>
 
 	<build>
 		<plugins>

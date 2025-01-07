@@ -1,15 +1,15 @@
 package com.vantruong.product.service;
 
-import com.vantruong.common.dto.response.CategoryResponse;
-import com.vantruong.common.exception.Constant;
-import com.vantruong.common.exception.NotFoundException;
 import com.vantruong.product.constant.MessageConstant;
 import com.vantruong.product.converter.CategoryConverter;
 import com.vantruong.product.dto.AllLevelCategoryDto;
 import com.vantruong.product.dto.CategoryPost;
 import com.vantruong.product.dto.CategoryPut;
 import com.vantruong.product.entity.Category;
+import com.vantruong.product.exception.ErrorCode;
+import com.vantruong.product.exception.NotFoundException;
 import com.vantruong.product.repository.CategoryRepository;
+import com.vantruong.product.viewmodel.CategoryVm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -26,12 +26,12 @@ public class CategoryService {
 
 
   private Category findById(Long categoryId) {
-    if(categoryId == null) return null;
+    if (categoryId == null) return null;
     return categoryRepository.findById(categoryId)
             .orElse(null);
   }
 
-  public CategoryResponse createCategory(CategoryPost categoryPost) {
+  public CategoryVm createCategory(CategoryPost categoryPost) {
     Category parentCategory = this.findById(categoryPost.parentCategoryId());
     Category category = Category.builder()
             .name(categoryPost.name())
@@ -47,11 +47,11 @@ public class CategoryService {
     category.setName(categoryPut.name());
     category.setImage(categoryPut.imageUrl());
 
-    if(categoryPut.isTopLevel()) {
+    if (categoryPut.isTopLevel()) {
       category.setParentCategory(null);
     } else {
       Category parentCategory = this.findById(categoryPut.parentCategoryId());
-      if(parentCategory != null && !parentCategory.getId().equals(category.getId())) {
+      if (parentCategory != null && !parentCategory.getId().equals(category.getId())) {
         category.setParentCategory(parentCategory);
       }
     }
@@ -74,16 +74,6 @@ public class CategoryService {
     return result;
   }
 
-//  public List<CategoryResponse> getTopLevelCategory() {
-//    List<Category> categories = categoryRepository.findTopLevelCategory();
-//    return categoryConverter.convertToListCategoryResponse(categories);
-//  }
-
-//  public List<CategoryResponse> getSubCategoriesByParentId(Long parentId) {
-//    List<Category> categories = categoryRepository.findSubcategoriesByParentId(parentId);
-//    return categoryConverter.convertToListCategoryResponse(categories);
-//  }
-
   private List<Category> findSubCategoriesByParentId(Long parentId) {
     return categoryRepository.findSubcategoriesByParentId(parentId);
   }
@@ -103,7 +93,7 @@ public class CategoryService {
 
   public Category getCategoryById(Long id) {
     return categoryRepository.findById(id).orElseThrow(() ->
-            new NotFoundException(Constant.ErrorCode.NOT_FOUND, MessageConstant.CATEGORY_NOT_FOUND));
+            new NotFoundException(ErrorCode.NOT_FOUND, MessageConstant.CATEGORY_NOT_FOUND));
   }
 
   public List<AllLevelCategoryDto> getAllLevelChildrenByCategory(Long categoryId) {

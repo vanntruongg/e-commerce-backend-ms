@@ -1,0 +1,6 @@
+#sonar:
+#  projectKey: vantruong.cart
+#  sources: ./src
+#  host:
+#    url: http://localhost:9000
+#  login: sqp_9ca1f0a08366149e5c3a57df051f709db34f87c1

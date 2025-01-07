@@ -1,7 +1,7 @@
 package com.vantruong.identity.security;
 
-import com.vantruong.common.exception.Constant;
 import com.vantruong.identity.constant.MessageConstant;
+import com.vantruong.identity.exception.ErrorCode;
 import com.vantruong.identity.exception.FormException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +29,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
     if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-      throw new FormException(Constant.ErrorCode.FORM_ERROR, MessageConstant.PASSWORD_INCORRECT, new Throwable("password"));
+      throw new FormException(ErrorCode.FORM_ERROR, MessageConstant.PASSWORD_INCORRECT, new Throwable("password"));
     }
     return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
   }

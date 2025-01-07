@@ -2,8 +2,6 @@ package com.vantruong.user.service;
 
 import com.vantruong.user.dto.request.PermissionRequest;
 import com.vantruong.user.dto.response.PermissionResponse;
-import com.vantruong.user.entity.Permission;
-import com.vantruong.user.repository.PermissionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -18,6 +18,7 @@
         <option value="$PROJECT_DIR$/rating-service/pom.xml" />
         <option value="$PROJECT_DIR$/common-library/pom.xml" />
         <option value="$PROJECT_DIR$/config-server/pom.xml" />
+        <option value="$PROJECT_DIR$/rating/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
@@ -25,7 +26,9 @@
         <option value="$PROJECT_DIR$/auth-service/client/pom.xml" />
         <option value="$PROJECT_DIR$/book-service/pom.xml" />
         <option value="$PROJECT_DIR$/chat-bot-service/pom.xml" />
+        <option value="$PROJECT_DIR$/common-library/pom.xml" />
         <option value="$PROJECT_DIR$/email-service/pom.xml" />
+        <option value="$PROJECT_DIR$/parent-pom/pom.xml" />
         <option value="$PROJECT_DIR$/payment-service/pom.xml" />
       </set>
     </option>

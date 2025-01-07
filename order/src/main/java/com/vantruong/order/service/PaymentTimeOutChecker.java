@@ -1,7 +1,5 @@
 package com.vantruong.order.service;
 
-import com.vantruong.common.event.CancelOrderEvent;
-import com.vantruong.common.event.CancelOrderItem;
 import com.vantruong.order.entity.Order;
 import com.vantruong.order.entity.enumeration.PaymentStatus;
 import com.vantruong.order.producer.KafkaProducer;
@@ -12,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,23 +26,23 @@ public class PaymentTimeOutChecker {
     List<Order> orders = orderService.findOrdersByStatusAndTime(PaymentStatus.PENDING, timeoutThreshold);
 
     for (Order order : orders) {
-      CancelOrderEvent event = createCancelOrderEvent(order);
-      kafkaProducer.sendCancelOrder(event);
+//      CancelOrderEvent event = createCancelOrderEvent(order);
+//      kafkaProducer.sendCancelOrder(event);
 
       orderService.deleteOrder(order.getOrderId());
     }
   }
 
-  private CancelOrderEvent createCancelOrderEvent(Order order) {
-    Set<CancelOrderItem> cancelOrderItems = order.getOrderItems().stream()
-            .map(item -> new CancelOrderItem(
-                    item.getProductId(),
-                    item.getQuantity(),
-                    item.getProductSize()
-            ))
-            .collect(Collectors.toSet());
-    return CancelOrderEvent.builder()
-            .orderItems(cancelOrderItems)
-            .build();
-  }
+//  private CancelOrderEvent createCancelOrderEvent(Order order) {
+//    Set<CancelOrderItem> cancelOrderItems = order.getOrderItems().stream()
+//            .map(item -> new CancelOrderItem(
+//                    item.getProductId(),
+//                    item.getQuantity(),
+//                    item.getProductSize()
+//            ))
+//            .collect(Collectors.toSet());
+//    return CancelOrderEvent.builder()
+//            .orderItems(cancelOrderItems)
+//            .build();
+//  }
 }
